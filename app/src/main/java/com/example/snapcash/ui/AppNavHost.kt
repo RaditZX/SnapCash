@@ -1,7 +1,7 @@
 package com.example.snapcash.ui
 
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -15,13 +15,17 @@ import com.example.snapcash.ui.screen.*
 import com.example.snapcash.ui.screen.Auth.LoginScreen
 import com.example.snapcash.ui.screen.Auth.RegisterScreen
 import kotlinx.coroutines.launch
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddCircle
 
 @Composable
 fun AppNavHost(
     navController: NavHostController = rememberNavController()
 ) {
-    val sidebarState = rememberDrawerState(DrawerValue.Closed) // ✅ Gunakan rememberDrawerState
-    val sidebarScope = rememberCoroutineScope() // ✅ Tambahkan scope untuk sidebar
+    val sidebarState = rememberDrawerState(DrawerValue.Closed)
+    val sidebarScope = rememberCoroutineScope()
 
     ModalNavigationDrawer(
         drawerContent = {
@@ -31,16 +35,16 @@ fun AppNavHost(
             ) {
                 SidebarContent(
                     navController = navController,
-                    sidebarScope = sidebarScope, // ✅ Kirim scope ke SidebarContent
-                    sidebarState = sidebarState // ✅ Kirim state ke SidebarContent
+                    sidebarScope = sidebarScope,
+                    sidebarState = sidebarState
                 )
             }
         },
         drawerState = sidebarState
     ) {
         Scaffold(
-//            bottomBar = { BottomNavigationBar(navController) }
-        ) { paddingValues ->
+            bottomBar = { BottomNavigationBar(navController) },
+        )  { paddingValues ->
             NavHost(
                 navController = navController,
                 startDestination = "signIn",
@@ -58,14 +62,20 @@ fun AppNavHost(
                 composable("dashboard") {
                     DashboardScreen(
                         navController = navController,
-                        openSidebar = { sidebarScope.launch { sidebarState.open() } } // ✅ Gunakan scope untuk membuka sidebar
+                        openSidebar = { sidebarScope.launch { sidebarState.open() } }
                     )
                 }
-                composable("form_pemasukan") {
-                    PemasukanEntryScreen(navController = navController)
+                composable("catat") {
+                    CatatScreen(navController = navController)
                 }
-                composable("form_pengeluaran") {
-                    PengeluaranEntryScreen(navController = navController)
+                composable("history") {
+                    HistoryScreen(navController = navController)
+                }
+                composable("profile") {
+                    ProfileScreen(navController = navController)
+                }
+                composable("middle") {
+                    // Bisa diarahkan ke fitur lain, misalnya layar transaksi cepat
                 }
             }
         }
