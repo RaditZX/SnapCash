@@ -12,6 +12,8 @@ import androidx.navigation.compose.*
 import com.example.snapcash.ui.component.BottomNavigationBar
 import com.example.snapcash.ui.component.SidebarContent
 import com.example.snapcash.ui.screen.*
+import com.example.snapcash.ui.screen.Auth.LoginScreen
+import com.example.snapcash.ui.screen.Auth.RegisterScreen
 import kotlinx.coroutines.launch
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -42,13 +44,22 @@ fun AppNavHost(
     ) {
         Scaffold(
             bottomBar = { BottomNavigationBar(navController) },
-        ) { paddingValues ->
+        )  { paddingValues ->
             NavHost(
                 navController = navController,
-                startDestination = "home",
+                startDestination = "signIn",
                 modifier = Modifier.padding(paddingValues)
             ) {
-                composable("home") {
+
+                composable("signIn"){
+                    LoginScreen(navController)
+                }
+
+                composable("signUp"){
+                    RegisterScreen(navController)
+                }
+
+                composable("dashboard") {
                     DashboardScreen(
                         navController = navController,
                         openSidebar = { sidebarScope.launch { sidebarState.open() } }
