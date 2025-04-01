@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     id("com.google.devtools.ksp")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -51,6 +52,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.places)
+    implementation(libs.androidx.benchmark.macro)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -58,17 +60,25 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    implementation(libs.androidx.navigation.compose)
     implementation ("com.squareup.retrofit2:retrofit:2.11.0")
     implementation ("com.squareup.retrofit2:converter-gson:2.11.0")
     implementation ("com.squareup.okhttp3:logging-interceptor:4.12.0")
     implementation ("androidx.paging:paging-compose:3.3.0")
     implementation ("androidx.paging:paging-runtime-ktx:3.3.0")
 
-    implementation ("androidx.room:room-ktx:2.6.1")
-    ksp ("androidx.room:room-compiler:2.6.1")
-
-    implementation("com.google.dagger:hilt-android:2.51")
+    ksp("androidx.room:room-compiler:2.5.0")
+    implementation ("com.google.dagger:hilt-android:2.51")
     ksp("com.google.dagger:hilt-android-compiler:2.51")
+    implementation ("androidx.datastore:datastore-preferences:1.1.1")
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+    implementation("androidx.compose.foundation:foundation:1.5.0")
+
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+
+    // Sesuaikan versi Kotlin dan KSP dengan versi yang sesuai
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.23")
 
     implementation ("androidx.datastore:datastore-preferences:1.1.1")
 
@@ -76,4 +86,10 @@ dependencies {
 
     implementation("com.google.android.material:material:1.9.0")
 
+    implementation("io.coil-kt.coil3:coil-compose:3.1.0")
+    implementation("io.coil-kt.coil3:coil-network-okhttp:3.1.0")
+
+    implementation("com.google.code.gson:gson:2.10.1")
+
+    implementation(platform("androidx.compose:compose-bom:2025.02.00"))
 }
