@@ -1,8 +1,8 @@
 package com.example.snapcash.ui.screen
 
+import com.example.snapcash.ui.component.AddBarangDialog
 import android.app.DatePickerDialog
 import android.icu.util.Calendar
-import android.widget.DatePicker
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -26,9 +26,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -46,7 +48,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import java.text.NumberFormat
 import java.text.SimpleDateFormat
+import java.util.Locale
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -54,21 +59,16 @@ import java.text.SimpleDateFormat
 fun PengeluaranEntryScreen(navController: NavController) {
     val context = LocalContext.current
 
+    // State untuk form input
     var judul by remember { mutableStateOf("") }
     var toko by remember { mutableStateOf("") }
     var tanggal by remember { mutableStateOf("") }
 
+    // State untuk menampilkan dialog
+    var showDialog by remember { mutableStateOf(false) }
 
-    val calendar = Calendar.getInstance()
-    var datePicker = DatePickerDialog(
-        context,
-        { _, year, month, dayOfMonth ->
-            tanggal = "$dayOfMonth/${month + 1}/$year"
-        },
-        calendar.get(Calendar.YEAR),
-        calendar.get(Calendar.MONTH),
-        calendar.get(Calendar.DAY_OF_MONTH)
-    )
+    // List barang
+    var barangList by remember { mutableStateOf(listOf<Barang>()) }
 
     Scaffold(
         topBar = {
@@ -82,17 +82,8 @@ fun PengeluaranEntryScreen(navController: NavController) {
             )
         },
         floatingActionButton = {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                horizontalAlignment = Alignment.End,
-                modifier = Modifier.padding(end = 16.dp, bottom = 16.dp)
-            ) {
-                FloatingActionButton(onClick = { /* Tambah Barang */ }) {
-                    Icon(imageVector = Icons.Default.Add, contentDescription = "Tambah Barang")
-                }
-                FloatingActionButton(onClick = { /* Keranjang */ }) {
-                    Icon(imageVector = Icons.Default.ShoppingCart, contentDescription = "Keranjang")
-                }
+            FloatingActionButton(onClick = { showDialog = true }) {
+                Icon(imageVector = Icons.Default.Add, contentDescription = "Tambah Barang")
             }
         },
         bottomBar = {
@@ -108,7 +99,8 @@ fun PengeluaranEntryScreen(navController: NavController) {
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text("Total Pengeluaran", style = MaterialTheme.typography.bodyLarge)
-                    Text("40.000", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
+                    Text(formatRupiah(barangList.sumOf { it.harga.toIntOrNull() ?: 0 }),
+                        style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
                 }
                 Button(
                     onClick = { /* Submit */ },
@@ -129,65 +121,97 @@ fun PengeluaranEntryScreen(navController: NavController) {
         ) {
             // Form Input
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Text("Judul", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Color.Black)
                 OutlinedTextField(
                     value = judul,
                     onValueChange = { judul = it },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color.White, shape = RoundedCornerShape(12.dp)),
+                    label = { Text("Judul") },
+                    modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
                     colors = OutlinedTextFieldDefaults.colors(
                         unfocusedBorderColor = Color.Gray,
-                        focusedBorderColor = Color.Blue,
-                        cursorColor = Color.Black,
-                        focusedTextColor = Color.Black,
-                        unfocusedTextColor = Color.Black
+                        focusedBorderColor = Color.Blue
                     )
                 )
 
-                Text("Toko", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Color.Black)
                 OutlinedTextField(
                     value = toko,
                     onValueChange = { toko = it },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color.White, shape = RoundedCornerShape(12.dp)),
+                    label = { Text("Toko") },
+                    modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
                     colors = OutlinedTextFieldDefaults.colors(
                         unfocusedBorderColor = Color.Gray,
-                        focusedBorderColor = Color.Blue,
-                        cursorColor = Color.Black,
-                        focusedTextColor = Color.Black,
-                        unfocusedTextColor = Color.Black
+                        focusedBorderColor = Color.Blue
                     )
                 )
 
-                Text("Tanggal", style = MaterialTheme.typography.labelMedium)
                 OutlinedTextField(
                     value = tanggal,
-                    onValueChange = {},
+                    onValueChange = { tanggal = it },
+                    label = { Text("Tanggal") },
                     modifier = Modifier.fillMaxWidth(),
-                    trailingIcon = {
-                        IconButton(onClick = { datePicker.show() }) {
-                            Icon(Icons.Default.DateRange, contentDescription = "Pilih Tanggal")
-                        }
-                    },
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(12.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        unfocusedBorderColor = Color.Gray,
+                        focusedBorderColor = Color.Blue
+                    )
                 )
             }
 
-            // Placeholder untuk tabel barang
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp)
-                    .border(1.dp, Color.Gray, RoundedCornerShape(8.dp)),
-                contentAlignment = Alignment.Center
-            ) {
-                Text("Tabel Barang (Akan Diisi)")
+            // Tabel Barang
+            Column {
+                Text("Daftar Barang", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                Spacer(modifier = Modifier.height(8.dp))
+
+                if (barangList.isEmpty()) {
+                    Text("Belum ada barang ditambahkan", color = Color.Gray)
+                } else {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        barangList.forEachIndexed { index, barang ->
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                                    .padding(12.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Column {
+                                    Text("${barang.nama} - ${barang.kategori} (${barang.subkategori})", fontSize = 14.sp)
+                                    Text("Jumlah: ${barang.jumlah} | Harga: ${formatRupiah(barang.harga.toIntOrNull() ?: 0)}", fontSize = 12.sp, color = Color.Gray)
+                                }
+                                IconButton(onClick = {
+                                    barangList = barangList.toMutableList().apply { removeAt(index) }
+                                }) {
+                                    Icon(Icons.Default.Delete, contentDescription = "Hapus", tint = Color.Red)
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }
+
+    // Panggil Dialog
+    AddBarangDialog(
+        showDialog = showDialog,
+        onDismiss = { showDialog = false },
+        onAddItem = { nama, kategori, subkategori, jumlah, harga ->
+            barangList = barangList + Barang(nama, kategori, subkategori, jumlah, harga)
+        }
+    )
 }
 
+data class Barang(
+    val nama: String,
+    val kategori: String,
+    val subkategori: String,
+    val jumlah: String,
+    val harga: String
+)
+
+fun formatRupiah(amount: Int): String {
+    val format = NumberFormat.getCurrencyInstance(Locale("id", "ID"))
+    return format.format(amount)
+}
