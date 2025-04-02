@@ -1,7 +1,5 @@
 package com.example.snapcash.ui
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -17,8 +15,6 @@ import com.example.snapcash.ui.screen.Auth.RegisterScreen
 import kotlinx.coroutines.launch
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddCircle
 
 @Composable
 fun AppNavHost(
@@ -30,7 +26,7 @@ fun AppNavHost(
     ModalNavigationDrawer(
         drawerContent = {
             Surface(
-                modifier = Modifier.width(LocalConfiguration.current.screenWidthDp.dp / 2),
+                modifier = Modifier.width(LocalConfiguration.current.screenWidthDp.dp * 3 / 4),
                 color = MaterialTheme.colorScheme.surface
             ) {
                 SidebarContent(
@@ -76,6 +72,15 @@ fun AppNavHost(
                 }
                 composable("middle") {
                     // Bisa diarahkan ke fitur lain, misalnya layar transaksi cepat
+                }
+                composable("settings") {
+                    SettingScreen(navController = navController)
+                }
+                composable("aboutus") {
+                    AboutUsScreen(navController = navController)
+                }
+                composable("help") {
+                    HelpScreen(navController = navController)
                 }
             }
         }
