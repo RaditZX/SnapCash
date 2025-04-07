@@ -3,6 +3,7 @@ package com.example.snapcash.data
 import android.media.Image
 import okhttp3.MultipartBody
 import retrofit2.http.Body
+import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Multipart
 import retrofit2.http.POST
@@ -27,6 +28,12 @@ interface SnapCashApiService {
         @Header("Authorization") token: String?,
         @Part image: MultipartBody.Part
     ): generateTextFromInvoiceResponse
+
+    @GET("pengeluaranUser")
+    suspend fun getPengeluaranUser(@Header("Authorization") token: String) : DefaultResponse
+
+    @GET("pemasukanUser")
+    suspend fun getPemasukanUser(@Header("Authorization") token: String) : DefaultResponse
 
 
 }
