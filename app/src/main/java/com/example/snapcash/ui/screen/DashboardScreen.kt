@@ -14,7 +14,7 @@ import androidx.navigation.NavController
 @Composable
 fun DashboardScreen(navController: NavController, openSidebar: () -> Unit) {
     Column(modifier = Modifier.fillMaxSize()) {
-        // Navigation Icon (Sidebar Menu Button)
+
         IconButton(
             onClick = openSidebar,
             modifier = Modifier.padding(16.dp)
@@ -22,7 +22,6 @@ fun DashboardScreen(navController: NavController, openSidebar: () -> Unit) {
             Icon(imageVector = Icons.Default.Menu, contentDescription = "Sidebar Menu")
         }
 
-        // Main Content
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center

@@ -38,7 +38,7 @@ fun BottomNavigationBar(navController: NavController) {
 
         NavigationBar(
             containerColor = backgroundColor,
-            modifier = Modifier.height(68.dp) // Menyesuaikan tinggi navbar
+            modifier = Modifier.height(68.dp)
         ) {
             NavigationBarItem(
                 icon = { Icon(Icons.Default.Home, contentDescription = "Home", modifier = Modifier.offset(y = 12.dp)) },
@@ -107,7 +107,7 @@ fun MainScreen() {
             ) {
                 composable("home") {
                     DashboardScreen(navController) {
-                        sidebarScope.launch { sidebarState.open() } // Membuka sidebar
+                        sidebarScope.launch { sidebarState.open() }
                     }
                 }
                 composable("catat") { CatatScreen(navController) }

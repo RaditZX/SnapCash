@@ -27,7 +27,7 @@ data class Transaction(
     val title: String,
     val category: String,
     val amount: Int,
-    val date: String // Format: "dd/MM/yyyy"
+    val date: String
 )
 
 @Composable
@@ -56,7 +56,6 @@ fun HistoryScreen(navController: NavController) {
         )
     }
 
-    // Sort otomatis berdasarkan tanggal terbaru setiap kali selectedType berubah
     LaunchedEffect(selectedType) {
         currentTransactions = if (selectedType == "Money Income") {
             incomeTransactions.sortedByDescending { parseDate(it.date) }
@@ -167,13 +166,11 @@ fun HistoryScreen(navController: NavController) {
     }
 }
 
-// Parse tanggal dari string ke Date untuk sorting
 fun parseDate(dateString: String): Date {
     val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
     return formatter.parse(dateString) ?: Date(0)
 }
 
-// Format uang dengan tanda + atau -
 fun formatCurrencyWithSign(amount: Int): String {
     val format = NumberFormat.getCurrencyInstance(Locale("id", "ID"))
     format.maximumFractionDigits = 0
