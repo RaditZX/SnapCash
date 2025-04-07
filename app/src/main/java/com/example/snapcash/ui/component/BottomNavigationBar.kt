@@ -1,6 +1,7 @@
 package com.example.snapcash.ui.component
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -34,90 +35,113 @@ fun BottomNavigationBar(navController: NavController) {
     val currentRoute = navController.currentBackStackEntry?.destination?.route
 
     Box {
-        val backgroundColor = if (isSystemInDarkTheme()) Color.Black else night
+        val backgroundColor = if (isSystemInDarkTheme()) Color(0xFF1E1E1E) else night
+        val navPrimaryColor  = Color(0xFF2D6CE9)
 
         NavigationBar(
             containerColor = backgroundColor,
-            modifier = Modifier.height(68.dp) // Menyesuaikan tinggi navbar
+            modifier = Modifier.height(68.dp).offset(y=21.dp) // Menyesuaikan tinggi navbar
         ) {
             NavigationBarItem(
-                icon = { Icon(Icons.Default.Home, contentDescription = "Home", modifier = Modifier.offset(y = 12.dp)) },
-                label = { Text("Home", modifier = Modifier.offset(y = 12.dp)) },
-                selected = currentRoute == "home",
-                colors = NavigationBarItemDefaults.colors(selectedIconColor = Color.Blue, unselectedIconColor = Color.Gray),
-                onClick = { navController.navigate("home") }
+                modifier = Modifier.offset(y = 5.dp),
+                icon = {
+                    Icon(
+                        Icons.Default.Home,
+                        contentDescription = "Home",
+
+                    )
+                },
+                label = { Text("Home") },
+                selected = currentRoute == "dashboard",
+                colors = NavigationBarItemDefaults.colors(
+                    selectedIconColor = navPrimaryColor,
+                    unselectedIconColor = Color.Gray,
+                    selectedTextColor = navPrimaryColor,          // 👈 change label color when selected
+                    unselectedTextColor = Color.Gray,
+                    indicatorColor = Color.Transparent
+                ),
+                onClick = { navController.navigate("dashboard") }
             )
             NavigationBarItem(
-                icon = { Icon(Icons.Default.Search, contentDescription = "Catat", modifier = Modifier.offset(y = 12.dp)) },
-                label = { Text("Catat", modifier = Modifier.offset(y = 12.dp)) },
+                modifier = Modifier.offset(y = 5.dp),
+                icon = {
+                    Icon(
+                        Icons.Default.Search,
+                        contentDescription = "Catat",
+                    )
+                },
+                label = { Text("Catat" ) },
                 selected = currentRoute == "catat",
-                colors = NavigationBarItemDefaults.colors(selectedIconColor = Color.Blue, unselectedIconColor = Color.Gray),
+                colors = NavigationBarItemDefaults.colors(
+                    selectedIconColor = navPrimaryColor,
+                    unselectedIconColor = Color.Gray,
+                    selectedTextColor = navPrimaryColor,          // 👈 change label color when selected
+                    unselectedTextColor = Color.Gray,
+                    indicatorColor = Color.Transparent
+                ),
                 onClick = { navController.navigate("catat") }
             )
             Spacer(modifier = Modifier.weight(1f))
             NavigationBarItem(
-                icon = { Icon(Icons.Default.CheckCircle, contentDescription = "History", modifier = Modifier.offset(y = 12.dp)) },
-                label = { Text("History", modifier = Modifier.offset(y = 12.dp)) },
+                modifier = Modifier.offset(y = 5.dp),
+                icon = {
+                    Icon(
+                        Icons.Default.CheckCircle,
+                        contentDescription = "History",
+                    )
+                },
+                label = { Text("History") },
                 selected = currentRoute == "history",
-                colors = NavigationBarItemDefaults.colors(selectedIconColor = Color.Blue, unselectedIconColor = Color.Gray),
+                colors = NavigationBarItemDefaults.colors(
+                    selectedIconColor = navPrimaryColor,
+                    unselectedIconColor = Color.Gray,
+                    selectedTextColor = navPrimaryColor,          // 👈 change label color when selected
+                    unselectedTextColor = Color.Gray,
+                    indicatorColor = Color.Transparent
+                ),
                 onClick = { navController.navigate("history") }
             )
             NavigationBarItem(
-                icon = { Icon(Icons.Default.Person, contentDescription = "Profile", modifier = Modifier.offset(y = 12.dp)) },
-                label = { Text("Profile", modifier = Modifier.offset(y = 12.dp)) },
+                modifier = Modifier.offset(y = 5.dp),
+                icon = {
+                    Icon(
+                        Icons.Default.Person,
+                        contentDescription = "Profile",
+                    )
+                },
+                label = { Text("Profile") },
                 selected = currentRoute == "profile",
-                colors = NavigationBarItemDefaults.colors(selectedIconColor = Color.Blue, unselectedIconColor = Color.Gray),
+                colors = NavigationBarItemDefaults.colors(
+                    selectedIconColor = navPrimaryColor,
+                    unselectedIconColor = Color.Gray,
+                    selectedTextColor = navPrimaryColor,          // 👈 change label color when selected
+                    unselectedTextColor = Color.Gray,
+                    indicatorColor = Color.Transparent
+                ),
                 onClick = { navController.navigate("profile") }
             )
         }
 
         FloatingActionButton(
-            onClick = { navController.navigate("middle") },
-            containerColor = MaterialTheme.colorScheme.primary,
+            onClick = { navController.navigate("camera") },
+            containerColor = Color(0xFF2D6CE9),
             shape = CircleShape,
             modifier = Modifier
-                .size(70.dp)
-                .offset(y = (-30).dp)
+                .size(90.dp)
+                .offset(y = (-10).dp)
                 .align(Alignment.Center)
+                .border(
+                    width = 4.dp,
+                    color = Color(0xFFA9C0FF), // 👈 stroke color
+                    shape = CircleShape
+                )
         ) {
-            Icon(Icons.Default.AddCircle, contentDescription = "Middle", tint = MaterialTheme.colorScheme.onPrimary)
+            Icon(Icons.Default.AddCircle, contentDescription = "Middle", tint = Color.White)
         }
     }
 }
 
-@Composable
-fun MainScreen() {
-    val navController = rememberNavController()
-    val sidebarState = rememberDrawerState(initialValue = DrawerValue.Closed)
-    val sidebarScope = rememberCoroutineScope()
 
-    ModalNavigationDrawer(
-        drawerContent = {
-            SidebarContent(navController, sidebarScope, sidebarState)
-        },
-        drawerState = sidebarState
-    ) {
-        Scaffold(
-            bottomBar = { BottomNavigationBar(navController) }
-        ) { innerPadding ->
-            NavHost(
-                navController = navController,
-                startDestination = "home",
-                modifier = Modifier.padding(innerPadding)
-            ) {
-                composable("home") {
-                    DashboardScreen(navController) {
-                        sidebarScope.launch { sidebarState.open() } // Membuka sidebar
-                    }
-                }
-                composable("catat") { CatatScreen(navController) }
-                composable("history") { HistoryScreen(navController) }
-                composable("profile") { ProfileScreen(navController) }
-                composable("middle") { /* Bisa arahkan ke screen lain atau tampilkan dialog */ }
-            }
-        }
-    }
-}
 
 
 @Preview("default", "rectangle")
