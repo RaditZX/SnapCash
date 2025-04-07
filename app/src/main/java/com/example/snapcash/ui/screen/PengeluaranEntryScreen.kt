@@ -57,17 +57,13 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PengeluaranEntryScreen(navController: NavController) {
-    val context = LocalContext.current
 
-    // State untuk form input
     var judul by remember { mutableStateOf("") }
     var toko by remember { mutableStateOf("") }
     var tanggal by remember { mutableStateOf("") }
 
-    // State untuk menampilkan dialog
     var showDialog by remember { mutableStateOf(false) }
 
-    // List barang
     var barangList by remember { mutableStateOf(listOf<Barang>()) }
 
     Scaffold(

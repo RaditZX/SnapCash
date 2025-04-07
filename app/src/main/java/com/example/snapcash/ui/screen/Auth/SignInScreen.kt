@@ -82,12 +82,6 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel = hiltVie
             value = emailState.value,
             onValueChange = { emailState.value = it } ,
             label = { Text("Email") },
-            colors = TextFieldDefaults.textFieldColors(
-                containerColor = Color.White,
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                focusedTextColor = Color.Black
-            ),
             shape = RoundedCornerShape(10.dp),
             modifier = Modifier.fillMaxWidth()
         )
@@ -98,12 +92,6 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel = hiltVie
             value = passwordState.value,
             onValueChange = { passwordState.value = it },
             label = { Text("Password") },
-            colors = TextFieldDefaults.textFieldColors(
-                containerColor = Color.White,
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                focusedTextColor = Color.Black
-            ),
             shape = RoundedCornerShape(10.dp),
             modifier = Modifier.fillMaxWidth(),
         )

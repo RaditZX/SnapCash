@@ -82,12 +82,6 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel = hilt
             value = emailState.value,
             onValueChange = { emailState.value = it } ,
             label = { Text("Email") },
-            colors = TextFieldDefaults.textFieldColors(
-                containerColor = Color.White,
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                focusedTextColor = Color.Black
-            ),
             shape = RoundedCornerShape(10.dp),
             modifier = Modifier.fillMaxWidth()
         )
@@ -98,12 +92,6 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel = hilt
             value = passwordState.value,
             onValueChange = { passwordState.value = it },
             label = { Text("Password") },
-            colors = TextFieldDefaults.textFieldColors(
-                containerColor = Color.White,
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                focusedTextColor = Color.Black
-            ),
             shape = RoundedCornerShape(10.dp),
             modifier = Modifier.fillMaxWidth(),
         )
@@ -114,12 +102,6 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel = hilt
             value = ConfirmationPasswordState.value,
             onValueChange = { ConfirmationPasswordState.value = it },
             label = { Text("Confirmation Password") },
-            colors = TextFieldDefaults.textFieldColors(
-                containerColor = Color.White,
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                focusedTextColor = Color.Black
-            ),
             shape = RoundedCornerShape(10.dp),
             modifier = Modifier.fillMaxWidth(),
         )
