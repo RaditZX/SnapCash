@@ -38,10 +38,6 @@ fun BottomNavigationBar(navController: NavController) {
         val backgroundColor = if (isSystemInDarkTheme()) Color(0xFF1E1E1E) else night
         val navPrimaryColor  = Color(0xFF2D6CE9)
 
-        NavigationBar(
-            containerColor = backgroundColor,
-            modifier = Modifier.height(68.dp).offset(y=21.dp) // Menyesuaikan tinggi navbar
-        ) {
             NavigationBarItem(
                 modifier = Modifier.offset(y = 5.dp),
                 icon = {
