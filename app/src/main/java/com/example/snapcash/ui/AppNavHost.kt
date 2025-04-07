@@ -1,5 +1,6 @@
 package com.example.snapcash.ui
 
+
 import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresExtension
@@ -23,6 +24,7 @@ import com.example.snapcash.data.OnboardingPrefs
 import com.example.snapcash.ui.screen.Upload.CameraScreen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+
 
 
 @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
@@ -52,7 +54,7 @@ fun AppNavHost(
     ModalNavigationDrawer(
         drawerContent = {
             Surface(
-                modifier = Modifier.width(LocalConfiguration.current.screenWidthDp.dp / 2),
+                modifier = Modifier.width(LocalConfiguration.current.screenWidthDp.dp * 3 / 4),
                 color = MaterialTheme.colorScheme.surface
             ) {
                 SidebarContent(
@@ -117,6 +119,18 @@ fun AppNavHost(
                 }
                 composable("profile") {
                     ProfileScreen(navController = navController)
+                }
+                composable("middle") {
+                    // Bisa diarahkan ke fitur lain, misalnya layar transaksi cepat
+                }
+                composable("settings") {
+                    SettingScreen(navController = navController)
+                }
+                composable("aboutus") {
+                    AboutUsScreen(navController = navController)
+                }
+                composable("help") {
+                    HelpScreen(navController = navController)
                 }
             }
         }
