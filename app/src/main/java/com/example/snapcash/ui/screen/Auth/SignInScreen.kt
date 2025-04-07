@@ -58,6 +58,7 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel = hiltVie
     val authClient = remember { GoogleAuthUiClient(context) }
 
     val isLoading by viewModel.isLoading
+    val isSuccess by viewModel.isSucces
 
 
     val launcher = rememberLauncherForActivityResult(
@@ -227,9 +228,10 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel = hiltVie
                 showDialog,
                 "Login",
                 dialogMessage.value,
-                "dashboard",
+                if (isSuccess) "dashboard" else "signIn",
                 navController
             )
+
         }
     }
 }

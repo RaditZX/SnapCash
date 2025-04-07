@@ -33,6 +33,12 @@ data class generateTextFromInvoiceResponse(
     val data: JsonObject
 )
 
+data class DefaultResponse(
+    val message: String,
+    val isSucces: Boolean,
+    val data: Array<JsonObject>
+)
+
 data class User(
     val uid: String,
     val email: String,

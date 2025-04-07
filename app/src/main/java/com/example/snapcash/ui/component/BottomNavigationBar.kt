@@ -12,7 +12,6 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -20,14 +19,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import androidx.compose.ui.Alignment
-import com.example.snapcash.ui.screen.CatatScreen
-import com.example.snapcash.ui.screen.DashboardScreen
-import com.example.snapcash.ui.screen.HistoryScreen
-import com.example.snapcash.ui.screen.ProfileScreen
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import com.example.snapcash.ui.theme.*
-import kotlinx.coroutines.launch
 import androidx.compose.foundation.isSystemInDarkTheme
 
 @Composable
@@ -38,6 +30,10 @@ fun BottomNavigationBar(navController: NavController) {
         val backgroundColor = if (isSystemInDarkTheme()) Color(0xFF1E1E1E) else night
         val navPrimaryColor  = Color(0xFF2D6CE9)
 
+        NavigationBar(
+            containerColor = backgroundColor,
+            modifier = Modifier.height(68.dp).offset(y=21.dp) // Menyesuaikan tinggi navbar
+        ) {
             NavigationBarItem(
                 modifier = Modifier.offset(y = 5.dp),
                 icon = {
@@ -45,7 +41,7 @@ fun BottomNavigationBar(navController: NavController) {
                         Icons.Default.Home,
                         contentDescription = "Home",
 
-                    )
+                        )
                 },
                 label = { Text("Home") },
                 selected = currentRoute == "dashboard",

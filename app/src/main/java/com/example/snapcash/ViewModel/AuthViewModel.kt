@@ -24,12 +24,20 @@ class AuthViewModel @Inject constructor(private val apiService: SnapCashApiServi
         isLoading.value = loading
     }
 
+    var isSucces = mutableStateOf(false)
+    fun setIsSucces(succes: Boolean){
+        isSucces.value = succes
+    }
+
     @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
     fun signUp(email: String, password: String, onResult: (Boolean, String) -> Unit) {
         viewModelScope.launch {
             setLoading(true)
             try {
                 val response = apiService.signUp(SignInRequest(email, password))
+                if(response.isSucces){
+                    setIsSucces(true)
+                }
                 onResult(true, response.message)
 
             }catch (e: HttpException) {
@@ -65,6 +73,10 @@ class AuthViewModel @Inject constructor(private val apiService: SnapCashApiServi
                     throw Exception("Incorrect email or password.")
                 }
 
+                if(response.isSucces){
+                    setIsSucces(true)
+                }
+
                 onResult(true, response.message)
 
             }catch (e: HttpException) {
@@ -95,6 +107,9 @@ class AuthViewModel @Inject constructor(private val apiService: SnapCashApiServi
             try {
                 Log.d("auth", idToken)
                 val response = apiService.registerWithGoogle("Bearer $idToken")
+                if(response.isSucces){
+                    setIsSucces(true)
+                }
                 onResult(true, response.message)
             } catch (e: HttpException) {
                 val errorBody = e.response()?.errorBody()?.string()
@@ -122,7 +137,10 @@ class AuthViewModel @Inject constructor(private val apiService: SnapCashApiServi
             try {
                 Log.d("auth", idToken)
                 val response = apiService.signWithGoogle("Bearer $idToken")
-
+                Log.d("auth", response.isSucces.toString())
+                if(response.isSucces){
+                    setIsSucces(true)
+                }
                 onResult(true, response.message)
             } catch (e: HttpException) {
                 val errorBody = e.response()?.errorBody()?.string()

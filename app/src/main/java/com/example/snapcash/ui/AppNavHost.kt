@@ -120,9 +120,6 @@ fun AppNavHost(
                 composable("profile") {
                     ProfileScreen(navController = navController)
                 }
-                composable("middle") {
-                    // Bisa diarahkan ke fitur lain, misalnya layar transaksi cepat
-                }
                 composable("settings") {
                     SettingScreen(navController = navController)
                 }
