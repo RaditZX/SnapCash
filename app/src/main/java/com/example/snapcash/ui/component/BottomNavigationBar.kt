@@ -45,7 +45,7 @@ fun BottomNavigationBar(navController: NavController) {
                 label = { Text("Home", modifier = Modifier.offset(y = 12.dp)) },
                 selected = currentRoute == "home",
                 colors = NavigationBarItemDefaults.colors(selectedIconColor = Color.Blue, unselectedIconColor = Color.Gray),
-                onClick = { navController.navigate("home") }
+                onClick = { navController.navigate("dashboard") }
             )
             NavigationBarItem(
                 icon = { Icon(Icons.Default.Search, contentDescription = "Catat", modifier = Modifier.offset(y = 12.dp)) },
