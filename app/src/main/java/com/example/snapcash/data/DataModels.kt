@@ -1,5 +1,5 @@
 package com.example.snapcash.data
-
+import com.google.gson.JsonObject
 import com.google.gson.annotations.SerializedName
 
 data class SignInRequest(
@@ -9,12 +9,14 @@ data class SignInRequest(
 
 data class SignUpResponse(
     val data: SignInRequest,  // Adjust according to your API response
-    val message: String
+    val message: String,
+    val isSucces : Boolean
 )
 
 data class SignInResponse(
     val data: UserCredentialData,
-    val message: String
+    val message: String,
+    val isSucces : Boolean
 )
 
 data class UserCredentialData(
@@ -23,6 +25,12 @@ data class UserCredentialData(
 
 data class UserCredential(
     val user: User
+)
+
+data class generateTextFromInvoiceResponse(
+    val message: String,
+    val isSucces: Boolean,
+    val data: JsonObject
 )
 
 data class User(

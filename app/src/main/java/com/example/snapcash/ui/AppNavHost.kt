@@ -1,7 +1,8 @@
 package com.example.snapcash.ui
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
+import android.content.Context
+import android.os.Build
+import androidx.annotation.RequiresExtension
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -17,15 +18,36 @@ import com.example.snapcash.ui.screen.Auth.RegisterScreen
 import kotlinx.coroutines.launch
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.runtime.setValue
+import com.example.snapcash.data.OnboardingPrefs
+import com.example.snapcash.ui.screen.Upload.CameraScreen
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 
+
+@RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
+@Composable
+fun AppEntry(navController: NavHostController, context: Context) {
+    var startDestination by remember { mutableStateOf("onBoarding") }
+
+    LaunchedEffect(Unit) {
+        val isOnboardingShown = OnboardingPrefs.isOnboardingShown(context)
+        startDestination = if (isOnboardingShown) "signIn" else "onBoarding"
+    }
+
+    AppNavHost(navController, startDestination)
+}
+
+@RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
 @Composable
 fun AppNavHost(
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController = rememberNavController(),
+    startDestination: String
 ) {
     val sidebarState = rememberDrawerState(DrawerValue.Closed)
     val sidebarScope = rememberCoroutineScope()
+    val currentBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = currentBackStackEntry?.destination?.route
 
     ModalNavigationDrawer(
         drawerContent = {
@@ -43,20 +65,42 @@ fun AppNavHost(
         drawerState = sidebarState
     ) {
         Scaffold(
-            bottomBar = { BottomNavigationBar(navController) },
+            bottomBar = {
+                if (currentRoute !in listOf("signIn", "signUp","onBoarding")) {
+                    BottomNavigationBar(navController)
+                }
+            },
         )  { paddingValues ->
             NavHost(
                 navController = navController,
-                startDestination = "signIn",
+                startDestination = startDestination,
                 modifier = Modifier.padding(paddingValues)
             ) {
 
+                composable("onBoarding") {
+                    OnboardingScreen(
+                        onFinish = {
+                            // Simpan status onboarding sudah selesai
+                            CoroutineScope(Dispatchers.IO).launch {
+                                OnboardingPrefs.setOnboardingShown(navController.context)
+                            }
+                            navController.navigate("SignIn") {
+                                popUpTo("onBoarding") { inclusive = true }
+                            }
+                        },
+                        navController = navController
+                    )
+                }
                 composable("signIn"){
                     LoginScreen(navController)
                 }
 
                 composable("signUp"){
                     RegisterScreen(navController)
+                }
+
+                composable("camera"){
+                    CameraScreen(navController = navController)
                 }
 
                 composable("dashboard") {
@@ -73,9 +117,6 @@ fun AppNavHost(
                 }
                 composable("profile") {
                     ProfileScreen(navController = navController)
-                }
-                composable("middle") {
-                    // Bisa diarahkan ke fitur lain, misalnya layar transaksi cepat
                 }
             }
         }
