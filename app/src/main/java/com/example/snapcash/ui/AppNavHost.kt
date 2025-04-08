@@ -111,8 +111,12 @@ fun AppNavHost(
                         openSidebar = { sidebarScope.launch { sidebarState.open() } }
                     )
                 }
-                composable("catat") {
-                    CatatScreen(navController = navController)
+                composable("tambah/pengeluaran") {
+                    PengeluaranEntryScreen(navController = navController, id = null)
+                }
+                composable("update/pengeluaran/{id}") { backStackEntry ->
+                    val id = backStackEntry.arguments?.getString("id").toString()
+                    PengeluaranEntryScreen(navController = navController, id)
                 }
                 composable("history") {
                     HistoryScreen(navController = navController)
@@ -124,7 +128,7 @@ fun AppNavHost(
                     SettingScreen(navController = navController)
                 }
                 composable("aboutus") {
-                    AboutUsScreen(navController = navController)
+                    PemasukanEntryScreen(navController = navController)
                 }
                 composable("help") {
                     HelpScreen(navController = navController)

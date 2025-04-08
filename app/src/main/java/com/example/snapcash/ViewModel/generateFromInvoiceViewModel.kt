@@ -56,6 +56,7 @@ class GenerateFromInvoiceViewModel  @Inject constructor(private val apiService: 
                 }
             } catch (e: Exception) {
                 Log.e("EXCEPTION", "Exception: ${e.message}", e)
+                onResult(false, "failed:${e.message}" )
             } finally {
                 setLoading(false) // Hide loading spinner
             }

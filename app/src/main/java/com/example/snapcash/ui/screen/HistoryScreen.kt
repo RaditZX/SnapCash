@@ -36,7 +36,9 @@ data class Transaction(
     val title: String,
     val category: String,
     val amount: Int,
-    val date: String
+    val date: String,
+    val id: String,
+    val isPengeluaran : Boolean
 )
 
 @Composable
@@ -75,7 +77,9 @@ fun HistoryScreen(
                         item.get("namaPemasukan")?.asString ?: "",
                         item.get("sumber")?.asString ?: "",
                         item.get("total")?.asInt ?: 0,
-                        item.get("tanggal")?.asString ?: ""
+                        item.get("tanggal")?.asString ?: "",
+                        item.get("id")?.asString ?: "",
+                        item.get("isPengeluaran")?.asBoolean ?: false
                     )
                 }
             }
@@ -88,7 +92,9 @@ fun HistoryScreen(
                         item.get("namaPengeluaran")?.asString ?: "",
                         item.get("toko")?.asString ?: "",
                         item.get("total")?.asInt ?: 0,
-                        item.get("tanggal")?.asString ?: ""
+                        item.get("tanggal")?.asString ?: "",
+                        item.get("id")?.asString ?: "",
+                        item.get("isPengeluaran")?.asBoolean ?: false
                     )
                 }
             }
@@ -229,7 +235,13 @@ fun HistoryScreen(
 
             LazyColumn {
                 items(displayedTransactions) { transaction ->
-                    Column(modifier = Modifier.padding(vertical = 8.dp)) {
+                    Column(modifier = Modifier.padding(vertical = 8.dp).clickable(onClick = {
+                        if (transaction.isPengeluaran){
+                            navController.navigate("update/pengeluaran/${transaction.id}")
+                        }else{
+                            navController.navigate("update/pemasukan/${transaction.id}")
+                        }
+                    } )) {
                         Text(transaction.title, fontWeight = FontWeight.Bold)
                         Text(transaction.category.uppercase(), fontSize = 12.sp, color = Color.Gray)
                         Row(

@@ -201,12 +201,6 @@ fun takePicture(
     imageCapture.takePicture(outputOptions, executor, object : ImageCapture.OnImageSavedCallback {
         override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
             Handler(Looper.getMainLooper()).post {
-                Toast.makeText(
-                    context,
-                    "Photo saved: ${outputFileResults.savedUri ?: Uri.fromFile(file)}",
-                    Toast.LENGTH_SHORT
-                ).show()
-
                 onImageSaved(file) // ← kirim balik ke composable
             }
         }

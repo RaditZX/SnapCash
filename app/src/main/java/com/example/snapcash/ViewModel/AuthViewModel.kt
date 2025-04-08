@@ -8,6 +8,7 @@ import androidx.annotation.RequiresExtension
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.snapcash.data.SessionManager
 import com.example.snapcash.data.SignInRequest
 import com.example.snapcash.data.SnapCashApiService
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -67,7 +68,7 @@ class AuthViewModel @Inject constructor(private val apiService: SnapCashApiServi
             setLoading(true)
             try {
                 val response = apiService.signIn(SignInRequest(email, password))
-
+                Log.d("token", response.data.userCredential._tokenResponse.idToken)
                 // If response.message contains a specific error, throw a custom exception
                 if (response.message == "Invalid credentials") {
                     throw Exception("Incorrect email or password.")
@@ -75,6 +76,8 @@ class AuthViewModel @Inject constructor(private val apiService: SnapCashApiServi
 
                 if(response.isSucces){
                     setIsSucces(true)
+
+                    SessionManager.idToken = response.data.userCredential._tokenResponse.idToken
                 }
 
                 onResult(true, response.message)
