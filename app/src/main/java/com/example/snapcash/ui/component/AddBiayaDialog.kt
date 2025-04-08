@@ -15,10 +15,10 @@ import androidx.compose.ui.window.Dialog
 import com.example.snapcash.ui.component.DropdownMenu
 
 @Composable
-fun AddBarangDialog(
+fun AddBiayaDialog(
     showDialog: Boolean,
     onDismiss: () -> Unit,
-    onAddItem: (String, String, String, String) -> Unit
+    onAddItem: (String, String) -> Unit
 ) {
     if (showDialog) {
         Dialog(onDismissRequest = onDismiss) {
@@ -27,49 +27,33 @@ fun AddBarangDialog(
                     .background(Color.White, shape = RoundedCornerShape(12.dp))
                     .padding(16.dp)
             ) {
-                var namaProduk by remember { mutableStateOf("") }
-                var kategori by remember { mutableStateOf("") }
-                var jumlah by remember { mutableStateOf("") }
-                var harga by remember { mutableStateOf("") }
-                val kategoriList = listOf("Gaji", "Investasi", "Bisnis", "Hadiah")
+                var namabiaya by remember { mutableStateOf("") }
+                var jumlahbiaya by remember { mutableStateOf("") }
 
                 Column(
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text("Tambah Barang", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                    Text("Tambahan Biaya", fontSize = 18.sp, fontWeight = FontWeight.Bold)
 
                     OutlinedTextField(
-                        value = namaProduk, onValueChange = { namaProduk = it },
-                        label = { Text("Nama Produk") },
+                        value = namabiaya, onValueChange = { namabiaya = it },
+                        label = { Text("Nama Biaya") },
                         modifier = Modifier.fillMaxWidth()
                     )
 
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        DropdownMenu(
-                            label = "",
-                            options = kategoriList,
-                            selectedOption = kategori,
-                            onOptionSelected = { kategori = it }
-                        )
-                    }
 
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         OutlinedTextField(
-                            value = jumlah, onValueChange = { jumlah = it },
+                            value = jumlahbiaya, onValueChange = { jumlahbiaya = it },
                             label = { Text("Jumlah") },
-                            modifier = Modifier.weight(1f)
-                        )
-                        OutlinedTextField(
-                            value = harga, onValueChange = { harga = it },
-                            label = { Text("Harga") },
                             modifier = Modifier.weight(1f)
                         )
                     }
 
                     Button(
                         onClick = {
-                            onAddItem(namaProduk, kategori, jumlah, harga)
+                            onAddItem(namabiaya, jumlahbiaya)
                             onDismiss()
                         },
                         modifier = Modifier.fillMaxWidth(),
@@ -82,3 +66,4 @@ fun AddBarangDialog(
         }
     }
 }
+

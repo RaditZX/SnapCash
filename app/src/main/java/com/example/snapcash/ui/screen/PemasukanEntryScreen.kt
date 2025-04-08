@@ -48,12 +48,11 @@ fun PemasukanEntryScreen(navController: NavController) {
     var judul by remember { mutableStateOf("") }
     var nominal by remember { mutableStateOf("") }
     var kategori by remember { mutableStateOf("") }
-    var subKategori by remember { mutableStateOf("") }
+    var sumber by remember { mutableStateOf("") }
     var tanggal by remember { mutableStateOf("Pilih Tanggal") }
 
     // Data kategori & sub kategori
     val kategoriList = listOf("Gaji", "Investasi", "Bisnis", "Hadiah")
-    val subKategoriList = listOf("Bonus", "THR", "Dividen", "Lainnya")
 
     // Date Picker
     val context = LocalContext.current
@@ -103,12 +102,12 @@ fun PemasukanEntryScreen(navController: NavController) {
                 onOptionSelected = { kategori = it }
             )
 
-            Text("Sub Kategori", style = MaterialTheme.typography.labelMedium)
-            DropdownMenu(
-                label = "",
-                options = subKategoriList,
-                selectedOption = subKategori,
-                onOptionSelected = { subKategori = it }
+            Text("Sumber", style = MaterialTheme.typography.labelMedium)
+            OutlinedTextField(
+                value = sumber,
+                onValueChange = { sumber = it },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp)
             )
 
             Row(

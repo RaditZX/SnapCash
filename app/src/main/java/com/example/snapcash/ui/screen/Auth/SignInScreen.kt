@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -37,6 +38,8 @@ import com.example.snapcash.R
 import androidx.compose.material3.*
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import com.example.snapcash.ViewModel.AuthViewModel
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -129,6 +132,8 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel = hiltVie
             TextField(
                 value = passwordState.value,
                 onValueChange = { passwordState.value = it },
+                visualTransformation = PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 label = { Text("Password") },
                 colors = TextFieldDefaults.colors(
                     focusedIndicatorColor = Color.Transparent,
