@@ -67,6 +67,7 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel = hilt
     val authClient = remember { GoogleAuthUiClient(context) }
 
     val isLoading by viewModel.isLoading
+    val isSuccess by viewModel.isSucces
 
 
     val launcher = rememberLauncherForActivityResult(
@@ -249,7 +250,7 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel = hilt
                 showDialog,
                 "Register",
                 dialogMessage.value,
-                "signIn",
+                if (isSuccess) "signIn" else "signUp",
                 navController
             )
         }
