@@ -4,8 +4,6 @@ import com.example.snapcash.ui.component.DropdownMenu
 import android.app.DatePickerDialog
 import android.icu.util.Calendar
 import android.widget.DatePicker
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -41,22 +39,27 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.snapcash.ViewModel.PemasukanViewModel
+import com.google.gson.JsonObject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PemasukanEntryScreen(navController: NavController) {
-    var judul by remember { mutableStateOf("") }
-    var nominal by remember { mutableStateOf("") }
-    var kategori by remember { mutableStateOf("") }
-    var sumber by remember { mutableStateOf("") }
-    var tanggal by remember { mutableStateOf("Pilih Tanggal") }
-
-    // Data kategori & sub kategori
-    val kategoriList = listOf("Gaji", "Investasi", "Bisnis", "Hadiah")
-
-    // Date Picker
+fun PemasukanEntryScreen(
+    navController: NavController,
+    viewModel: PemasukanViewModel = hiltViewModel()
+) {
     val context = LocalContext.current
     val calendar = Calendar.getInstance()
+
+    var judul by remember { mutableStateOf("") }
+    var sumber by remember { mutableStateOf("") }
+    var tanggal by remember { mutableStateOf("") }
+    var kategori by remember { mutableStateOf("") }
+    var nominal by remember { mutableStateOf("") }
+
+    val kategoriList = listOf("Gaji", "Investasi", "Bisnis", "Hadiah")
+
     val datePicker = DatePickerDialog(
         context,
         { _, year, month, dayOfMonth ->
@@ -70,7 +73,7 @@ fun PemasukanEntryScreen(navController: NavController) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("INCOME") },
+                title = { Text("Tambah Pemasukan") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
@@ -136,16 +139,29 @@ fun PemasukanEntryScreen(navController: NavController) {
                                 Icon(Icons.Default.DateRange, contentDescription = "Pilih Tanggal")
                             }
                         },
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(12.dp),
+                        readOnly = true
                     )
                 }
             }
 
             Spacer(modifier = Modifier.weight(1f))
 
-            // Tombol Submit
             Button(
-                onClick = {},
+                onClick = {
+                    if (judul.isNotBlank() && sumber.isNotBlank() && tanggal.isNotBlank() && nominal.isNotBlank()) {
+                        val request = JsonObject().apply {
+                            addProperty("namaPemasukan", judul)
+                            addProperty("sumber", kategori)
+                            addProperty("tanggal", tanggal)
+                            addProperty("total", nominal.toIntOrNull() ?: 0)
+                            addProperty("tambahanBiaya", sumber)
+                            addProperty("isPengeluaran", false)
+                        }
+
+                        viewModel.addPemasukan(request, navController)
+                    }
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 16.dp),
@@ -156,3 +172,4 @@ fun PemasukanEntryScreen(navController: NavController) {
         }
     }
 }
+
