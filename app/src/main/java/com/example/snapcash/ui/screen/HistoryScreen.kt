@@ -1,7 +1,6 @@
 package com.example.snapcash.ui.screen
 
 import android.util.Log
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
@@ -9,12 +8,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.*
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.snapcash.ViewModel.AuthViewModel
@@ -38,7 +36,7 @@ data class Transaction(
     val amount: Int,
     val date: String,
     val id: String,
-    val isPengeluaran : Boolean
+    val isPengeluaran: Boolean
 )
 
 @Composable
@@ -48,27 +46,23 @@ fun HistoryScreen(
     viewModel2: PemasukanViewModel = hiltViewModel()
 ) {
     var selectedType by remember { mutableStateOf("Money Outcome") }
-    var isDropdownExpanded by remember { mutableStateOf(false) }
     var isDescending by remember { mutableStateOf(true) }
 
     val pengeluaranData by remember { viewModel.pengeluaranData }
     val pemasukanData by remember { viewModel2.pemasukanData }
     val isLoading by viewModel.isLoading
     val isLoadingPemasukan by viewModel2.isLoading
+
     LaunchedEffect(Unit) {
         viewModel.getPengeluaranUser()
         viewModel2.getPemasukanUser()
     }
 
-
-
     if (isLoading || isLoadingPemasukan) {
-        // 👇 Show loading UI while waiting
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             CircularProgressIndicator()
         }
     } else {
-
         val incomeTransactions by remember(pengeluaranData) {
             derivedStateOf {
                 pemasukanData.map { item ->
@@ -132,80 +126,55 @@ fun HistoryScreen(
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-                Text(
-                    text = "HISTORY",
-                    style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.SemiBold)
-                )
-            }
+            Text(
+                text = "HISTORY",
+                style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.SemiBold),
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(40.dp)
-                    .background(Color.LightGray, RoundedCornerShape(50))
-                    .clickable { isDropdownExpanded = true }
-            ) {
-                // Center text
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(selectedType, color = Color.Black)
-                }
+            val selectedTabIndex = if (selectedType == "Money Income") 0 else 1
 
-                // Icon at the end (right-aligned)
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(end = 16.dp),
-                    contentAlignment = Alignment.CenterEnd
-                ) {
-                    Icon(
-                        Icons.Default.ArrowDropDown,
-                        tint = Color.Black,
-                        contentDescription = "Dropdown"
+            TabRow(
+                selectedTabIndex = selectedTabIndex,
+                indicator = { tabPositions ->
+                    TabRowDefaults.Indicator(
+                        Modifier
+                            .tabIndicatorOffset(tabPositions[selectedTabIndex])
+                            .height(3.dp),
+                        color = Color(0xFF3F51B5)
                     )
+                },
+                containerColor = Color.Transparent,
+                divider = {
+                    Divider(thickness = 1.dp, color = Color.LightGray)
                 }
-
-
-
-                DropdownMenu(
-                    expanded = isDropdownExpanded,
-                    onDismissRequest = { isDropdownExpanded = false },
-                    modifier = Modifier.fillMaxWidth() // <- Important
-                ) {
-                    listOf("Money Income", "Money Outcome").forEach { type ->
-                        DropdownMenuItem(
-                            text = {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .background(Color.LightGray, RoundedCornerShape(50))
-                                        .padding(vertical = 8.dp, horizontal = 16.dp),
-                                    contentAlignment = Alignment.Center
-
-                                ) {
-                                    Text(
-                                        text = type,
-                                        color = Color.Black,
-                                        modifier = Modifier.align(Alignment.Center)
-                                    )
-                                }
-                            },
-                            onClick = {
-                                selectedType = type
-                                isDropdownExpanded = false
-                            }
+            ) {
+                Tab(
+                    selected = selectedTabIndex == 0,
+                    onClick = { selectedType = "Money Income" },
+                    text = {
+                        Text(
+                            "INCOME",
+                            fontWeight = FontWeight.Bold,
+                            color = if (selectedTabIndex == 0) Color(0xFF3F51B5) else Color.Gray
                         )
                     }
-                }
+                )
+                Tab(
+                    selected = selectedTabIndex == 1,
+                    onClick = { selectedType = "Money Outcome" },
+                    text = {
+                        Text(
+                            "OUTCOME",
+                            fontWeight = FontWeight.Bold,
+                            color = if (selectedTabIndex == 1) Color(0xFF3F51B5) else Color.Gray
+                        )
+                    }
+                )
             }
-
 
             Spacer(modifier = Modifier.height(24.dp))
 
@@ -217,7 +186,7 @@ fun HistoryScreen(
                 Column {
                     Text("TOTAL", fontWeight = FontWeight.Bold)
                     Text(
-                        formatCurrencyWithSign(totalAmount),
+                        formatCurrencyWithSign(totalAmount, selectedType == "Money Outcome"),
                         color = if (selectedType == "Money Income") Color(0xFF4CAF50) else Color.Red,
                         fontWeight = FontWeight.Bold,
                         fontSize = 25.sp
@@ -235,13 +204,17 @@ fun HistoryScreen(
 
             LazyColumn {
                 items(displayedTransactions) { transaction ->
-                    Column(modifier = Modifier.padding(vertical = 8.dp).clickable(onClick = {
-                        if (transaction.isPengeluaran){
-                            navController.navigate("update/pengeluaran/${transaction.id}")
-                        }else{
-                            navController.navigate("update/pemasukan/${transaction.id}")
-                        }
-                    } )) {
+                    Column(
+                        modifier = Modifier
+                            .padding(vertical = 8.dp)
+                            .clickable {
+                                if (transaction.isPengeluaran) {
+                                    navController.navigate("update/pengeluaran/${transaction.id}")
+                                } else {
+                                    navController.navigate("update/pemasukan/${transaction.id}")
+                                }
+                            }
+                    ) {
                         Text(transaction.title, fontWeight = FontWeight.Bold)
                         Text(transaction.category.uppercase(), fontSize = 12.sp, color = Color.Gray)
                         Row(
@@ -250,8 +223,8 @@ fun HistoryScreen(
                         ) {
                             Text(transaction.date, fontSize = 12.sp, color = Color.Gray)
                             Text(
-                                formatCurrencyWithSign(transaction.amount),
-                                color = if (selectedType == "Money Income") Color(0xFF4CAF50) else Color.Red,
+                                formatCurrencyWithSign(transaction.amount, transaction.isPengeluaran),
+                                color = if (transaction.isPengeluaran) Color.Red else Color(0xFF4CAF50),
                                 fontWeight = FontWeight.SemiBold
                             )
                         }
@@ -263,12 +236,11 @@ fun HistoryScreen(
     }
 }
 
-
-fun formatCurrencyWithSign(amount: Int): String {
+fun formatCurrencyWithSign(amount: Int, isPengeluaran: Boolean): String {
     val format = NumberFormat.getCurrencyInstance(Locale("id", "ID"))
     format.maximumFractionDigits = 0
     val absoluteAmount = format.format(kotlin.math.abs(amount))
-    return if (amount >= 0) "+$absoluteAmount" else "-$absoluteAmount"
+    return if (isPengeluaran) "-$absoluteAmount" else "+$absoluteAmount"
 }
 
 fun translateIndonesianDate(dateStr: String): String {

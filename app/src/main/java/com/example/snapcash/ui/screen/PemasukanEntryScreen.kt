@@ -1,11 +1,8 @@
 package com.example.snapcash.ui.screen
 
-import com.example.snapcash.ui.component.DropdownMenu
 import android.app.DatePickerDialog
 import android.icu.util.Calendar
-import android.widget.DatePicker
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -25,15 +22,11 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.Button
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,6 +35,20 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.snapcash.ViewModel.PemasukanViewModel
 import com.google.gson.JsonObject
+import com.google.gson.JsonArray
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.background
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.Alignment
+import com.example.snapcash.ui.component.AddBiayaDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -55,10 +62,11 @@ fun PemasukanEntryScreen(
     var judul by remember { mutableStateOf("") }
     var sumber by remember { mutableStateOf("") }
     var tanggal by remember { mutableStateOf("") }
-    var kategori by remember { mutableStateOf("") }
     var nominal by remember { mutableStateOf("") }
+    var biayalist by remember { mutableStateOf(listOf<Tambahanbiaya>()) }
 
-    val kategoriList = listOf("Gaji", "Investasi", "Bisnis", "Hadiah")
+    // Toggle form tambahan biaya
+    var showDialogBiaya by remember { mutableStateOf(false) }
 
     val datePicker = DatePickerDialog(
         context,
@@ -72,104 +80,191 @@ fun PemasukanEntryScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Tambah Pemasukan") },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
-                    }
+            Column {
+                Text(
+                    text = "CATAT",
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 16.dp),
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                )
+
+                TabRow(selectedTabIndex = 0) {
+                    Tab(
+                        selected = true,
+                        onClick = { /* Do nothing, stay on this screen */ },
+                        text = { Text("INCOME", fontWeight = FontWeight.Bold) }
+                    )
+                    Tab(
+                        selected = false,
+                        onClick = {
+                            navController.navigate("tambah/pengeluaran") // Sesuaikan dengan route-mu
+                        },
+                        text = { Text("OUTCOME", color = Color.Gray) }
+                    )
                 }
-            )
+            }
+        },
+
+        floatingActionButton = {
+            FloatingActionButton(onClick = { showDialogBiaya = true }) {
+                Icon(Icons.Default.Add, contentDescription = "Tambah Biaya")
+            }
+        },
+        bottomBar = {
+            val nominalValue = nominal.toDoubleOrNull() ?: 0.0
+            val totalTambahan = biayalist.sumOf { it.jumlahbiaya }
+            val total = nominalValue + totalTambahan
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text("Total Pemasukan", style = MaterialTheme.typography.bodyLarge)
+                    Text(
+                        formatRupiah(total.toInt()),
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+                Button(
+                    onClick = {
+                        if (judul.isNotBlank() && sumber.isNotBlank() && tanggal.isNotBlank() && nominal.isNotBlank()) {
+                            val biayaArray = JsonArray()
+                            biayalist.forEach {
+                                val biayaObj = JsonObject().apply {
+                                    addProperty("namaBiaya", it.namabiaya)
+                                    addProperty("jumlah", it.jumlahbiaya)
+                                }
+                                biayaArray.add(biayaObj)
+                            }
+
+                            val request = JsonObject().apply {
+                                addProperty("namaPemasukan", judul)
+                                addProperty("sumber", sumber)
+                                addProperty("tanggal", tanggal)
+                                addProperty("total", total)
+                                add("tambahanBiaya", biayaArray)
+                                addProperty("isPengeluaran", false)
+                            }
+
+                            viewModel.addPemasukan(request, navController)
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text("SUBMIT")
+                }
+            }
         }
     ) { paddingValues ->
-        Column(
+        LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text("Judul", style = MaterialTheme.typography.labelMedium)
-            OutlinedTextField(
-                value = judul,
-                onValueChange = { judul = it },
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp)
-            )
+            item {
+                OutlinedTextField(
+                    value = judul,
+                    onValueChange = { judul = it },
+                    label = { Text("Judul") },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp)
+                )
+            }
 
-            Text("Kategori", style = MaterialTheme.typography.labelMedium)
-            DropdownMenu(
-                label = "",
-                options = kategoriList,
-                selectedOption = kategori,
-                onOptionSelected = { kategori = it }
-            )
+            item {
+                OutlinedTextField(
+                    value = sumber,
+                    onValueChange = { sumber = it },
+                    label = { Text("Sumber") },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp)
+                )
+            }
 
-            Text("Sumber", style = MaterialTheme.typography.labelMedium)
-            OutlinedTextField(
-                value = sumber,
-                onValueChange = { sumber = it },
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp)
-            )
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text("Nominal", style = MaterialTheme.typography.labelMedium)
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
                     OutlinedTextField(
                         value = nominal,
                         onValueChange = { nominal = it },
-                        modifier = Modifier.fillMaxWidth(),
-                        placeholder = { Text("Rp") },
-                        shape = RoundedCornerShape(12.dp)
+                        label = { Text("Nominal") },
+                        modifier = Modifier.weight(1f),
+                        shape = RoundedCornerShape(12.dp),
+                        placeholder = { Text("Rp") }
                     )
-                }
-
-                Column(modifier = Modifier.weight(1f)) {
-                    Text("Tanggal", style = MaterialTheme.typography.labelMedium)
                     OutlinedTextField(
                         value = tanggal,
                         onValueChange = {},
-                        modifier = Modifier.fillMaxWidth(),
+                        label = { Text("Tanggal") },
+                        readOnly = true,
                         trailingIcon = {
                             IconButton(onClick = { datePicker.show() }) {
                                 Icon(Icons.Default.DateRange, contentDescription = "Pilih Tanggal")
                             }
                         },
-                        shape = RoundedCornerShape(12.dp),
-                        readOnly = true
+                        modifier = Modifier.weight(1f),
+                        shape = RoundedCornerShape(12.dp)
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.weight(1f))
-
-            Button(
-                onClick = {
-                    if (judul.isNotBlank() && sumber.isNotBlank() && tanggal.isNotBlank() && nominal.isNotBlank()) {
-                        val request = JsonObject().apply {
-                            addProperty("namaPemasukan", judul)
-                            addProperty("sumber", kategori)
-                            addProperty("tanggal", tanggal)
-                            addProperty("total", nominal.toIntOrNull() ?: 0)
-                            addProperty("tambahanBiaya", sumber)
-                            addProperty("isPengeluaran", false)
-                        }
-
-                        viewModel.addPemasukan(request, navController)
+            // Header Tambahan Biaya
+            item {
+                Column {
+                    Text("Tambahan Biaya", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    if (biayalist.isEmpty()) {
+                        Text("Belum ada Tambahan Biaya", color = Color.Gray)
                     }
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                Text("SUBMIT")
+                }
+            }
+
+            // List Biaya Tambahan
+            itemsIndexed(biayalist) { index, biaya ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                        .padding(12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Column {
+                        Text("${biaya.namabiaya} - ${formatRupiah(biaya.jumlahbiaya.toInt())}", fontSize = 14.sp)
+                    }
+                    IconButton(onClick = {
+                        biayalist = biayalist.toMutableList().apply { removeAt(index) }
+                    }) {
+                        Icon(Icons.Default.Delete, contentDescription = "Hapus", tint = Color.Red)
+                    }
+                }
             }
         }
     }
+
+    AddBiayaDialog(
+        showDialog = showDialogBiaya,
+        onDismiss = { showDialogBiaya = false },
+        onAddItem = { namabiaya, jumlahbiaya ->
+            biayalist = biayalist + Tambahanbiaya(namabiaya, jumlahbiaya.toDouble())
+        }
+    )
 }
 

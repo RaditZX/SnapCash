@@ -46,7 +46,7 @@ class PemasukanViewModel @Inject constructor(private val apiService:SnapCashApiS
             try {
                 isLoading.value = true
                 val response =
-                    apiService.getPengeluaranUserById("Bearer ${SessionManager.idToken}", id)
+                    apiService.getPemasukanUserById("Bearer ${SessionManager.idToken}", id)
                 if (response.isSucces) {
                     pemasukanDataById.value = response.data
                 }
