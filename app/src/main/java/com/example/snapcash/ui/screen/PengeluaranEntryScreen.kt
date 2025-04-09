@@ -1,11 +1,10 @@
 package com.example.snapcash.ui.screen
 
-import com.example.snapcash.ui.component.AddBarangDialog
 import android.app.DatePickerDialog
 import android.icu.util.Calendar
+import android.util.Log
+import com.example.snapcash.ui.component.AddBarangDialog
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,6 +14,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
@@ -26,19 +27,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -48,140 +50,329 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.snapcash.ViewModel.PengeluaranViewModel
+import com.example.snapcash.ui.component.AddBiayaDialog
+import com.google.gson.JsonArray
+import com.google.gson.JsonObject
 import java.text.NumberFormat
-import java.text.SimpleDateFormat
 import java.util.Locale
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PengeluaranEntryScreen(navController: NavController) {
+fun PengeluaranEntryScreen(
+    navController: NavController,
+    id: String?,
+    viewModel: PengeluaranViewModel = hiltViewModel()
+) {
+    val context = LocalContext.current
 
+    // State untuk form input
     var judul by remember { mutableStateOf("") }
     var toko by remember { mutableStateOf("") }
     var tanggal by remember { mutableStateOf("") }
+    var total by remember { mutableStateOf(0) }
+    var request by remember { mutableStateOf(JsonObject()) }
 
+    val pengeluaranData by remember { viewModel.pengeluaranDataById }
+    val isLoading by viewModel.isLoading
+    var isUpdate by remember { mutableStateOf(false) }
+
+    val calendar = Calendar.getInstance()
+    val datePicker = DatePickerDialog(
+        context,
+        { _, year, month, dayOfMonth ->
+            tanggal = "$dayOfMonth/${month + 1}/$year"
+        },
+        calendar.get(Calendar.YEAR),
+        calendar.get(Calendar.MONTH),
+        calendar.get(Calendar.DAY_OF_MONTH)
+    )
+
+
+    // State untuk menampilkan dialog
     var showDialog by remember { mutableStateOf(false) }
-
+    var showDialogBiaya by remember { mutableStateOf(false) }
     var barangList by remember { mutableStateOf(listOf<Barang>()) }
+    var biayalist by remember { mutableStateOf(listOf<Tambahanbiaya>()) }
+    Log.d("id", id.toString())
+    if (id != null) {
+        LaunchedEffect(Unit) {
+            viewModel.getPengluaranUserById(id.toString())
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("OUTCOME", style = MaterialTheme.typography.titleMedium) },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Back")
-                    }
-                }
-            )
-        },
-        floatingActionButton = {
-            FloatingActionButton(onClick = { showDialog = true }) {
-                Icon(imageVector = Icons.Default.Add, contentDescription = "Tambah Barang")
-            }
-        },
-        bottomBar = {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.surfaceVariant)
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text("Total Pengeluaran", style = MaterialTheme.typography.bodyLarge)
-                    Text(formatRupiah(barangList.sumOf { it.harga.toIntOrNull() ?: 0 }),
-                        style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
-                }
-                Button(
-                    onClick = { /* Submit */ },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary)
-                ) {
-                    Text("SUBMIT")
-                }
+
+        }
+        LaunchedEffect(pengeluaranData) {
+            if (pengeluaranData.size() > 0) {
+                isUpdate = true
+                judul = pengeluaranData.get("namaPengeluaran")?.asString ?: ""
+                toko = pengeluaranData.get("toko")?.asString ?: ""
+                tanggal = pengeluaranData.get("tanggal")?.asString ?: ""
+                val barangJsonArray = pengeluaranData.get("barang")?.asJsonArray
+                barangList = barangJsonArray?.map { item ->
+                    val obj = item.asJsonObject
+                    Barang(
+                        nama = obj.get("namaBarang").asString,
+                        jumlah = obj.get("jumlah").asInt,
+                        harga = obj.get("harga").asDouble,
+                        kategori = obj.get("kategori").asString,
+                    )
+                } ?: emptyList()
+
+                val biayaJsonArray = pengeluaranData.get("tambahanBiaya")?.asJsonArray
+                biayalist = biayaJsonArray?.map { item ->
+                    val obj = item.asJsonObject
+                    Tambahanbiaya(
+                        namabiaya = obj.get("namaBiaya").asString,
+                        jumlahbiaya = obj.get("jumlah").asDouble,
+                    )
+                } ?: emptyList()
+
+
             }
         }
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            // Form Input
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                OutlinedTextField(
-                    value = judul,
-                    onValueChange = { judul = it },
-                    label = { Text("Judul") },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        unfocusedBorderColor = Color.Gray,
-                        focusedBorderColor = Color.Blue
-                    )
+
+    }
+
+    LaunchedEffect(barangList, biayalist) {
+        val totalBarang = barangList.sumOf { it.harga.toInt() }
+        val totalBiaya = biayalist.sumOf { it.jumlahbiaya.toInt() }
+        total = totalBarang + totalBiaya
+    }
+
+
+    val barangArray = JsonArray()
+    barangList.forEach { barang ->
+        val barangObj = JsonObject().apply {
+            addProperty("namaBarang", barang.nama)
+            addProperty("jumlah", barang.jumlah)
+            addProperty("harga", barang.harga)
+            addProperty("kategori", barang.kategori)
+        }
+        barangArray.add(barangObj)
+    }
+
+    val biayaArray = JsonArray()
+    biayalist.forEach { biaya ->
+        val biayaObj = JsonObject().apply {
+            addProperty("namaBiaya", biaya.namabiaya)
+            addProperty("jumlah", biaya.jumlahbiaya)
+        }
+        biayaArray.add(biayaObj)
+    }
+
+    request = JsonObject().apply {
+        addProperty("namaPengeluaran", judul)
+        addProperty("toko", toko)
+        addProperty("tanggal", tanggal)
+        addProperty("total", total)
+        add("barang", barangArray)
+        add("tambahanBiaya", biayaArray)
+
+    }
+
+
+
+    if (isLoading) {
+        // 👇 Show loading UI while waiting
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator()
+        }
+    } else {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text("OUTCOME", style = MaterialTheme.typography.titleMedium) },
+                    navigationIcon = {
+                        IconButton(onClick = { navController.popBackStack() }) {
+                            Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Back")
+                        }
+                    }
                 )
+            },
+            floatingActionButton = {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    horizontalAlignment = Alignment.End
+                ) {
+                    FloatingActionButton(onClick = {
+                        // show dialog untuk biaya
+                        showDialog = false // pastikan dialog barang tertutup dulu
+                        showDialogBiaya = true
+                    }) {
+                        Icon(imageVector = Icons.Default.Add, contentDescription = "Tambah Biaya")
+                    }
 
-                OutlinedTextField(
-                    value = toko,
-                    onValueChange = { toko = it },
-                    label = { Text("Toko") },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        unfocusedBorderColor = Color.Gray,
-                        focusedBorderColor = Color.Blue
-                    )
-                )
-
-                OutlinedTextField(
-                    value = tanggal,
-                    onValueChange = { tanggal = it },
-                    label = { Text("Tanggal") },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        unfocusedBorderColor = Color.Gray,
-                        focusedBorderColor = Color.Blue
-                    )
-                )
-            }
-
-            // Tabel Barang
-            Column {
-                Text("Daftar Barang", fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                Spacer(modifier = Modifier.height(8.dp))
-
-                if (barangList.isEmpty()) {
-                    Text("Belum ada barang ditambahkan", color = Color.Gray)
-                } else {
-                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        barangList.forEachIndexed { index, barang ->
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .background(MaterialTheme.colorScheme.surfaceVariant)
-                                    .padding(12.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Column {
-                                    Text("${barang.nama} - ${barang.kategori} (${barang.subkategori})", fontSize = 14.sp)
-                                    Text("Jumlah: ${barang.jumlah} | Harga: ${formatRupiah(barang.harga.toIntOrNull() ?: 0)}", fontSize = 12.sp, color = Color.Gray)
-                                }
-                                IconButton(onClick = {
-                                    barangList = barangList.toMutableList().apply { removeAt(index) }
-                                }) {
-                                    Icon(Icons.Default.Delete, contentDescription = "Hapus", tint = Color.Red)
-                                }
+                    FloatingActionButton(onClick = {
+                        // show dialog untuk barang
+                        showDialogBiaya = false // pastikan dialog biaya tertutup dulu
+                        showDialog = true
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.Create,
+                            contentDescription = "Tambah Barang"
+                        )
+                    }
+                }
+            },
+            bottomBar = {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text("Total Pengeluaran", style = MaterialTheme.typography.bodyLarge)
+                        Text(
+                            formatRupiah(total),
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                    Button(
+                        onClick = {
+                            if (isUpdate) {
+                                viewModel.updatePengeluaranUserById(
+                                    id.toString(),
+                                    request,
+                                    navController
+                                )
+                            } else {
+                                viewModel.addPengeluaran(request, navController)
                             }
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary)
+                    ) {
+                        Text("SUBMIT")
+                    }
+                }
+            }
+        ) { paddingValues ->
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                // Form
+                item {
+                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        OutlinedTextField(
+                            value = judul,
+                            onValueChange = { judul = it },
+                            label = { Text("Judul") },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                unfocusedBorderColor = Color.Gray,
+                                focusedBorderColor = Color.Blue
+                            )
+                        )
+
+                        OutlinedTextField(
+                            value = toko,
+                            onValueChange = { toko = it },
+                            label = { Text("Toko") },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                unfocusedBorderColor = Color.Gray,
+                                focusedBorderColor = Color.Blue
+                            )
+                        )
+
+                        OutlinedTextField(
+                            value = tanggal,
+                            onValueChange = { tanggal = it },
+                            label = { Text("Tanggal") },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(12.dp),
+                            trailingIcon = {
+                                IconButton(onClick = { datePicker.show() }) {
+                                    Icon(Icons.Default.DateRange, contentDescription = "Pilih Tanggal")
+                                }
+                            },
+                            colors = OutlinedTextFieldDefaults.colors(
+                                unfocusedBorderColor = Color.Gray,
+                                focusedBorderColor = Color.Blue
+                            )
+                        )
+                    }
+                }
+
+                // Header Barang
+                item {
+                    Column {
+                        Text("Daftar Barang", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                        Spacer(modifier = Modifier.height(8.dp))
+                        if (barangList.isEmpty()) {
+                            Text("Belum ada barang ditambahkan", color = Color.Gray)
+                        }
+                    }
+                }
+
+                // Daftar Barang
+                itemsIndexed(barangList) { index, barang ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(MaterialTheme.colorScheme.surfaceVariant)
+                            .padding(12.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Column {
+                            Text("${barang.nama} - ${barang.kategori}", fontSize = 14.sp)
+                            Text(
+                                "Jumlah: ${barang.jumlah} | Harga: ${formatRupiah(barang.harga.toInt())}",
+                                fontSize = 12.sp,
+                                color = Color.Gray
+                            )
+                        }
+                        IconButton(onClick = {
+                            barangList = barangList.toMutableList().apply { removeAt(index) }
+                        }) {
+                            Icon(Icons.Default.Delete, contentDescription = "Hapus", tint = Color.Red)
+                        }
+                    }
+                }
+
+                // Header Biaya
+                item {
+                    Column {
+                        Text("Tambahan Biaya", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                        Spacer(modifier = Modifier.height(8.dp))
+                        if (biayalist.isEmpty()) {
+                            Text("Belum ada Tambahan Biaya", color = Color.Gray)
+                        }
+                    }
+                }
+
+                // Daftar Biaya
+                itemsIndexed(biayalist) { index, biaya ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(MaterialTheme.colorScheme.surfaceVariant)
+                            .padding(12.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Column {
+                            Text("${biaya.namabiaya} - ${formatRupiah(biaya.jumlahbiaya.toInt())}", fontSize = 14.sp)
+                        }
+                        IconButton(onClick = {
+                            biayalist = biayalist.toMutableList().apply { removeAt(index) }
+                        }) {
+                            Icon(Icons.Default.Delete, contentDescription = "Hapus", tint = Color.Red)
                         }
                     }
                 }
@@ -193,8 +384,16 @@ fun PengeluaranEntryScreen(navController: NavController) {
     AddBarangDialog(
         showDialog = showDialog,
         onDismiss = { showDialog = false },
-        onAddItem = { nama, kategori, subkategori, jumlah, harga ->
-            barangList = barangList + Barang(nama, kategori, subkategori, jumlah, harga)
+        onAddItem = { nama, kategori, jumlah, harga ->
+            barangList = barangList + Barang(nama, kategori, jumlah.toInt(), harga.toDouble())
+        }
+    )
+
+    AddBiayaDialog(
+        showDialog = showDialogBiaya,
+        onDismiss = { showDialogBiaya = false },
+        onAddItem = { namabiaya, jumlahbiaya ->
+            biayalist = biayalist + Tambahanbiaya(namabiaya, jumlahbiaya.toDouble())
         }
     )
 }
@@ -202,9 +401,13 @@ fun PengeluaranEntryScreen(navController: NavController) {
 data class Barang(
     val nama: String,
     val kategori: String,
-    val subkategori: String,
-    val jumlah: String,
-    val harga: String
+    val jumlah: Int,
+    val harga: Double
+)
+
+data class Tambahanbiaya(
+    val namabiaya: String,
+    val jumlahbiaya: Double
 )
 
 fun formatRupiah(amount: Int): String {

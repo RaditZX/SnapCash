@@ -1,13 +1,16 @@
 package com.example.snapcash.data
 
 import android.media.Image
+import com.google.gson.JsonObject
 import okhttp3.MultipartBody
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Multipart
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Part
+import retrofit2.http.Path
 
 interface SnapCashApiService {
     @POST("signup")
@@ -35,5 +38,28 @@ interface SnapCashApiService {
     @GET("pemasukanUser")
     suspend fun getPemasukanUser(@Header("Authorization") token: String) : DefaultResponse
 
+    @GET("pemasukanUser/{id}")
+    suspend fun getPemasukanUserById(
+        @Header("Authorization") token: String,
+        @Path("id") id: String
+    ): generateTextFromInvoiceResponse
 
+    @GET("pengeluaranUser/{id}")
+    suspend fun getPengeluaranUserById(
+        @Header("Authorization") token: String,
+        @Path("id") id: String
+    ): generateTextFromInvoiceResponse
+
+    @PUT("/pengeluaranUser/update/{id}")
+    suspend fun  updatePengeluaranById(
+        @Header("Authorization") token: String,
+        @Path("id") id: String,
+        @Body data: JsonObject
+    ) : generateTextFromInvoiceResponse
+
+    @POST("pengeluaranUser")
+    suspend fun addPengeluaran(
+        @Header("Authorization") token: String,
+        @Body data: JsonObject
+    ) : generateTextFromInvoiceResponse
 }

@@ -16,15 +16,21 @@ data class SignUpResponse(
 data class SignInResponse(
     val data: UserCredentialData,
     val message: String,
-    val isSucces : Boolean
+    val isSucces : Boolean,
 )
+
 
 data class UserCredentialData(
     val userCredential: UserCredential
 )
 
+data class token(
+    val idToken : String
+)
+
 data class UserCredential(
-    val user: User
+    val user: User,
+    val _tokenResponse : token
 )
 
 data class generateTextFromInvoiceResponse(

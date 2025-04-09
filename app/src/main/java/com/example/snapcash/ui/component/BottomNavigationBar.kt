@@ -71,7 +71,7 @@ fun BottomNavigationBar(navController: NavController) {
                     unselectedTextColor = Color.Gray,
                     indicatorColor = Color.Transparent
                 ),
-                onClick = { navController.navigate("catat") }
+                onClick = { navController.navigate("tambah/pengeluaran") }
             )
             Spacer(modifier = Modifier.weight(1f))
             NavigationBarItem(
