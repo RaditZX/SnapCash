@@ -57,9 +57,23 @@ interface SnapCashApiService {
         @Body data: JsonObject
     ) : generateTextFromInvoiceResponse
 
+    @PUT("/pemasukanUser/update/{id}")
+    suspend fun  updatePemasukanById(
+        @Header("Authorization") token: String,
+        @Path("id") id: String,
+        @Body data: JsonObject
+    ) : generateTextFromInvoiceResponse
+
     @POST("pengeluaranUser")
     suspend fun addPengeluaran(
         @Header("Authorization") token: String,
         @Body data: JsonObject
     ) : generateTextFromInvoiceResponse
+
+    @POST("pemasukanUser")
+    suspend fun addPemasukan(
+        @Header("Authorization") token: String,
+        @Body data: JsonObject
+    ): generateTextFromInvoiceResponse
+
 }

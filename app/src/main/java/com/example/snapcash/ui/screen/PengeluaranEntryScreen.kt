@@ -57,6 +57,8 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import java.text.NumberFormat
 import java.util.Locale
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -182,14 +184,33 @@ fun PengeluaranEntryScreen(
     } else {
         Scaffold(
             topBar = {
-                TopAppBar(
-                    title = { Text("OUTCOME", style = MaterialTheme.typography.titleMedium) },
-                    navigationIcon = {
-                        IconButton(onClick = { navController.popBackStack() }) {
-                            Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Back")
-                        }
+                Column {
+                    Text(
+                        text = "CATAT",
+                        style = MaterialTheme.typography.titleLarge,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 16.dp),
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                    )
+
+                    TabRow(selectedTabIndex = 1) {
+                        Tab(
+                            selected = false,
+                            onClick = {
+                                navController.navigate("tambah/pemasukan") // Sesuaikan dengan route-mu
+                            },
+                            text = { Text("INCOME", color = Color.Gray) }
+                        )
+                        Tab(
+                            selected = true,
+                            onClick = { /* Stay here */ },
+                            text = { Text("OUTCOME", fontWeight = FontWeight.Bold) }
+                        )
                     }
-                )
+                }
             },
             floatingActionButton = {
                 Column(

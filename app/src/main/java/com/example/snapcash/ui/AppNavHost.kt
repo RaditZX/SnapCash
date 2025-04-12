@@ -111,6 +111,9 @@ fun AppNavHost(
                         openSidebar = { sidebarScope.launch { sidebarState.open() } }
                     )
                 }
+                composable("tambah/pemasukan"){
+                    PemasukanEntryScreen(navController = navController)
+                }
                 composable("tambah/pengeluaran") {
                     PengeluaranEntryScreen(navController = navController, id = null)
                 }
@@ -128,7 +131,7 @@ fun AppNavHost(
                     SettingScreen(navController = navController)
                 }
                 composable("aboutus") {
-                    PemasukanEntryScreen(navController = navController)
+                    AboutUsScreen(navController = navController)
                 }
                 composable("help") {
                     HelpScreen(navController = navController)
