@@ -52,6 +52,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.snapcash.ViewModel.PengeluaranViewModel
+import com.example.snapcash.data.Barang
+import com.example.snapcash.data.Tambahanbiaya
 import com.example.snapcash.ui.component.AddBiayaDialog
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
@@ -96,7 +98,6 @@ fun PengeluaranEntryScreen(
     var showDialogBiaya by remember { mutableStateOf(false) }
     var barangList by remember { mutableStateOf(listOf<Barang>()) }
     var biayalist by remember { mutableStateOf(listOf<Tambahanbiaya>()) }
-    Log.d("id", id.toString())
     if (id != null) {
         LaunchedEffect(Unit) {
             viewModel.getPengluaranUserById(id.toString())
@@ -214,6 +215,17 @@ fun PengeluaranEntryScreen(
                             contentDescription = "Tambah Barang"
                         )
                     }
+                    if (isUpdate){
+                        FloatingActionButton(onClick = {
+                            viewModel.deletePengeluaranById(id.toString(), navController)
+                        }) {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = "Delete Pengeluaran"
+                            )
+                        }
+                    }
+
                 }
             },
             bottomBar = {
@@ -398,17 +410,6 @@ fun PengeluaranEntryScreen(
     )
 }
 
-data class Barang(
-    val nama: String,
-    val kategori: String,
-    val jumlah: Int,
-    val harga: Double
-)
-
-data class Tambahanbiaya(
-    val namabiaya: String,
-    val jumlahbiaya: Double
-)
 
 fun formatRupiah(amount: Int): String {
     val format = NumberFormat.getCurrencyInstance(Locale("id", "ID"))

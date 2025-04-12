@@ -4,6 +4,7 @@ import android.media.Image
 import com.google.gson.JsonObject
 import okhttp3.MultipartBody
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Multipart
@@ -55,6 +56,25 @@ interface SnapCashApiService {
         @Header("Authorization") token: String,
         @Path("id") id: String,
         @Body data: JsonObject
+    ) : generateTextFromInvoiceResponse
+
+    @PUT("/pemasukanUser/update/{id}")
+    suspend fun  updatePemasukanById(
+        @Header("Authorization") token: String,
+        @Path("id") id: String,
+        @Body data: JsonObject
+    ) : generateTextFromInvoiceResponse
+
+    @DELETE("pengeluaranUser/delete/{id}")
+    suspend fun  deletePengeluaranById(
+        @Header("Authorization") token: String,
+        @Path("id") id: String,
+    ) : generateTextFromInvoiceResponse
+
+    @DELETE("pemasukanUser/delete/{id}")
+    suspend fun  deletePemasukanById(
+        @Header("Authorization") token: String,
+        @Path("id") id: String,
     ) : generateTextFromInvoiceResponse
 
     @POST("pengeluaranUser")
