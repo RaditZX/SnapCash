@@ -63,7 +63,7 @@ fun BottomNavigationBar(navController: NavController) {
                     )
                 },
                 label = { Text("Catat" ) },
-                selected = currentRoute == "catat",
+                selected = currentRoute == "tambah/pengeluaran" || currentRoute == "tambah/pemasukan",
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = navPrimaryColor,
                     unselectedIconColor = Color.Gray,

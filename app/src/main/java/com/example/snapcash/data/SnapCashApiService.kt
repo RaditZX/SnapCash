@@ -34,10 +34,10 @@ interface SnapCashApiService {
     ): generateTextFromInvoiceResponse
 
     @GET("pengeluaranUser")
-    suspend fun getPengeluaranUser(@Header("Authorization") token: String) : DefaultResponse
+    suspend fun getPengeluaranUser(@Header("Authorization") token: String): DefaultResponse
 
     @GET("pemasukanUser")
-    suspend fun getPemasukanUser(@Header("Authorization") token: String) : DefaultResponse
+    suspend fun getPemasukanUser(@Header("Authorization") token: String): DefaultResponse
 
     @GET("pemasukanUser/{id}")
     suspend fun getPemasukanUserById(
@@ -52,34 +52,40 @@ interface SnapCashApiService {
     ): generateTextFromInvoiceResponse
 
     @PUT("/pengeluaranUser/update/{id}")
-    suspend fun  updatePengeluaranById(
+    suspend fun updatePengeluaranById(
         @Header("Authorization") token: String,
         @Path("id") id: String,
         @Body data: JsonObject
-    ) : generateTextFromInvoiceResponse
+    ): generateTextFromInvoiceResponse
 
     @PUT("/pemasukanUser/update/{id}")
-    suspend fun  updatePemasukanById(
+    suspend fun updatePemasukanById(
         @Header("Authorization") token: String,
         @Path("id") id: String,
         @Body data: JsonObject
-    ) : generateTextFromInvoiceResponse
-
-    @DELETE("pengeluaranUser/delete/{id}")
-    suspend fun  deletePengeluaranById(
-        @Header("Authorization") token: String,
-        @Path("id") id: String,
-    ) : generateTextFromInvoiceResponse
-
-    @DELETE("pemasukanUser/delete/{id}")
-    suspend fun  deletePemasukanById(
-        @Header("Authorization") token: String,
-        @Path("id") id: String,
-    ) : generateTextFromInvoiceResponse
+    ): generateTextFromInvoiceResponse
 
     @POST("pengeluaranUser")
     suspend fun addPengeluaran(
         @Header("Authorization") token: String,
         @Body data: JsonObject
+    ): generateTextFromInvoiceResponse
+
+    @POST("pemasukanUser")
+    suspend fun addPemasukan(
+        @Header("Authorization") token: String,
+        @Body data: JsonObject
+    ): generateTextFromInvoiceResponse
+
+    @DELETE("pemasukanUser/delete/{id}")
+    suspend fun deletePemasukanById(
+        @Header("Authorization") token: String,
+        @Path("id") id: String,
+    ): generateTextFromInvoiceResponse
+
+    @DELETE("pengeluaranUser/delete/{id}")
+    suspend fun deletePengeluaranById(
+        @Header("Authorization") token: String,
+        @Path("id") id: String,
     ) : generateTextFromInvoiceResponse
 }

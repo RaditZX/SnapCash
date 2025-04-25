@@ -33,6 +33,7 @@ import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
@@ -59,6 +60,10 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import java.text.NumberFormat
 import java.util.Locale
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
+import androidx.compose.material3.TabRowDefaults
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -137,7 +142,7 @@ fun PengeluaranEntryScreen(
     }
 
     LaunchedEffect(barangList, biayalist) {
-        val totalBarang = barangList.sumOf { it.harga.toInt() }
+        val totalBarang = barangList.sumOf { (it.harga.toInt()) * (it.jumlah.toInt()) }
         val totalBiaya = biayalist.sumOf { it.jumlahbiaya.toInt() }
         total = totalBarang + totalBiaya
     }
@@ -183,21 +188,45 @@ fun PengeluaranEntryScreen(
     } else {
         Scaffold(
             topBar = {
-                TopAppBar(
-                    title = { Text("OUTCOME", style = MaterialTheme.typography.titleMedium) },
-                    navigationIcon = {
-                        IconButton(onClick = { navController.popBackStack() }) {
-                            Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Back")
-                        }
+                Column {
+                    Text(
+                        text = "CATAT",
+                        style = MaterialTheme.typography.titleLarge,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 16.dp),
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                    )
+
+                    TabRow(selectedTabIndex = 1,contentColor = Color(0xFF2D6CE9),indicator = { tabPositions ->
+                        TabRowDefaults.Indicator(
+                            modifier = Modifier.tabIndicatorOffset(tabPositions[1]),
+                            color = Color(0xFF2D6CE9) // 👈 your custom underline color
+                        )
+                    }) {
+                        Tab(
+                            selected = false,
+                            onClick = {
+                                navController.navigate("tambah/pemasukan") // Sesuaikan dengan route-mu
+                            },
+                            text = { Text("INCOME", color = Color.Gray) }
+                        )
+                        Tab(
+                            selected = true,
+                            onClick = { /* Stay here */ },
+                            text = { Text("OUTCOME", fontWeight = FontWeight.Bold) }
+                        )
                     }
-                )
+                }
             },
             floatingActionButton = {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                     horizontalAlignment = Alignment.End
                 ) {
-                    FloatingActionButton(onClick = {
+                    FloatingActionButton(containerColor = Color(0xFF2D6CE9),onClick = {
                         // show dialog untuk biaya
                         showDialog = false // pastikan dialog barang tertutup dulu
                         showDialogBiaya = true
@@ -205,7 +234,7 @@ fun PengeluaranEntryScreen(
                         Icon(imageVector = Icons.Default.Add, contentDescription = "Tambah Biaya")
                     }
 
-                    FloatingActionButton(onClick = {
+                    FloatingActionButton(containerColor = Color(0xFF2D6CE9),onClick = {
                         // show dialog untuk barang
                         showDialogBiaya = false // pastikan dialog biaya tertutup dulu
                         showDialog = true
@@ -216,7 +245,7 @@ fun PengeluaranEntryScreen(
                         )
                     }
                     if (isUpdate){
-                        FloatingActionButton(onClick = {
+                        FloatingActionButton(containerColor = Color(0xFF2D6CE9),onClick = {
                             viewModel.deletePengeluaranById(id.toString(), navController)
                         }) {
                             Icon(
@@ -240,7 +269,7 @@ fun PengeluaranEntryScreen(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text("Total Pengeluaran", style = MaterialTheme.typography.bodyLarge)
+                        Text("Total Outcome", style = MaterialTheme.typography.bodyLarge)
                         Text(
                             formatRupiah(total),
                             style = MaterialTheme.typography.bodyLarge,
@@ -260,7 +289,12 @@ fun PengeluaranEntryScreen(
                             }
                         },
                         modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary)
+                        colors = ButtonColors(
+                            containerColor = Color(0xFF2D6CE9),
+                            contentColor = Color.White,
+                            disabledContainerColor = Color.Gray,
+                            disabledContentColor = Color.Gray,
+                        ),
                     ) {
                         Text("SUBMIT")
                     }
@@ -280,7 +314,7 @@ fun PengeluaranEntryScreen(
                         OutlinedTextField(
                             value = judul,
                             onValueChange = { judul = it },
-                            label = { Text("Judul") },
+                            label = { Text("Title") },
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(12.dp),
                             colors = OutlinedTextFieldDefaults.colors(
@@ -292,7 +326,7 @@ fun PengeluaranEntryScreen(
                         OutlinedTextField(
                             value = toko,
                             onValueChange = { toko = it },
-                            label = { Text("Toko") },
+                            label = { Text("Store") },
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(12.dp),
                             colors = OutlinedTextFieldDefaults.colors(
@@ -304,7 +338,7 @@ fun PengeluaranEntryScreen(
                         OutlinedTextField(
                             value = tanggal,
                             onValueChange = { tanggal = it },
-                            label = { Text("Tanggal") },
+                            label = { Text("Date") },
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(12.dp),
                             trailingIcon = {
@@ -323,10 +357,10 @@ fun PengeluaranEntryScreen(
                 // Header Barang
                 item {
                     Column {
-                        Text("Daftar Barang", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                        Text("List Item", fontSize = 16.sp, fontWeight = FontWeight.Bold)
                         Spacer(modifier = Modifier.height(8.dp))
                         if (barangList.isEmpty()) {
-                            Text("Belum ada barang ditambahkan", color = Color.Gray)
+                            Text("There are no item", color = Color.Gray)
                         }
                     }
                 }
@@ -344,7 +378,7 @@ fun PengeluaranEntryScreen(
                         Column {
                             Text("${barang.nama} - ${barang.kategori}", fontSize = 14.sp)
                             Text(
-                                "Jumlah: ${barang.jumlah} | Harga: ${formatRupiah(barang.harga.toInt())}",
+                                "Quantity: ${barang.jumlah} | Price: ${formatRupiah(barang.harga.toInt())}",
                                 fontSize = 12.sp,
                                 color = Color.Gray
                             )
@@ -360,10 +394,10 @@ fun PengeluaranEntryScreen(
                 // Header Biaya
                 item {
                     Column {
-                        Text("Tambahan Biaya", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                        Text("Additional Cost", fontSize = 16.sp, fontWeight = FontWeight.Bold)
                         Spacer(modifier = Modifier.height(8.dp))
                         if (biayalist.isEmpty()) {
-                            Text("Belum ada Tambahan Biaya", color = Color.Gray)
+                            Text("There are no additional cost", color = Color.Gray)
                         }
                     }
                 }

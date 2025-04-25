@@ -16,12 +16,13 @@ import javax.inject.Inject
 class PemasukanViewModel @Inject constructor(private val apiService:SnapCashApiService) : ViewModel()  {
     val pemasukanData = mutableStateOf(arrayOf<JsonObject>())
 
+    val pemasukanDataById = mutableStateOf(JsonObject())
+
     fun setPemasukanData(data: Array<JsonObject>) {
         pemasukanData.value = data
     }
 
-    val pemasukanDataById = mutableStateOf(JsonObject())
-    val isLoading = mutableStateOf(true)
+    val isLoading = mutableStateOf(false)
 
     fun getPemasukanUser (){
         viewModelScope.launch{
@@ -57,7 +58,6 @@ class PemasukanViewModel @Inject constructor(private val apiService:SnapCashApiS
         }
     }
 
-
     fun updatePemasukanUserById(id: String, data: JsonObject, navController: NavController) {
         viewModelScope.launch {
             try {
@@ -66,6 +66,24 @@ class PemasukanViewModel @Inject constructor(private val apiService:SnapCashApiS
                     apiService.updatePemasukanById("Bearer ${SessionManager.idToken}", id, data)
                 if (response.isSucces) {
                     navController.navigate("history")
+                }
+            } catch (e: Exception) {
+                Log.e("EXCEPTION", "Exception: ${e.message}", e)
+            } finally {
+                isLoading.value = false
+            }
+        }
+    }
+
+    fun addPemasukan(data: JsonObject, navController: NavController) {
+        viewModelScope.launch {
+            try {
+                isLoading.value = true
+                val response = apiService.addPemasukan("Bearer ${SessionManager.idToken}", data)
+                if (response.isSucces) {
+                    navController.navigate("history")
+                } else {
+                    Log.e("ADD_PEMASUKAN", "Failed: ${response.message}")
                 }
             } catch (e: Exception) {
                 Log.e("EXCEPTION", "Exception: ${e.message}", e)
@@ -90,4 +108,5 @@ class PemasukanViewModel @Inject constructor(private val apiService:SnapCashApiS
             }
         }
     }
+
 }

@@ -35,7 +35,7 @@ object NetworkModule {
     @Singleton
     fun provideRetrofit(client: OkHttpClient): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("https://snap-cash-service.vercel.app/")
+            .baseUrl("https://snapcash-service.my.id/")
             .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
