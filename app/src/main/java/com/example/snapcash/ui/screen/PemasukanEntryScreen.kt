@@ -1,9 +1,11 @@
 package com.example.snapcash.ui.screen
 
 import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import android.icu.util.Calendar
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,50 +15,53 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.example.snapcash.ViewModel.PemasukanViewModel
 import com.example.snapcash.data.Tambahanbiaya
 import com.example.snapcash.ui.component.AddBiayaDialog
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
-
+import java.text.NumberFormat
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -65,9 +70,13 @@ fun PemasukanEntryScreen(
     viewModel: PemasukanViewModel = hiltViewModel(),
     id: String?
 ) {
+    // Context
     val context = LocalContext.current
-    val calendar = Calendar.getInstance()
 
+    // Colors
+    val primaryColor = Color(0xFF2D6CE9)
+
+    // State variables
     var judul by remember { mutableStateOf("") }
     var sumber by remember { mutableStateOf("") }
     var tanggal by remember { mutableStateOf("") }
@@ -75,9 +84,41 @@ fun PemasukanEntryScreen(
     var subTotal by remember { mutableStateOf(0) }
     var kategori by remember { mutableStateOf("") }
     var biayalist by remember { mutableStateOf(listOf<Tambahanbiaya>()) }
-    val pemasukanData by remember { viewModel.pemasukanDataById }
+    var showDialogBiaya by remember { mutableStateOf(false) }
     var isUpdate by remember { mutableStateOf(false) }
-    var totalIsUpdate by remember {mutableStateOf(0.0)}
+    var totalIsUpdate by remember { mutableStateOf(0.0) }
+
+    // ViewModel state
+    val pemasukanData by remember { viewModel.pemasukanDataById }
+
+    // Date and time setup
+    val dateTimeFormatter = SimpleDateFormat("dd MMMM yyyy, HH:mm:ss", Locale("id", "ID"))
+    val calendar = Calendar.getInstance()
+
+    // Date and time picker dialogs
+    val datePicker = DatePickerDialog(
+        context,
+        { _, year, month, dayOfMonth ->
+            calendar.set(year, month, dayOfMonth)
+            TimePickerDialog(
+                context,
+                { _, hourOfDay, minute ->
+                    calendar.set(Calendar.HOUR_OF_DAY, hourOfDay)
+                    calendar.set(Calendar.MINUTE, minute)
+                    calendar.set(Calendar.SECOND, 0)
+                    tanggal = dateTimeFormatter.format(calendar.time)
+                },
+                calendar.get(Calendar.HOUR_OF_DAY),
+                calendar.get(Calendar.MINUTE),
+                true
+            ).show()
+        },
+        calendar.get(Calendar.YEAR),
+        calendar.get(Calendar.MONTH),
+        calendar.get(Calendar.DAY_OF_MONTH)
+    )
+
+    // Load data if in update mode
     if (id != null) {
         LaunchedEffect(Unit) {
             viewModel.getPemasukanUserById(id)
@@ -102,33 +143,20 @@ fun PemasukanEntryScreen(
                     )
                 } ?: emptyList()
 
-                totalIsUpdate = (if (nominal == 0) {
-                    0.0
-                } else {
-                    val totalBiaya = biayalist.sumOf { it.jumlahbiaya }
-                    Log.d("biaya", totalBiaya.toString())
-                    (nominal - totalBiaya)
-                })
+                // Calculate total excluding additional costs
+                val totalBiaya = biayalist.sumOf { it.jumlahbiaya }
+                totalIsUpdate = if (nominal == 0) 0.0 else (nominal - totalBiaya)
+                Log.d("biaya", "Total biaya: $totalBiaya, Total is update: $totalIsUpdate")
             }
         }
     }
 
-    val kategoriList = listOf("Gaji", "Investasi", "Bisnis", "Hadiah")
-    var showDialogBiaya by remember { mutableStateOf(false) }
-
-
-    val datePicker = DatePickerDialog(
-        context,
-        { _, year, month, dayOfMonth ->
-            tanggal = "$dayOfMonth/${month + 1}/$year"
-        },
-        calendar.get(Calendar.YEAR),
-        calendar.get(Calendar.MONTH),
-        calendar.get(Calendar.DAY_OF_MONTH)
-    )
+    // Calculate totals
+    val nominalValue = if (isUpdate) totalIsUpdate else subTotal.toDouble()
+    val totalTambahan = biayalist.sumOf { it.jumlahbiaya }
+    val total = nominalValue + totalTambahan
 
     Scaffold(
-
         topBar = {
             Column {
                 Text(
@@ -142,12 +170,16 @@ fun PemasukanEntryScreen(
                     textAlign = TextAlign.Center
                 )
 
-                TabRow(selectedTabIndex = 0, contentColor = Color(0xFF2D6CE9),indicator = { tabPositions ->
-                    TabRowDefaults.Indicator(
-                        modifier = Modifier.tabIndicatorOffset(tabPositions[0]),
-                        color = Color(0xFF2D6CE9) // 👈 your custom underline color
-                    )
-                }) {
+                TabRow(
+                    selectedTabIndex = 0,
+                    contentColor = primaryColor,
+                    indicator = { tabPositions ->
+                        TabRowDefaults.Indicator(
+                            modifier = Modifier.tabIndicatorOffset(tabPositions[0]),
+                            color = primaryColor
+                        )
+                    }
+                ) {
                     Tab(
                         selected = true,
                         onClick = {},
@@ -169,29 +201,30 @@ fun PemasukanEntryScreen(
                 horizontalAlignment = Alignment.End
             ) {
                 if (isUpdate) {
-                    FloatingActionButton(containerColor = Color(0xFF2D6CE9), onClick = {
-                        viewModel.deletePemasukanById(id.toString(), navController)
-                    }) {
+                    FloatingActionButton(
+                        containerColor = primaryColor,
+                        onClick = {
+                            viewModel.deletePemasukanById(id.toString(), navController)
+                        }
+                    ) {
                         Icon(
                             imageVector = Icons.Default.Delete,
-                            contentDescription = "Delete Pemasukan"
+                            contentDescription = "Delete Income"
                         )
                     }
                 }
-                FloatingActionButton(onClick = { showDialogBiaya = true }, containerColor = Color(0xFF2D6CE9)) {
-                    Icon(Icons.Default.Add, contentDescription = "Tambah Biaya")
+                FloatingActionButton(
+                    onClick = { showDialogBiaya = true },
+                    containerColor = primaryColor
+                ) {
+                    Icon(
+                        Icons.Default.Add,
+                        contentDescription = "Add Cost"
+                    )
                 }
             }
         },
         bottomBar = {
-            val nominalValue = nominal.toDouble() ?: 0.0
-            val totalTambahan = biayalist.sumOf { it.jumlahbiaya }
-            val total = if (isUpdate) {
-                totalIsUpdate + totalTambahan
-            } else {
-                nominalValue + totalTambahan
-            }
-
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -212,14 +245,16 @@ fun PemasukanEntryScreen(
                 }
                 Button(
                     onClick = {
-                        if (judul.isNotBlank() && sumber.isNotBlank() && tanggal.isNotBlank() && nominal != 0) {
-                            val biayaArray = JsonArray()
-                            biayalist.forEach {
-                                val biayaObj = JsonObject().apply {
-                                    addProperty("namaBiaya", it.namabiaya)
-                                    addProperty("jumlah", it.jumlahbiaya)
+                        if (judul.isNotBlank() && sumber.isNotBlank() && tanggal.isNotBlank() &&
+                            (isUpdate || subTotal != 0)) {
+
+                            val biayaArray = JsonArray().apply {
+                                biayalist.forEach { biaya ->
+                                    add(JsonObject().apply {
+                                        addProperty("namaBiaya", biaya.namabiaya)
+                                        addProperty("jumlah", biaya.jumlahbiaya)
+                                    })
                                 }
-                                biayaArray.add(biayaObj)
                             }
 
                             val request = JsonObject().apply {
@@ -234,17 +269,15 @@ fun PemasukanEntryScreen(
                             viewModel.addPemasukan(request, navController)
                         }
                     },
-                    colors = ButtonColors(
-                        containerColor = Color(0xFF2D6CE9),
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                        containerColor = primaryColor,
                         contentColor = Color.White,
                         disabledContainerColor = Color.Gray,
-                        disabledContentColor = Color.Gray,
-                    ),
-
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp)
+                        disabledContentColor = Color.Gray
+                    )
                 ) {
-
                     Text("SUBMIT")
                 }
             }
@@ -257,6 +290,7 @@ fun PemasukanEntryScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+            // Title field
             item {
                 OutlinedTextField(
                     value = judul,
@@ -267,6 +301,7 @@ fun PemasukanEntryScreen(
                 )
             }
 
+            // Source field
             item {
                 OutlinedTextField(
                     value = sumber,
@@ -277,19 +312,25 @@ fun PemasukanEntryScreen(
                 )
             }
 
+            // Amount and date fields
             item {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
+                    // Amount field
                     OutlinedTextField(
                         value = if (isUpdate) {
-                            totalIsUpdate.toInt().toString() // atau pakai format jika mau tetap 2 digit desimal
+                            totalIsUpdate.toInt().toString()
                         } else {
                             subTotal.toString()
                         },
                         onValueChange = {
-                            subTotal = it.toIntOrNull() ?: 0
+                            if (isUpdate) {
+                                totalIsUpdate = it.toDoubleOrNull() ?: 0.0
+                            } else {
+                                subTotal = it.toIntOrNull() ?: 0
+                            }
                         },
                         label = { Text("Amount") },
                         modifier = Modifier.weight(1f),
@@ -297,25 +338,45 @@ fun PemasukanEntryScreen(
                         placeholder = { Text("Rp") },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                     )
+
+                    // Date field
                     OutlinedTextField(
                         value = tanggal,
-                        onValueChange = {},
+                        onValueChange = { /* Read-only */ },
                         label = { Text("Date") },
-                        readOnly = true,
                         trailingIcon = {
                             IconButton(onClick = { datePicker.show() }) {
-                                Icon(Icons.Default.DateRange, contentDescription = "Pilih Tanggal")
+                                Icon(Icons.Default.DateRange, contentDescription = "Select Date")
                             }
                         },
-                        modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(12.dp)
+                        modifier = Modifier
+                            .weight(1f)
+                            .pointerInput(Unit) {
+                                detectTapGestures { datePicker.show() }
+                            },
+                        shape = RoundedCornerShape(12.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            unfocusedBorderColor = Color.Gray,
+                            focusedBorderColor = primaryColor,
+                            disabledBorderColor = Color.Gray,
+                            disabledTextColor = MaterialTheme.colorScheme.onSurface,
+                            disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            disabledTrailingIconColor = MaterialTheme.colorScheme.onSurface
+                        ),
+                        readOnly = true,
+                        enabled = false
                     )
                 }
             }
 
+            // Additional costs header
             item {
                 Column {
-                    Text("Additional Add", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                    Text(
+                        "Additional Add",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold
+                    )
                     Spacer(modifier = Modifier.height(8.dp))
                     if (biayalist.isEmpty()) {
                         Text("There are no additional add", color = Color.Gray)
@@ -323,6 +384,7 @@ fun PemasukanEntryScreen(
                 }
             }
 
+            // List of additional costs
             itemsIndexed(biayalist) { index, biaya ->
                 Row(
                     modifier = Modifier
@@ -333,26 +395,38 @@ fun PemasukanEntryScreen(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Column {
-                        Text("${biaya.namabiaya} - ${formatRupiah(biaya.jumlahbiaya.toInt())}", fontSize = 14.sp)
+                        Text(
+                            "${biaya.namabiaya} - ${formatRupiah(biaya.jumlahbiaya.toInt())}",
+                            fontSize = 14.sp
+                        )
                     }
-                    IconButton(onClick = {
-                        biayalist = biayalist.toMutableList().apply { removeAt(index) }
-                    }) {
-                        Icon(Icons.Default.Delete, contentDescription = "Hapus", tint = Color.Red)
+                    IconButton(
+                        onClick = {
+                            biayalist = biayalist.toMutableList().apply {
+                                removeAt(index)
+                            }
+                        }
+                    ) {
+                        Icon(
+                            Icons.Default.Delete,
+                            contentDescription = "Delete",
+                            tint = Color.Red
+                        )
                     }
                 }
             }
         }
     }
 
+    // Dialog for adding additional costs
     AddBiayaDialog(
         showDialog = showDialogBiaya,
         onDismiss = { showDialogBiaya = false },
         onAddItem = { namabiaya, jumlahbiaya ->
-            biayalist = biayalist + Tambahanbiaya(namabiaya, jumlahbiaya.toDouble())
+            biayalist = biayalist + Tambahanbiaya(
+                namabiaya,
+                jumlahbiaya.toDouble()
+            )
         }
     )
 }
-
-
-
