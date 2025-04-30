@@ -136,7 +136,7 @@ fun PengeluaranEntryScreen(
     }
 
     LaunchedEffect(barangList, biayalist) {
-        val totalBarang = barangList.sumOf { it.harga.toInt() }
+        val totalBarang = barangList.sumOf { (it.harga.toInt() * it.jumlah.toInt())}
         val totalBiaya = biayalist.sumOf { it.jumlahbiaya.toInt() }
         total = totalBarang + totalBiaya
     }
@@ -175,7 +175,6 @@ fun PengeluaranEntryScreen(
 
 
     if (isLoading) {
-        // 👇 Show loading UI while waiting
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             CircularProgressIndicator()
         }
