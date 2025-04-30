@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -18,6 +17,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.example.snapcash.ui.theme.night
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -25,7 +25,8 @@ fun DropdownMenu(
     label: String,
     options: List<String>,
     selectedOption: String,
-    onOptionSelected: (String) -> Unit
+    onOptionSelected: (String) -> Unit,
+    containerColor: Color
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -34,7 +35,7 @@ fun DropdownMenu(
             modifier = Modifier
                 .fillMaxWidth()
                 .border(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
-                .background(Color.White, RoundedCornerShape(12.dp))
+                .background(color = containerColor, RoundedCornerShape(12.dp))
                 .clickable { expanded = true }
                 .padding(16.dp)
         ) {
@@ -55,7 +56,7 @@ fun DropdownMenu(
             onDismissRequest = { expanded = false },
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color.White, RoundedCornerShape(12.dp))
+                .background(containerColor, RoundedCornerShape(12.dp))
         ) {
             options.forEach { option ->
                 DropdownMenuItem(

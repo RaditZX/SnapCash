@@ -12,7 +12,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import com.example.snapcash.ui.component.DropdownMenu
+import com.example.snapcash.ui.theme.night
 
 @Composable
 fun AddBarangDialog(
@@ -24,14 +24,14 @@ fun AddBarangDialog(
         Dialog(onDismissRequest = onDismiss) {
             Box(
                 modifier = Modifier
-                    .background(Color.White, shape = RoundedCornerShape(12.dp))
+                    .background(night, shape = RoundedCornerShape(12.dp))
                     .padding(16.dp)
             ) {
                 var namaProduk by remember { mutableStateOf("") }
                 var kategori by remember { mutableStateOf("") }
                 var jumlah by remember { mutableStateOf("") }
                 var harga by remember { mutableStateOf("") }
-                val kategoriList = listOf("Gaji", "Investasi", "Bisnis", "Hadiah")
+                val kategoriList = listOf("Food&Beverage", "Fashion", "Transportation", "Education")
 
                 Column(
                     verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -47,6 +47,7 @@ fun AddBarangDialog(
 
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         DropdownMenu(
+                            containerColor = night,
                             label = "",
                             options = kategoriList,
                             selectedOption = kategori,
@@ -57,12 +58,12 @@ fun AddBarangDialog(
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         OutlinedTextField(
                             value = jumlah, onValueChange = { jumlah = it },
-                            label = { Text("Jumlah") },
+                            label = { Text("Quantity") },
                             modifier = Modifier.weight(1f)
                         )
                         OutlinedTextField(
                             value = harga, onValueChange = { harga = it },
-                            label = { Text("Harga") },
+                            label = { Text("Price") },
                             modifier = Modifier.weight(1f)
                         )
                     }
@@ -73,9 +74,9 @@ fun AddBarangDialog(
                             onDismiss()
                         },
                         modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(Color.Blue)
+                        colors = ButtonDefaults.buttonColors(Color(0xFF2D6CE9))
                     ) {
-                        Text("Tambah", color = Color.White)
+                        Text("Add", color = Color.White)
                     }
                 }
             }

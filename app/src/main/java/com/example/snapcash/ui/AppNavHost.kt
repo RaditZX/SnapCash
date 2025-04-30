@@ -114,9 +114,16 @@ fun AppNavHost(
                 composable("tambah/pengeluaran") {
                     PengeluaranEntryScreen<Any>(navController = navController, id = null)
                 }
+                composable("tambah/pemasukan") {
+                    PemasukanEntryScreen(navController = navController, id = null)
+                }
                 composable("update/pengeluaran/{id}") { backStackEntry ->
                     val id = backStackEntry.arguments?.getString("id").toString()
                     PengeluaranEntryScreen<Any>(navController = navController, id)
+                }
+                composable("update/pemasukan/{id}") { backStackEntry ->
+                    val id = backStackEntry.arguments?.getString("id").toString()
+                    PemasukanEntryScreen(navController = navController, id = id)
                 }
                 composable("history") {
                     HistoryScreen(navController = navController)
@@ -128,7 +135,7 @@ fun AppNavHost(
                     SettingScreen(navController = navController)
                 }
                 composable("aboutus") {
-                    PemasukanEntryScreen(navController = navController)
+                    AboutUsScreen(navController)
                 }
                 composable("help") {
                     HelpScreen(navController = navController)

@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.snapcash.ui.component.DropdownMenu
+import com.example.snapcash.ui.theme.night
 
 @Composable
 fun AddBiayaDialog(
@@ -24,7 +25,7 @@ fun AddBiayaDialog(
         Dialog(onDismissRequest = onDismiss) {
             Box(
                 modifier = Modifier
-                    .background(Color.White, shape = RoundedCornerShape(12.dp))
+                    .background(night, shape = RoundedCornerShape(12.dp))
                     .padding(16.dp)
             ) {
                 var namabiaya by remember { mutableStateOf("") }
@@ -38,7 +39,7 @@ fun AddBiayaDialog(
 
                     OutlinedTextField(
                         value = namabiaya, onValueChange = { namabiaya = it },
-                        label = { Text("Nama Biaya") },
+                        label = { Text("Cost Title") },
                         modifier = Modifier.fillMaxWidth()
                     )
 
@@ -46,7 +47,7 @@ fun AddBiayaDialog(
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         OutlinedTextField(
                             value = jumlahbiaya, onValueChange = { jumlahbiaya = it },
-                            label = { Text("Jumlah") },
+                            label = { Text("Total Cost") },
                             modifier = Modifier.weight(1f)
                         )
                     }
@@ -57,9 +58,9 @@ fun AddBiayaDialog(
                             onDismiss()
                         },
                         modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(Color.Blue)
+                        colors = ButtonDefaults.buttonColors(Color(0xFF2D6CE9))
                     ) {
-                        Text("Tambah", color = Color.White)
+                        Text("Add", color = Color.White)
                     }
                 }
             }
