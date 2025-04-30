@@ -93,4 +93,20 @@ class PemasukanViewModel @Inject constructor(private val apiService:SnapCashApiS
         }
     }
 
+    fun deletePemasukanById(id: String, navController: NavController){
+        viewModelScope.launch {
+            try {
+                isLoading.value = true
+                val response = apiService.deletePemasukanById("Bearer ${SessionManager.idToken}", id)
+                if (response.isSucces) {
+                    navController.navigate("history")
+                }
+            } catch (e: Exception) {
+                Log.e("EXCEPTION", "Exception: ${e.message}", e)
+            } finally {
+                isLoading.value = false
+            }
+        }
+    }
+
 }
