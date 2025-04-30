@@ -22,11 +22,9 @@ fun DashboardScreen(navController: NavController, openSidebar: () -> Unit) {
             Icon(imageVector = Icons.Default.Menu, contentDescription = "Sidebar Menu")
         }
 
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            BasicText(text = "Dashboard Screen", style = MaterialTheme.typography.headlineLarge)
-        }
+        Text(
+            text = "Welcome Back Nama",
+            modifier = Modifier.padding(16.dp)
+        )
     }
 }

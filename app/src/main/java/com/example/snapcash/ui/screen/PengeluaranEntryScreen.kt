@@ -1,10 +1,12 @@
 package com.example.snapcash.ui.screen
 
+import android.app.TimePickerDialog
 import android.app.DatePickerDialog
 import android.icu.util.Calendar
 import android.util.Log
 import com.example.snapcash.ui.component.AddBarangDialog
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -59,14 +61,14 @@ import com.example.snapcash.ui.component.AddBiayaDialog
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import java.text.NumberFormat
+import java.text.SimpleDateFormat
 import java.util.Locale
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
+import androidx.compose.ui.input.pointer.pointerInput
 
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PengeluaranEntryScreen(
     navController: NavController,
@@ -86,11 +88,24 @@ fun PengeluaranEntryScreen(
     val isLoading by viewModel.isLoading
     var isUpdate by remember { mutableStateOf(false) }
 
+    val dateTimeFormatter = SimpleDateFormat("dd MMMM yyyy, HH:mm:ss", Locale("id", "ID"))
     val calendar = Calendar.getInstance()
     val datePicker = DatePickerDialog(
         context,
         { _, year, month, dayOfMonth ->
-            tanggal = "$dayOfMonth/${month + 1}/$year"
+            calendar.set(year, month, dayOfMonth)
+            TimePickerDialog(
+                context,
+                { _, hourOfDay, minute ->
+                    calendar.set(Calendar.HOUR_OF_DAY, hourOfDay)
+                    calendar.set(Calendar.MINUTE, minute)
+                    calendar.set(Calendar.SECOND, 0) // Set detik ke 0
+                    tanggal = dateTimeFormatter.format(calendar.time)
+                },
+                calendar.get(Calendar.HOUR_OF_DAY),
+                calendar.get(Calendar.MINUTE),
+                true
+            ).show()
         },
         calendar.get(Calendar.YEAR),
         calendar.get(Calendar.MONTH),
@@ -106,15 +121,22 @@ fun PengeluaranEntryScreen(
     if (id != null) {
         LaunchedEffect(Unit) {
             viewModel.getPengluaranUserById(id.toString())
-
-
         }
         LaunchedEffect(pengeluaranData) {
             if (pengeluaranData.size() > 0) {
                 isUpdate = true
                 judul = pengeluaranData.get("namaPengeluaran")?.asString ?: ""
                 toko = pengeluaranData.get("toko")?.asString ?: ""
-                tanggal = pengeluaranData.get("tanggal")?.asString ?: ""
+                val backendDate = pengeluaranData.get("tanggal")?.asString ?: ""
+                try {
+                    val backendDateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                    val parsedDate = backendDateFormat.parse(backendDate)
+                    if (parsedDate != null) {
+                        tanggal = dateTimeFormatter.format(parsedDate)
+                    }
+                } catch (e: Exception) {
+                    tanggal = backendDate // Fallback jika parsing gagal
+                }
                 val barangJsonArray = pengeluaranData.get("barang")?.asJsonArray
                 barangList = barangJsonArray?.map { item ->
                     val obj = item.asJsonObject
@@ -337,9 +359,13 @@ fun PengeluaranEntryScreen(
 
                         OutlinedTextField(
                             value = tanggal,
-                            onValueChange = { tanggal = it },
+                            onValueChange = { /* Read-only */ },
                             label = { Text("Date") },
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .pointerInput(Unit) {
+                                    detectTapGestures { datePicker.show() }
+                                },
                             shape = RoundedCornerShape(12.dp),
                             trailingIcon = {
                                 IconButton(onClick = { datePicker.show() }) {
@@ -348,8 +374,14 @@ fun PengeluaranEntryScreen(
                             },
                             colors = OutlinedTextFieldDefaults.colors(
                                 unfocusedBorderColor = Color.Gray,
-                                focusedBorderColor = Color.Blue
-                            )
+                                focusedBorderColor = Color.Blue,
+                                disabledBorderColor = Color.Gray,
+                                disabledTextColor = MaterialTheme.colorScheme.onSurface,
+                                disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                disabledTrailingIconColor = MaterialTheme.colorScheme.onSurface
+                            ),
+                            readOnly = true,
+                            enabled = false
                         )
                     }
                 }
@@ -426,7 +458,6 @@ fun PengeluaranEntryScreen(
         }
     }
 
-    // Panggil Dialog
     AddBarangDialog(
         showDialog = showDialog,
         onDismiss = { showDialog = false },
@@ -443,7 +474,6 @@ fun PengeluaranEntryScreen(
         }
     )
 }
-
 
 fun formatRupiah(amount: Int): String {
     val format = NumberFormat.getCurrencyInstance(Locale("id", "ID"))

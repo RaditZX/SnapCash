@@ -106,5 +106,4 @@ class PengeluaranViewModel @Inject constructor(private val apiService: SnapCashA
             }
         }
     }
-
 }
