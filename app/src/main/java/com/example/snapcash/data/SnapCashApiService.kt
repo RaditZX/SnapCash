@@ -88,4 +88,32 @@ interface SnapCashApiService {
         @Header("Authorization") token: String,
         @Path("id") id: String,
     ) : generateTextFromInvoiceResponse
+
+    @GET("kategori")
+    suspend fun getKategori(@Header("Authorization") token: String): DefaultResponse
+
+    @POST("kategori/add")
+    suspend fun addKategori(
+        @Header("Authorization") token: String,
+        @Body data: JsonObject
+    ): generateTextFromInvoiceResponse
+
+    @GET("kategori/:id")
+    suspend fun getKategoriById(
+        @Header("Authorization") token: String,
+        @Path("id") id: String
+    ): generateTextFromInvoiceResponse
+
+    @PUT("kategori/update/:id")
+    suspend fun updateKategori(
+        @Header("Authorization") token: String,
+        @Path("id") id: String,
+        @Body data: JsonObject
+    ): generateTextFromInvoiceResponse
+
+    @DELETE("kategori/delete/:id")
+    suspend fun deleteKategori(
+        @Header("Authorization") token: String,
+        @Path("id") id: String
+    ): generateTextFromInvoiceResponse
 }

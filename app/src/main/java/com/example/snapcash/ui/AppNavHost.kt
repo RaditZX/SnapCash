@@ -22,10 +22,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.setValue
 import com.example.snapcash.data.OnboardingPrefs
 import com.example.snapcash.ui.screen.Upload.CameraScreen
-import  com.example.snapcash.ui.screen.listKategoriScreen
+import  com.example.snapcash.ui.screen.ListKategoriScreen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-
 
 
 @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
@@ -142,7 +141,7 @@ fun AppNavHost(
                     HelpScreen(navController = navController)
                 }
                 composable("kategori"){
-                    listKategoriScreen(navController = navController)
+                    ListKategoriScreen(navController = navController)
                 }
             }
         }

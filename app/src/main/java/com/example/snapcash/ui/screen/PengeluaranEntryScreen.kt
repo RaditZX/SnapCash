@@ -463,7 +463,8 @@ fun PengeluaranEntryScreen(
         onDismiss = { showDialog = false },
         onAddItem = { nama, kategori, jumlah, harga ->
             barangList = barangList + Barang(nama, kategori, jumlah.toInt(), harga.toDouble())
-        }
+        },
+        navController = navController
     )
 
     AddBiayaDialog(
