@@ -76,7 +76,6 @@ fun PemasukanEntryScreen(
     // Colors
     val primaryColor = Color(0xFF2D6CE9)
 
-    // State variables
     var judul by remember { mutableStateOf("") }
     var sumber by remember { mutableStateOf("") }
     var tanggal by remember { mutableStateOf("") }
