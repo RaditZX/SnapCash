@@ -1,12 +1,11 @@
 package com.example.snapcash.ui.screen
 
-import android.app.TimePickerDialog
 import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import android.icu.util.Calendar
 import android.util.Log
 import com.example.snapcash.ui.component.AddBarangDialog
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -61,14 +60,17 @@ import com.example.snapcash.ui.component.AddBiayaDialog
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import java.text.NumberFormat
-import java.text.SimpleDateFormat
 import java.util.Locale
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
-import androidx.compose.ui.input.pointer.pointerInput
+import com.example.snapcash.ui.component.DropdownMenu
+import com.example.snapcash.ui.theme.night
+import java.text.SimpleDateFormat
 
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PengeluaranEntryScreen(
     navController: NavController,
@@ -83,11 +85,11 @@ fun PengeluaranEntryScreen(
     var tanggal by remember { mutableStateOf("") }
     var total by remember { mutableStateOf(0) }
     var request by remember { mutableStateOf(JsonObject()) }
-
+    var kategori by remember { mutableStateOf("")}
     val pengeluaranData by remember { viewModel.pengeluaranDataById }
     val isLoading by viewModel.isLoading
     var isUpdate by remember { mutableStateOf(false) }
-
+    val kategoriList = listOf("Transportasi", "Belanja", "Pendidikan", "Hiburan")
     val dateTimeFormatter = SimpleDateFormat("dd MMMM yyyy, HH:mm:ss", Locale("id", "ID"))
     val calendar = Calendar.getInstance()
     val datePicker = DatePickerDialog(
@@ -121,30 +123,23 @@ fun PengeluaranEntryScreen(
     if (id != null) {
         LaunchedEffect(Unit) {
             viewModel.getPengluaranUserById(id.toString())
+
+
         }
         LaunchedEffect(pengeluaranData) {
             if (pengeluaranData.size() > 0) {
                 isUpdate = true
                 judul = pengeluaranData.get("namaPengeluaran")?.asString ?: ""
                 toko = pengeluaranData.get("toko")?.asString ?: ""
-                val backendDate = pengeluaranData.get("tanggal")?.asString ?: ""
-                try {
-                    val backendDateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-                    val parsedDate = backendDateFormat.parse(backendDate)
-                    if (parsedDate != null) {
-                        tanggal = dateTimeFormatter.format(parsedDate)
-                    }
-                } catch (e: Exception) {
-                    tanggal = backendDate // Fallback jika parsing gagal
-                }
+                tanggal = pengeluaranData.get("tanggal")?.asString ?: ""
+                kategori = pengeluaranData.get("kategori")?.asString ?: ""
                 val barangJsonArray = pengeluaranData.get("barang")?.asJsonArray
                 barangList = barangJsonArray?.map { item ->
                     val obj = item.asJsonObject
                     Barang(
                         nama = obj.get("namaBarang").asString,
                         jumlah = obj.get("jumlah").asInt,
-                        harga = obj.get("harga").asDouble,
-                        kategori = obj.get("kategori").asString,
+                        harga = obj.get("harga").asDouble
                     )
                 } ?: emptyList()
 
@@ -176,7 +171,6 @@ fun PengeluaranEntryScreen(
             addProperty("namaBarang", barang.nama)
             addProperty("jumlah", barang.jumlah)
             addProperty("harga", barang.harga)
-            addProperty("kategori", barang.kategori)
         }
         barangArray.add(barangObj)
     }
@@ -196,6 +190,7 @@ fun PengeluaranEntryScreen(
         addProperty("tanggal", tanggal)
         addProperty("total", total)
         add("barang", barangArray)
+        addProperty("kategori", kategori)
         add("tambahanBiaya", biayaArray)
 
     }
@@ -359,13 +354,9 @@ fun PengeluaranEntryScreen(
 
                         OutlinedTextField(
                             value = tanggal,
-                            onValueChange = { /* Read-only */ },
+                            onValueChange = { tanggal = it },
                             label = { Text("Date") },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .pointerInput(Unit) {
-                                    detectTapGestures { datePicker.show() }
-                                },
+                            modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(12.dp),
                             trailingIcon = {
                                 IconButton(onClick = { datePicker.show() }) {
@@ -374,14 +365,16 @@ fun PengeluaranEntryScreen(
                             },
                             colors = OutlinedTextFieldDefaults.colors(
                                 unfocusedBorderColor = Color.Gray,
-                                focusedBorderColor = Color.Blue,
-                                disabledBorderColor = Color.Gray,
-                                disabledTextColor = MaterialTheme.colorScheme.onSurface,
-                                disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                disabledTrailingIconColor = MaterialTheme.colorScheme.onSurface
-                            ),
-                            readOnly = true,
-                            enabled = false
+                                focusedBorderColor = Color.Blue
+                            )
+                        )
+
+                        DropdownMenu(
+                            containerColor = night,
+                            label = "Kategori",
+                            options = kategoriList,
+                            selectedOption = kategori,
+                            onOptionSelected = { kategori = it }
                         )
                     }
                 }
@@ -408,7 +401,11 @@ fun PengeluaranEntryScreen(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Column {
-                            Text("${barang.nama} - ${barang.kategori}", fontSize = 14.sp)
+                            Text(
+                                barang.nama,
+                                fontSize = 14.sp,
+                                color = Color.White
+                            )
                             Text(
                                 "Quantity: ${barang.jumlah} | Price: ${formatRupiah(barang.harga.toInt())}",
                                 fontSize = 12.sp,
@@ -458,13 +455,13 @@ fun PengeluaranEntryScreen(
         }
     }
 
+    // Panggil Dialog
     AddBarangDialog(
         showDialog = showDialog,
         onDismiss = { showDialog = false },
         onAddItem = { nama, kategori, jumlah, harga ->
-            barangList = barangList + Barang(nama, kategori, jumlah.toInt(), harga.toDouble())
-        },
-        navController = navController
+            barangList = barangList + Barang(nama, jumlah.toInt(), harga.toDouble())
+        }
     )
 
     AddBiayaDialog(
@@ -475,6 +472,7 @@ fun PengeluaranEntryScreen(
         }
     )
 }
+
 
 fun formatRupiah(amount: Int): String {
     val format = NumberFormat.getCurrencyInstance(Locale("id", "ID"))

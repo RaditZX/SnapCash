@@ -112,14 +112,14 @@ fun AppNavHost(
                     )
                 }
                 composable("tambah/pengeluaran") {
-                    PengeluaranEntryScreen<Any>(navController = navController, id = null)
+                    PengeluaranEntryScreen(navController = navController, id = null)
                 }
                 composable("tambah/pemasukan") {
                     PemasukanEntryScreen(navController = navController, id = null)
                 }
                 composable("update/pengeluaran/{id}") { backStackEntry ->
                     val id = backStackEntry.arguments?.getString("id").toString()
-                    PengeluaranEntryScreen<Any>(navController = navController, id)
+                    PengeluaranEntryScreen(navController = navController, id)
                 }
                 composable("update/pemasukan/{id}") { backStackEntry ->
                     val id = backStackEntry.arguments?.getString("id").toString()
