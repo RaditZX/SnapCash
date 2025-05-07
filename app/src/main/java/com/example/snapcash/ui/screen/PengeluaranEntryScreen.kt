@@ -1,6 +1,7 @@
 package com.example.snapcash.ui.screen
 
 import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import android.icu.util.Calendar
 import android.util.Log
 import com.example.snapcash.ui.component.AddBarangDialog
@@ -66,6 +67,7 @@ import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import com.example.snapcash.ui.component.DropdownMenu
 import com.example.snapcash.ui.theme.night
+import java.text.SimpleDateFormat
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -83,17 +85,29 @@ fun PengeluaranEntryScreen(
     var tanggal by remember { mutableStateOf("") }
     var total by remember { mutableStateOf(0) }
     var request by remember { mutableStateOf(JsonObject()) }
-    var kategori by remember { mutableStateOf("") }
-    val kategoriList = listOf("Transportasi", "Belanja", "Pendidikan", "Hiburan")
+    var kategori by remember { mutableStateOf("")}
     val pengeluaranData by remember { viewModel.pengeluaranDataById }
     val isLoading by viewModel.isLoading
     var isUpdate by remember { mutableStateOf(false) }
-
+    val kategoriList = listOf("Transportasi", "Belanja", "Pendidikan", "Hiburan")
+    val dateTimeFormatter = SimpleDateFormat("dd MMMM yyyy, HH:mm:ss", Locale("id", "ID"))
     val calendar = Calendar.getInstance()
     val datePicker = DatePickerDialog(
         context,
         { _, year, month, dayOfMonth ->
-            tanggal = "$dayOfMonth/${month + 1}/$year"
+            calendar.set(year, month, dayOfMonth)
+            TimePickerDialog(
+                context,
+                { _, hourOfDay, minute ->
+                    calendar.set(Calendar.HOUR_OF_DAY, hourOfDay)
+                    calendar.set(Calendar.MINUTE, minute)
+                    calendar.set(Calendar.SECOND, 0) // Set detik ke 0
+                    tanggal = dateTimeFormatter.format(calendar.time)
+                },
+                calendar.get(Calendar.HOUR_OF_DAY),
+                calendar.get(Calendar.MINUTE),
+                true
+            ).show()
         },
         calendar.get(Calendar.YEAR),
         calendar.get(Calendar.MONTH),
@@ -115,20 +129,18 @@ fun PengeluaranEntryScreen(
         LaunchedEffect(pengeluaranData) {
             if (pengeluaranData.size() > 0) {
                 isUpdate = true
-                judul = pengeluaranData.get("namaPengeluaran")?.takeIf { !it.isJsonNull }?.asString ?: ""
-                toko = pengeluaranData.get("toko")?.takeIf { !it.isJsonNull }?.asString ?: ""
-                tanggal = pengeluaranData.get("tanggal")?.takeIf { !it.isJsonNull }?.asString ?: ""
+                judul = pengeluaranData.get("namaPengeluaran")?.asString ?: ""
+                toko = pengeluaranData.get("toko")?.asString ?: ""
+                tanggal = pengeluaranData.get("tanggal")?.asString ?: ""
+                kategori = pengeluaranData.get("kategori")?.asString ?: ""
                 val barangJsonArray = pengeluaranData.get("barang")?.asJsonArray
-                barangList = barangJsonArray?.mapNotNull { item ->
+                barangList = barangJsonArray?.map { item ->
                     val obj = item.asJsonObject
-                    val nama = obj.get("namaBarang")?.takeIf { !it.isJsonNull }?.asString
-                    val jumlah = obj.get("jumlah")?.takeIf { !it.isJsonNull }?.asInt
-                    val harga = obj.get("harga")?.takeIf { !it.isJsonNull }?.asDouble
-                    val kategori = obj.get("kategori")?.takeIf { !it.isJsonNull }?.asString
-
-                    if (nama != null && jumlah != null && harga != null && kategori != null) {
-                        Barang(nama, kategori, jumlah, harga)
-                    } else null
+                    Barang(
+                        nama = obj.get("namaBarang").asString,
+                        jumlah = obj.get("jumlah").asInt,
+                        harga = obj.get("harga").asDouble
+                    )
                 } ?: emptyList()
 
                 val biayaJsonArray = pengeluaranData.get("tambahanBiaya")?.asJsonArray
@@ -159,7 +171,6 @@ fun PengeluaranEntryScreen(
             addProperty("namaBarang", barang.nama)
             addProperty("jumlah", barang.jumlah)
             addProperty("harga", barang.harga)
-            addProperty("kategori", barang.kategori)
         }
         barangArray.add(barangObj)
     }
@@ -177,9 +188,9 @@ fun PengeluaranEntryScreen(
         addProperty("namaPengeluaran", judul)
         addProperty("toko", toko)
         addProperty("tanggal", tanggal)
-        addProperty("kategori", kategori)
         addProperty("total", total)
         add("barang", barangArray)
+        addProperty("kategori", kategori)
         add("tambahanBiaya", biayaArray)
 
     }
@@ -360,12 +371,11 @@ fun PengeluaranEntryScreen(
 
                         DropdownMenu(
                             containerColor = night,
-                            label = "",
+                            label = "Kategori",
                             options = kategoriList,
                             selectedOption = kategori,
                             onOptionSelected = { kategori = it }
                         )
-
                     }
                 }
 
@@ -391,7 +401,11 @@ fun PengeluaranEntryScreen(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Column {
-                            Text("${barang.nama} - ${barang.kategori}", fontSize = 14.sp)
+                            Text(
+                                barang.nama,
+                                fontSize = 14.sp,
+                                color = Color.White
+                            )
                             Text(
                                 "Quantity: ${barang.jumlah} | Price: ${formatRupiah(barang.harga.toInt())}",
                                 fontSize = 12.sp,
@@ -446,7 +460,7 @@ fun PengeluaranEntryScreen(
         showDialog = showDialog,
         onDismiss = { showDialog = false },
         onAddItem = { nama, kategori, jumlah, harga ->
-            barangList = barangList + Barang(nama, kategori, jumlah.toInt(), harga.toDouble())
+            barangList = barangList + Barang(nama, jumlah.toInt(), harga.toDouble())
         }
     )
 

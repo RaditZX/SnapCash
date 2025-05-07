@@ -1,6 +1,7 @@
 package com.example.snapcash.ui.screen
 
 import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import android.icu.util.Calendar
 import android.util.Log
 import androidx.compose.foundation.background
@@ -58,6 +59,8 @@ import com.example.snapcash.ui.component.DropdownMenu
 import com.example.snapcash.ui.theme.night
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -68,7 +71,6 @@ fun PemasukanEntryScreen(
     id: String?
 ) {
     val context = LocalContext.current
-    val calendar = Calendar.getInstance()
 
     var judul by remember { mutableStateOf("") }
     var sumber by remember { mutableStateOf("") }
@@ -76,9 +78,10 @@ fun PemasukanEntryScreen(
     var nominal by remember { mutableStateOf(0) }
     var subTotal by remember { mutableStateOf(0) }
     var kategori by remember { mutableStateOf("") }
-    val kategoriList = listOf("Gaji", "Investasi", "Bisnis", "Hadiah")
     var biayalist by remember { mutableStateOf(listOf<Tambahanbiaya>()) }
     val pemasukanData by remember { viewModel.pemasukanDataById }
+    val kategoriList = listOf("Gaji", "Investasi", "Bisnis", "Hadiah")
+    var showDialogBiaya by remember { mutableStateOf(false) }
     var isUpdate by remember { mutableStateOf(false) }
     var totalIsUpdate by remember {mutableStateOf(0.0)}
     if (id != null) {
@@ -93,6 +96,7 @@ fun PemasukanEntryScreen(
                 kategori = pemasukanData.get("kategori")?.asString ?: ""
                 sumber = pemasukanData.get("sumber")?.asString ?: ""
                 tanggal = pemasukanData.get("tanggal")?.asString ?: ""
+                kategori = pemasukanData.get("kategori")?.asString ?: ""
                 nominal = pemasukanData.get("total")?.asInt ?: 0
                 subTotal = pemasukanData.get("subTotal")?.asInt ?: 0
 
@@ -116,14 +120,24 @@ fun PemasukanEntryScreen(
         }
     }
 
-
-    var showDialogBiaya by remember { mutableStateOf(false) }
-
-
+    val dateTimeFormatter = SimpleDateFormat("dd MMMM yyyy, HH:mm:ss", Locale("id", "ID"))
+    val calendar = Calendar.getInstance()
     val datePicker = DatePickerDialog(
         context,
         { _, year, month, dayOfMonth ->
-            tanggal = "$dayOfMonth/${month + 1}/$year"
+            calendar.set(year, month, dayOfMonth)
+            TimePickerDialog(
+                context,
+                { _, hourOfDay, minute ->
+                    calendar.set(Calendar.HOUR_OF_DAY, hourOfDay)
+                    calendar.set(Calendar.MINUTE, minute)
+                    calendar.set(Calendar.SECOND, 0) // Set detik ke 0
+                    tanggal = dateTimeFormatter.format(calendar.time)
+                },
+                calendar.get(Calendar.HOUR_OF_DAY),
+                calendar.get(Calendar.MINUTE),
+                true
+            ).show()
         },
         calendar.get(Calendar.YEAR),
         calendar.get(Calendar.MONTH),
@@ -282,10 +296,10 @@ fun PemasukanEntryScreen(
                 )
             }
 
-            item {
+            item{
                 DropdownMenu(
                     containerColor = night,
-                    label = "",
+                    label = "Kategori",
                     options = kategoriList,
                     selectedOption = kategori,
                     onOptionSelected = { kategori = it }
@@ -299,7 +313,7 @@ fun PemasukanEntryScreen(
                 ) {
                     OutlinedTextField(
                         value = if (isUpdate) {
-                            totalIsUpdate.toInt().toString() // atau pakai format jika mau tetap 2 digit desimal
+                            subTotal.toInt().toString() // atau pakai format jika mau tetap 2 digit desimal
                         } else {
                             nominal.toString()
                         },

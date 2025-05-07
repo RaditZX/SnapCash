@@ -2,7 +2,6 @@ package com.example.snapcash.data
 
 data class Barang(
     val nama: String,
-    val kategori: String,
     val jumlah: Int,
     val harga: Double
 )
