@@ -54,6 +54,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.snapcash.ViewModel.PemasukanViewModel
 import com.example.snapcash.data.Tambahanbiaya
 import com.example.snapcash.ui.component.AddBiayaDialog
+import com.example.snapcash.ui.component.DropdownMenu
+import com.example.snapcash.ui.theme.night
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 
@@ -74,6 +76,7 @@ fun PemasukanEntryScreen(
     var nominal by remember { mutableStateOf(0) }
     var subTotal by remember { mutableStateOf(0) }
     var kategori by remember { mutableStateOf("") }
+    val kategoriList = listOf("Gaji", "Investasi", "Bisnis", "Hadiah")
     var biayalist by remember { mutableStateOf(listOf<Tambahanbiaya>()) }
     val pemasukanData by remember { viewModel.pemasukanDataById }
     var isUpdate by remember { mutableStateOf(false) }
@@ -113,7 +116,7 @@ fun PemasukanEntryScreen(
         }
     }
 
-    val kategoriList = listOf("Gaji", "Investasi", "Bisnis", "Hadiah")
+
     var showDialogBiaya by remember { mutableStateOf(false) }
 
 
@@ -227,6 +230,8 @@ fun PemasukanEntryScreen(
                                 addProperty("sumber", sumber)
                                 addProperty("tanggal", tanggal)
                                 addProperty("total", total)
+                                addProperty("subTotal", nominal)
+                                addProperty("kategori", kategori)
                                 add("tambahanBiaya", biayaArray)
                                 addProperty("isPengeluaran", false)
                             }
@@ -278,6 +283,16 @@ fun PemasukanEntryScreen(
             }
 
             item {
+                DropdownMenu(
+                    containerColor = night,
+                    label = "",
+                    options = kategoriList,
+                    selectedOption = kategori,
+                    onOptionSelected = { kategori = it }
+                )
+            }
+
+            item {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -286,10 +301,10 @@ fun PemasukanEntryScreen(
                         value = if (isUpdate) {
                             totalIsUpdate.toInt().toString() // atau pakai format jika mau tetap 2 digit desimal
                         } else {
-                            subTotal.toString()
+                            nominal.toString()
                         },
                         onValueChange = {
-                            subTotal = it.toIntOrNull() ?: 0
+                            nominal = it.toIntOrNull() ?: 0
                         },
                         label = { Text("Amount") },
                         modifier = Modifier.weight(1f),

@@ -64,6 +64,8 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
+import com.example.snapcash.ui.component.DropdownMenu
+import com.example.snapcash.ui.theme.night
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -81,7 +83,8 @@ fun PengeluaranEntryScreen(
     var tanggal by remember { mutableStateOf("") }
     var total by remember { mutableStateOf(0) }
     var request by remember { mutableStateOf(JsonObject()) }
-
+    var kategori by remember { mutableStateOf("") }
+    val kategoriList = listOf("Transportasi", "Belanja", "Pendidikan", "Hiburan")
     val pengeluaranData by remember { viewModel.pengeluaranDataById }
     val isLoading by viewModel.isLoading
     var isUpdate by remember { mutableStateOf(false) }
@@ -112,18 +115,20 @@ fun PengeluaranEntryScreen(
         LaunchedEffect(pengeluaranData) {
             if (pengeluaranData.size() > 0) {
                 isUpdate = true
-                judul = pengeluaranData.get("namaPengeluaran")?.asString ?: ""
-                toko = pengeluaranData.get("toko")?.asString ?: ""
-                tanggal = pengeluaranData.get("tanggal")?.asString ?: ""
+                judul = pengeluaranData.get("namaPengeluaran")?.takeIf { !it.isJsonNull }?.asString ?: ""
+                toko = pengeluaranData.get("toko")?.takeIf { !it.isJsonNull }?.asString ?: ""
+                tanggal = pengeluaranData.get("tanggal")?.takeIf { !it.isJsonNull }?.asString ?: ""
                 val barangJsonArray = pengeluaranData.get("barang")?.asJsonArray
-                barangList = barangJsonArray?.map { item ->
+                barangList = barangJsonArray?.mapNotNull { item ->
                     val obj = item.asJsonObject
-                    Barang(
-                        nama = obj.get("namaBarang").asString,
-                        jumlah = obj.get("jumlah").asInt,
-                        harga = obj.get("harga").asDouble,
-                        kategori = obj.get("kategori").asString,
-                    )
+                    val nama = obj.get("namaBarang")?.takeIf { !it.isJsonNull }?.asString
+                    val jumlah = obj.get("jumlah")?.takeIf { !it.isJsonNull }?.asInt
+                    val harga = obj.get("harga")?.takeIf { !it.isJsonNull }?.asDouble
+                    val kategori = obj.get("kategori")?.takeIf { !it.isJsonNull }?.asString
+
+                    if (nama != null && jumlah != null && harga != null && kategori != null) {
+                        Barang(nama, kategori, jumlah, harga)
+                    } else null
                 } ?: emptyList()
 
                 val biayaJsonArray = pengeluaranData.get("tambahanBiaya")?.asJsonArray
@@ -172,6 +177,7 @@ fun PengeluaranEntryScreen(
         addProperty("namaPengeluaran", judul)
         addProperty("toko", toko)
         addProperty("tanggal", tanggal)
+        addProperty("kategori", kategori)
         addProperty("total", total)
         add("barang", barangArray)
         add("tambahanBiaya", biayaArray)
@@ -351,6 +357,15 @@ fun PengeluaranEntryScreen(
                                 focusedBorderColor = Color.Blue
                             )
                         )
+
+                        DropdownMenu(
+                            containerColor = night,
+                            label = "",
+                            options = kategoriList,
+                            selectedOption = kategori,
+                            onOptionSelected = { kategori = it }
+                        )
+
                     }
                 }
 

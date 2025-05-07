@@ -8,7 +8,7 @@ data class SignInRequest(
 )
 
 data class SignUpResponse(
-    val data: SignInRequest,  // Adjust according to your API response
+    val data: UserCredentialData,  // Adjust according to your API response
     val message: String,
     val isSucces : Boolean
 )
