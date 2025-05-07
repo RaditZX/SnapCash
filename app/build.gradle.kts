@@ -13,7 +13,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.snapcash"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
@@ -92,7 +92,7 @@ dependencies {
     implementation("io.coil-kt.coil3:coil-compose:3.1.0")
     implementation("io.coil-kt.coil3:coil-network-okhttp:3.1.0")
     implementation("androidx.camera:camera-core:1.3.0")
-    implementation("androidx.camera:camera-camera2:1.3.0")  // ✅ Required for CameraX
+    implementation("androidx.camera:camera-camera2:1.3.0")
     implementation("androidx.camera:camera-lifecycle:1.3.0")
     implementation("androidx.camera:camera-view:1.3.0")
     implementation("com.google.code.gson:gson:2.10.1")
@@ -101,5 +101,7 @@ dependencies {
     implementation ("com.google.android.gms:play-services-auth:20.7.0")
     implementation ("com.google.firebase:firebase-auth-ktx:22.1.1")
     implementation(platform("com.google.firebase:firebase-bom:33.12.0"))
+
+    implementation ("co.yml:ycharts:2.1.0")
 
 }
