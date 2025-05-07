@@ -31,7 +31,7 @@ fun AddBarangDialog(
                 var kategori by remember { mutableStateOf("") }
                 var jumlah by remember { mutableStateOf("") }
                 var harga by remember { mutableStateOf("") }
-                val kategoriList = listOf("Food&Beverage", "Fashion", "Transportation", "Education")
+
 
                 Column(
                     verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -45,15 +45,6 @@ fun AddBarangDialog(
                         modifier = Modifier.fillMaxWidth()
                     )
 
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        DropdownMenu(
-                            containerColor = night,
-                            label = "",
-                            options = kategoriList,
-                            selectedOption = kategori,
-                            onOptionSelected = { kategori = it }
-                        )
-                    }
 
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         OutlinedTextField(

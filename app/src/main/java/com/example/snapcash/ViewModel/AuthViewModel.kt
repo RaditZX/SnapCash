@@ -112,6 +112,8 @@ class AuthViewModel @Inject constructor(private val apiService: SnapCashApiServi
                 val response = apiService.registerWithGoogle("Bearer $idToken")
                 if(response.isSucces){
                     setIsSucces(true)
+
+                    SessionManager.idToken = idToken
                 }
                 onResult(true, response.message)
             } catch (e: HttpException) {

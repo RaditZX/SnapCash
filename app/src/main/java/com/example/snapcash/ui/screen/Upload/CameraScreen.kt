@@ -217,7 +217,7 @@ fun takePicture(
     imageCapture.takePicture(outputOptions, executor, object : ImageCapture.OnImageSavedCallback {
         override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
             Handler(Looper.getMainLooper()).post {
-                val compressedFile = compressImageFile(file, quality = 10) // Kompres ke 50% kualitas
+                val compressedFile = compressImageFile(file, quality = 50) // Kompres ke 50% kualitas
                 onImageSaved(compressedFile)
             }
         }
