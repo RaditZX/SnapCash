@@ -68,3 +68,12 @@ data class StsTokenManager(
     val accessToken: String,
     val expirationTime: Long
 )
+
+data class Transaction(
+    val title: String,
+    val category: String,
+    val amount: Int,
+    val date: String,
+    val id: String,
+    val isPengeluaran: Boolean
+)

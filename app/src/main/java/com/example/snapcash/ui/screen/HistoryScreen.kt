@@ -29,15 +29,7 @@ import java.text.NumberFormat
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
-
-data class Transaction(
-    val title: String,
-    val category: String,
-    val amount: Int,
-    val date: String,
-    val id: String,
-    val isPengeluaran: Boolean
-)
+import com.example.snapcash.data.Transaction
 
 @Composable
 fun HistoryScreen(
@@ -63,7 +55,7 @@ fun HistoryScreen(
             CircularProgressIndicator()
         }
     } else {
-        val incomeTransactions by remember(pengeluaranData) {
+        val incomeTransactions by remember(pemasukanData) {
             derivedStateOf {
                 pemasukanData.map { item ->
                     Log.d("pemasukan", item.toString())

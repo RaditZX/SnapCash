@@ -56,12 +56,11 @@ import com.example.snapcash.ViewModel.PemasukanViewModel
 import com.example.snapcash.data.Tambahanbiaya
 import com.example.snapcash.ui.component.AddBiayaDialog
 import com.example.snapcash.ui.component.DropdownMenu
-import com.example.snapcash.ui.theme.night
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import java.text.SimpleDateFormat
 import java.util.Locale
-
+import androidx.compose.material3.ButtonDefaults
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -79,14 +78,17 @@ fun PemasukanEntryScreen(
     var subTotal by remember { mutableStateOf(0) }
     var kategori by remember { mutableStateOf("") }
     var biayalist by remember { mutableStateOf(listOf<Tambahanbiaya>()) }
+
     val pemasukanData by remember { viewModel.pemasukanDataById }
     val kategoriList = listOf("Gaji", "Investasi", "Bisnis", "Hadiah")
+
     var showDialogBiaya by remember { mutableStateOf(false) }
     var isUpdate by remember { mutableStateOf(false) }
-    var totalIsUpdate by remember {mutableStateOf(0.0)}
+    var totalIsUpdate by remember { mutableStateOf(0.0) }
+
     if (id != null) {
         LaunchedEffect(Unit) {
-            viewModel.getPemasukanUserById(id)
+            viewModel.getPemasukanUserById(id.toString())
         }
 
         LaunchedEffect(pemasukanData) {
@@ -96,32 +98,29 @@ fun PemasukanEntryScreen(
                 kategori = pemasukanData.get("kategori")?.asString ?: ""
                 sumber = pemasukanData.get("sumber")?.asString ?: ""
                 tanggal = pemasukanData.get("tanggal")?.asString ?: ""
-                kategori = pemasukanData.get("kategori")?.asString ?: ""
                 nominal = pemasukanData.get("total")?.asInt ?: 0
                 subTotal = pemasukanData.get("subTotal")?.asInt ?: 0
 
                 val biayaJsonArray = pemasukanData.get("tambahanBiaya")?.asJsonArray
-                biayalist = biayaJsonArray?.map { item ->
-                    val obj = item.asJsonObject
+                biayalist = biayaJsonArray?.map {
+                    val obj = it.asJsonObject
                     Tambahanbiaya(
                         namabiaya = obj.get("namaBiaya").asString,
                         jumlahbiaya = obj.get("jumlah").asDouble,
                     )
                 } ?: emptyList()
 
-                totalIsUpdate = (if (nominal == 0) {
-                    0.0
-                } else {
+                totalIsUpdate = if (nominal == 0) 0.0 else {
                     val totalBiaya = biayalist.sumOf { it.jumlahbiaya }
-                    Log.d("biaya", totalBiaya.toString())
                     (nominal - totalBiaya)
-                })
+                }
             }
         }
     }
 
     val dateTimeFormatter = SimpleDateFormat("dd MMMM yyyy, HH:mm:ss", Locale("id", "ID"))
     val calendar = Calendar.getInstance()
+
     val datePicker = DatePickerDialog(
         context,
         { _, year, month, dayOfMonth ->
@@ -131,7 +130,7 @@ fun PemasukanEntryScreen(
                 { _, hourOfDay, minute ->
                     calendar.set(Calendar.HOUR_OF_DAY, hourOfDay)
                     calendar.set(Calendar.MINUTE, minute)
-                    calendar.set(Calendar.SECOND, 0) // Set detik ke 0
+                    calendar.set(Calendar.SECOND, 0)
                     tanggal = dateTimeFormatter.format(calendar.time)
                 },
                 calendar.get(Calendar.HOUR_OF_DAY),
@@ -145,7 +144,6 @@ fun PemasukanEntryScreen(
     )
 
     Scaffold(
-
         topBar = {
             Column {
                 Text(
@@ -159,24 +157,18 @@ fun PemasukanEntryScreen(
                     textAlign = TextAlign.Center
                 )
 
-                TabRow(selectedTabIndex = 0, contentColor = Color(0xFF2D6CE9),indicator = { tabPositions ->
+                TabRow(selectedTabIndex = 0, contentColor = Color(0xFF2D6CE9), indicator = {
                     TabRowDefaults.Indicator(
-                        modifier = Modifier.tabIndicatorOffset(tabPositions[0]),
-                        color = Color(0xFF2D6CE9) // 👈 your custom underline color
+                        modifier = Modifier.tabIndicatorOffset(it[0]),
+                        color = Color(0xFF2D6CE9)
                     )
                 }) {
-                    Tab(
-                        selected = true,
-                        onClick = {},
-                        text = { Text("INCOME", fontWeight = FontWeight.Bold) }
-                    )
-                    Tab(
-                        selected = false,
-                        onClick = {
-                            navController.navigate("tambah/pengeluaran")
-                        },
-                        text = { Text("OUTCOME", color = Color.Gray) }
-                    )
+                    Tab(selected = true, onClick = {},
+                        text = { Text("INCOME", fontWeight = FontWeight.Bold) })
+                    Tab(selected = false, onClick = {
+                        navController.navigate("tambah/pengeluaran")
+                    },
+                        text = { Text("OUTCOME", color = Color.Gray) })
                 }
             }
         },
@@ -189,25 +181,21 @@ fun PemasukanEntryScreen(
                     FloatingActionButton(containerColor = Color(0xFF2D6CE9), onClick = {
                         viewModel.deletePemasukanById(id.toString(), navController)
                     }) {
-                        Icon(
-                            imageVector = Icons.Default.Delete,
-                            contentDescription = "Delete Pemasukan"
-                        )
+                        Icon(Icons.Default.Delete, contentDescription = "Hapus Pemasukan")
                     }
                 }
-                FloatingActionButton(onClick = { showDialogBiaya = true }, containerColor = Color(0xFF2D6CE9)) {
+
+                FloatingActionButton(containerColor = Color(0xFF2D6CE9), onClick = {
+                    showDialogBiaya = true
+                }) {
                     Icon(Icons.Default.Add, contentDescription = "Tambah Biaya")
                 }
             }
         },
         bottomBar = {
-            val nominalValue = nominal.toDouble() ?: 0.0
+            val nominalValue = nominal.toDouble()
             val totalTambahan = biayalist.sumOf { it.jumlahbiaya }
-            val total = if (isUpdate) {
-                totalIsUpdate + totalTambahan
-            } else {
-                nominalValue + totalTambahan
-            }
+            val total = if (isUpdate) totalIsUpdate + totalTambahan else nominalValue + totalTambahan
 
             Column(
                 modifier = Modifier
@@ -221,22 +209,19 @@ fun PemasukanEntryScreen(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text("Total Income", style = MaterialTheme.typography.bodyLarge)
-                    Text(
-                        formatRupiah(total.toInt()),
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.Bold
-                    )
+                    Text(formatRupiah(total.toInt()), fontWeight = FontWeight.Bold)
                 }
+
                 Button(
                     onClick = {
                         if (judul.isNotBlank() && sumber.isNotBlank() && tanggal.isNotBlank() && nominal != 0) {
                             val biayaArray = JsonArray()
                             biayalist.forEach {
-                                val biayaObj = JsonObject().apply {
+                                val obj = JsonObject().apply {
                                     addProperty("namaBiaya", it.namabiaya)
                                     addProperty("jumlah", it.jumlahbiaya)
                                 }
-                                biayaArray.add(biayaObj)
+                                biayaArray.add(obj)
                             }
 
                             val request = JsonObject().apply {
@@ -250,29 +235,26 @@ fun PemasukanEntryScreen(
                                 addProperty("isPengeluaran", false)
                             }
 
-                            viewModel.addPemasukan(request, navController)
+                            if (isUpdate) {
+                                viewModel.updatePemasukanUserById(id.toString(), request, navController)
+                            } else {
+                                viewModel.addPemasukan(request, navController)
+                            }
                         }
                     },
-                    colors = ButtonColors(
-                        containerColor = Color(0xFF2D6CE9),
-                        contentColor = Color.White,
-                        disabledContainerColor = Color.Gray,
-                        disabledContentColor = Color.Gray,
-                    ),
-
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2D6CE9))
                 ) {
-
-                    Text("SUBMIT")
+                    Text("SUBMIT", color = Color.White)
                 }
             }
         }
-    ) { paddingValues ->
+    ) { padding ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
+                .padding(padding)
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
@@ -296,36 +278,28 @@ fun PemasukanEntryScreen(
                 )
             }
 
-            item{
+            item {
                 DropdownMenu(
-                    containerColor = night,
                     label = "Kategori",
                     options = kategoriList,
                     selectedOption = kategori,
-                    onOptionSelected = { kategori = it }
+                    onOptionSelected = { kategori = it },
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant
                 )
             }
 
             item {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     OutlinedTextField(
-                        value = if (isUpdate) {
-                            subTotal.toInt().toString() // atau pakai format jika mau tetap 2 digit desimal
-                        } else {
-                            nominal.toString()
-                        },
-                        onValueChange = {
-                            nominal = it.toIntOrNull() ?: 0
-                        },
+                        value = if (isUpdate) subTotal.toString() else nominal.toString(),
+                        onValueChange = { nominal = it.toIntOrNull() ?: 0 },
                         label = { Text("Amount") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         modifier = Modifier.weight(1f),
                         shape = RoundedCornerShape(12.dp),
-                        placeholder = { Text("Rp") },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                        placeholder = { Text("Rp") }
                     )
+
                     OutlinedTextField(
                         value = tanggal,
                         onValueChange = {},
@@ -358,8 +332,8 @@ fun PemasukanEntryScreen(
                         .fillMaxWidth()
                         .background(MaterialTheme.colorScheme.surfaceVariant)
                         .padding(12.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column {
                         Text("${biaya.namabiaya} - ${formatRupiah(biaya.jumlahbiaya.toInt())}", fontSize = 14.sp)
@@ -377,11 +351,8 @@ fun PemasukanEntryScreen(
     AddBiayaDialog(
         showDialog = showDialogBiaya,
         onDismiss = { showDialogBiaya = false },
-        onAddItem = { namabiaya, jumlahbiaya ->
-            biayalist = biayalist + Tambahanbiaya(namabiaya, jumlahbiaya.toDouble())
+        onAddItem = { nama, jumlah ->
+            biayalist = biayalist + Tambahanbiaya(nama, jumlah.toDouble())
         }
     )
 }
-
-
-
