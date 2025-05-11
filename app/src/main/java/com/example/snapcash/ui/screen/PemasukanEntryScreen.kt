@@ -14,47 +14,46 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.example.snapcash.ViewModel.PemasukanViewModel
 import com.example.snapcash.data.Tambahanbiaya
 import com.example.snapcash.ui.component.AddBiayaDialog
+import com.example.snapcash.ui.component.CurrencyInputField
 import com.example.snapcash.ui.component.DropdownMenu
 import com.example.snapcash.ui.theme.night
 import com.google.gson.JsonArray
@@ -120,29 +119,29 @@ fun PemasukanEntryScreen(
         }
     }
 
-    val dateTimeFormatter = SimpleDateFormat("dd MMMM yyyy, HH:mm:ss", Locale("id", "ID"))
-    val calendar = Calendar.getInstance()
-    val datePicker = DatePickerDialog(
-        context,
-        { _, year, month, dayOfMonth ->
-            calendar.set(year, month, dayOfMonth)
-            TimePickerDialog(
-                context,
-                { _, hourOfDay, minute ->
-                    calendar.set(Calendar.HOUR_OF_DAY, hourOfDay)
-                    calendar.set(Calendar.MINUTE, minute)
-                    calendar.set(Calendar.SECOND, 0) // Set detik ke 0
-                    tanggal = dateTimeFormatter.format(calendar.time)
-                },
-                calendar.get(Calendar.HOUR_OF_DAY),
-                calendar.get(Calendar.MINUTE),
-                true
-            ).show()
-        },
-        calendar.get(Calendar.YEAR),
-        calendar.get(Calendar.MONTH),
-        calendar.get(Calendar.DAY_OF_MONTH)
-    )
+        val dateTimeFormatter = SimpleDateFormat("dd MMMM yyyy, HH:mm:ss", Locale("id", "ID"))
+        val calendar = Calendar.getInstance()
+        val datePicker = DatePickerDialog(
+            context,
+            { _, year, month, dayOfMonth ->
+                calendar.set(year, month, dayOfMonth)
+                TimePickerDialog(
+                    context,
+                    { _, hourOfDay, minute ->
+                        calendar.set(Calendar.HOUR_OF_DAY, hourOfDay)
+                        calendar.set(Calendar.MINUTE, minute)
+                        calendar.set(Calendar.SECOND, 0) // Set detik ke 0
+                        tanggal = dateTimeFormatter.format(calendar.time)
+                    },
+                    calendar.get(Calendar.HOUR_OF_DAY),
+                    calendar.get(Calendar.MINUTE),
+                    true
+                ).show()
+            },
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH),
+            calendar.get(Calendar.DAY_OF_MONTH)
+        )
 
     Scaffold(
 
@@ -311,21 +310,18 @@ fun PemasukanEntryScreen(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    OutlinedTextField(
-                        value = if (isUpdate) {
-                            subTotal.toInt().toString() // atau pakai format jika mau tetap 2 digit desimal
+
+                    CurrencyInputField(
+                        "Nominal",
+                        if (isUpdate) {
+                            subTotal.toInt()
                         } else {
-                            nominal.toString()
+                            nominal
                         },
-                        onValueChange = {
-                            nominal = it.toIntOrNull() ?: 0
-                        },
-                        label = { Text("Amount") },
+                        onValueChange = { nominal = it},
                         modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(12.dp),
-                        placeholder = { Text("Rp") },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                     )
+
                     OutlinedTextField(
                         value = tanggal,
                         onValueChange = {},
@@ -372,6 +368,8 @@ fun PemasukanEntryScreen(
                 }
             }
         }
+        // Modal Bottom Sheet that will show the filter
+
     }
 
     AddBiayaDialog(

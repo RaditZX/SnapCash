@@ -1,6 +1,5 @@
 package com.example.snapcash.data
 
-import android.media.Image
 import com.google.gson.JsonObject
 import okhttp3.MultipartBody
 import retrofit2.http.Body
@@ -12,6 +11,7 @@ import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Part
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface SnapCashApiService {
     @POST("signup")
@@ -34,10 +34,24 @@ interface SnapCashApiService {
     ): generateTextFromInvoiceResponse
 
     @GET("pengeluaranUser")
-    suspend fun getPengeluaranUser(@Header("Authorization") token: String): DefaultResponse
+    suspend fun getPengeluaranUser(
+        @Header("Authorization") token: String,
+        @Query("kategori") kategori: String,
+        @Query("startDate") startDate: String,
+        @Query("endDate") endDate: String,
+        @Query("nominalMin") min: Int,
+        @Query("nominalMax") max: Int
+    ): DefaultResponse
 
     @GET("pemasukanUser")
-    suspend fun getPemasukanUser(@Header("Authorization") token: String): DefaultResponse
+    suspend fun getPemasukanUser(
+        @Header("Authorization") token: String,
+        @Query("kategori") kategori: String,
+        @Query("startDate") startDate: String,
+        @Query("endDate") endDate: String,
+        @Query("nominalMin") min: Int,
+        @Query("nominalMax") max: Int
+    ): DefaultResponse
 
     @GET("pemasukanUser/{id}")
     suspend fun getPemasukanUserById(
@@ -87,5 +101,10 @@ interface SnapCashApiService {
     suspend fun deletePengeluaranById(
         @Header("Authorization") token: String,
         @Path("id") id: String,
-    ) : generateTextFromInvoiceResponse
+    ): generateTextFromInvoiceResponse
+
+    @GET("currency")
+    suspend fun getCurrency(
+        @Header("Authorization") token: String,
+    ) : DefaultResponse
 }

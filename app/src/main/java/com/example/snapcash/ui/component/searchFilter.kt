@@ -1,0 +1,89 @@
+package com.example.snapcash.ui.component
+
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.TextField
+import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+
+@Composable
+fun SearchWithFilterBar(
+    modifier: Modifier = Modifier,
+    query: String,
+    onQueryChange: (String) -> Unit,
+    onFilterClick: () -> Unit
+) {
+    Row(
+        modifier = modifier
+            .padding(2.dp)
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // Search Field
+        TextField(
+            value = query,
+            onValueChange = onQueryChange,
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    contentDescription = "Search Icon"
+                )
+            },
+            placeholder = {
+                Text(
+                    text = "Search...",
+                    style = MaterialTheme.typography.bodySmall
+                )
+            },
+            textStyle = MaterialTheme.typography.bodySmall,
+            shape = RoundedCornerShape(12.dp),
+            modifier = Modifier
+                .weight(1f)
+                .height(48.dp)
+                 .border(1.dp, Color.LightGray, shape = CircleShape),
+            colors = TextFieldDefaults.textFieldColors(
+                 focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                disabledIndicatorColor = Color.Transparent,
+                textColor = Color.White
+            ),
+            singleLine = true
+        )
+
+
+        Spacer(modifier = Modifier.width(8.dp))
+
+        // Filter Button
+        IconButton(
+            onClick = onFilterClick,
+            modifier = Modifier
+                .size(48.dp)
+//                .background(Color.Gray, shape = CircleShape)
+                .border(1.dp, Color.LightGray, shape = CircleShape)
+        ) {
+            Icon(
+                imageVector = Icons.Default.MoreVert,
+                contentDescription = "Filter Icon"
+            )
+        }
+    }
+}
