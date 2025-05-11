@@ -1,10 +1,22 @@
 package com.example.snapcash.ui.component
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -18,7 +30,7 @@ import com.example.snapcash.ui.theme.night
 fun AddBarangDialog(
     showDialog: Boolean,
     onDismiss: () -> Unit,
-    onAddItem: (String, String, String, String) -> Unit
+    onAddItem: (String, String, String, Int) -> Unit
 ) {
     if (showDialog) {
         Dialog(onDismissRequest = onDismiss) {
@@ -30,7 +42,7 @@ fun AddBarangDialog(
                 var namaProduk by remember { mutableStateOf("") }
                 var kategori by remember { mutableStateOf("") }
                 var jumlah by remember { mutableStateOf("") }
-                var harga by remember { mutableStateOf("") }
+                var harga by remember { mutableStateOf(0) }
 
 
                 Column(
@@ -42,6 +54,7 @@ fun AddBarangDialog(
                     OutlinedTextField(
                         value = namaProduk, onValueChange = { namaProduk = it },
                         label = { Text("Nama Produk") },
+                        shape = RoundedCornerShape(12.dp),
                         modifier = Modifier.fillMaxWidth()
                     )
 
@@ -50,13 +63,10 @@ fun AddBarangDialog(
                         OutlinedTextField(
                             value = jumlah, onValueChange = { jumlah = it },
                             label = { Text("Quantity") },
+                            shape = RoundedCornerShape(12.dp),
                             modifier = Modifier.weight(1f)
                         )
-                        OutlinedTextField(
-                            value = harga, onValueChange = { harga = it },
-                            label = { Text("Price") },
-                            modifier = Modifier.weight(1f)
-                        )
+                        CurrencyInputField("Price", harga, {harga = it}, Modifier.weight(1f))
                     }
 
                     Button(
