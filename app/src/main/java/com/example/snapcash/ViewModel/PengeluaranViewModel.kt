@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
+import com.example.snapcash.data.FilterModel
 import com.example.snapcash.data.SessionManager
 import com.example.snapcash.data.SnapCashApiService
 import com.google.gson.JsonObject
@@ -25,11 +26,15 @@ class PengeluaranViewModel @Inject constructor(private val apiService: SnapCashA
 
     val isLoading = mutableStateOf(false)
 
-    fun getPengeluaranUser() {
+    fun getPengeluaranUser(filterData: FilterModel) {
         viewModelScope.launch {
             try {
                 isLoading.value = true
-                val response = apiService.getPengeluaranUser("Bearer ${SessionManager.idToken}")
+                val response = apiService.getPengeluaranUser("Bearer ${SessionManager.idToken}",filterData.kategori,
+                    filterData.startDate,
+                    filterData.endDate,
+                    filterData.min,
+                    filterData.max)
                 if (response.isSucces) {
                     setPengeluaranData(response.data)
                 }
@@ -80,6 +85,22 @@ class PengeluaranViewModel @Inject constructor(private val apiService: SnapCashA
             try {
                 isLoading.value = true
                 val response = apiService.addPengeluaran("Bearer ${SessionManager.idToken}", data)
+                if (response.isSucces) {
+                    navController.navigate("history")
+                }
+            } catch (e: Exception) {
+                Log.e("EXCEPTION", "Exception: ${e.message}", e)
+            } finally {
+                isLoading.value = false
+            }
+        }
+    }
+
+    fun deletePengeluaranById(id: String, navController: NavController){
+        viewModelScope.launch {
+            try {
+                isLoading.value = true
+                val response = apiService.deletePengeluaranById("Bearer ${SessionManager.idToken}", id)
                 if (response.isSucces) {
                     navController.navigate("history")
                 }

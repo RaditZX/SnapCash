@@ -69,6 +69,8 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel = hilt
     val isLoading by viewModel.isLoading
     val isSuccess by viewModel.isSucces
 
+    val nextRoute = remember { mutableStateOf("") }
+
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
@@ -76,11 +78,13 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel = hilt
         authClient.getIdTokenFromIntent(result.data) { idToken ->
             Log.d("token", idToken.toString())
             if (idToken != null) {
+
                 viewModel.registerWithGoogle(idToken, onResult = { success, message ->
                     dialogMessage.value = message  // Update the popup message
-                    showDialog.value = true  // Show the popup
+                    showDialog.value = true  // Show the popu
+                    nextRoute.value = "dashboard"
                 })
-                navController.navigate("dashboard")
+
             } else {
                 Log.e("GoogleLogin", "Gagal mendapatkan ID Token")
             }
@@ -250,10 +254,15 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel = hilt
                 showDialog,
                 "Register",
                 dialogMessage.value,
-                if (isSuccess) "signIn" else "signUp",
+                if (isSuccess) {
+                    if (nextRoute.value == "dashboard") "dashboard" else "SignIn"
+                } else {
+                    "signUp"
+                },
                 navController
             )
         }
+
     }
 }
 

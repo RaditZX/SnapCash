@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
+import com.example.snapcash.data.FilterModel
 import com.example.snapcash.data.SessionManager
 import com.example.snapcash.data.SnapCashApiService
 import com.google.gson.JsonObject
@@ -13,7 +14,8 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class PemasukanViewModel @Inject constructor(private val apiService:SnapCashApiService) : ViewModel()  {
+class PemasukanViewModel @Inject constructor(private val apiService: SnapCashApiService) :
+    ViewModel() {
     val pemasukanData = mutableStateOf(arrayOf<JsonObject>())
 
     val pemasukanDataById = mutableStateOf(JsonObject())
@@ -24,18 +26,25 @@ class PemasukanViewModel @Inject constructor(private val apiService:SnapCashApiS
 
     val isLoading = mutableStateOf(false)
 
-    fun getPemasukanUser (){
-        viewModelScope.launch{
+    fun getPemasukanUser(filterData: FilterModel) {
+        viewModelScope.launch {
             isLoading.value = true
             try {
-                val response = apiService.getPemasukanUser("Bearer ${SessionManager.idToken}")
+                val response = apiService.getPemasukanUser(
+                    "Bearer ${SessionManager.idToken}",
+                    filterData.kategori,
+                    filterData.startDate,
+                    filterData.endDate,
+                    filterData.min,
+                    filterData.max
+                )
 
-                if (response.isSucces){
+                if (response.isSucces) {
                     setPemasukanData(response.data)
                 }
-            }catch (e: Exception){
+            } catch (e: Exception) {
                 Log.e("EXCEPTION", "Exception: ${e.message}", e)
-            }finally {
+            } finally {
                 isLoading.value = false
             }
         }
@@ -84,6 +93,23 @@ class PemasukanViewModel @Inject constructor(private val apiService:SnapCashApiS
                     navController.navigate("history")
                 } else {
                     Log.e("ADD_PEMASUKAN", "Failed: ${response.message}")
+                }
+            } catch (e: Exception) {
+                Log.e("EXCEPTION", "Exception: ${e.message}", e)
+            } finally {
+                isLoading.value = false
+            }
+        }
+    }
+
+    fun deletePemasukanById(id: String, navController: NavController) {
+        viewModelScope.launch {
+            try {
+                isLoading.value = true
+                val response =
+                    apiService.deletePemasukanById("Bearer ${SessionManager.idToken}", id)
+                if (response.isSucces) {
+                    navController.navigate("history")
                 }
             } catch (e: Exception) {
                 Log.e("EXCEPTION", "Exception: ${e.message}", e)

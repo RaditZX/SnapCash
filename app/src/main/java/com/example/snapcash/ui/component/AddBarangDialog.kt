@@ -1,10 +1,22 @@
 package com.example.snapcash.ui.component
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -12,26 +24,26 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import com.example.snapcash.ui.component.DropdownMenu
+import com.example.snapcash.ui.theme.night
 
 @Composable
 fun AddBarangDialog(
     showDialog: Boolean,
     onDismiss: () -> Unit,
-    onAddItem: (String, String, String, String) -> Unit
+    onAddItem: (String, String, String, Int) -> Unit
 ) {
     if (showDialog) {
         Dialog(onDismissRequest = onDismiss) {
             Box(
                 modifier = Modifier
-                    .background(Color.White, shape = RoundedCornerShape(12.dp))
+                    .background(night, shape = RoundedCornerShape(12.dp))
                     .padding(16.dp)
             ) {
                 var namaProduk by remember { mutableStateOf("") }
                 var kategori by remember { mutableStateOf("") }
                 var jumlah by remember { mutableStateOf("") }
-                var harga by remember { mutableStateOf("") }
-                val kategoriList = listOf("Gaji", "Investasi", "Bisnis", "Hadiah")
+                var harga by remember { mutableStateOf(0) }
+
 
                 Column(
                     verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -42,29 +54,19 @@ fun AddBarangDialog(
                     OutlinedTextField(
                         value = namaProduk, onValueChange = { namaProduk = it },
                         label = { Text("Nama Produk") },
+                        shape = RoundedCornerShape(12.dp),
                         modifier = Modifier.fillMaxWidth()
                     )
 
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        DropdownMenu(
-                            label = "",
-                            options = kategoriList,
-                            selectedOption = kategori,
-                            onOptionSelected = { kategori = it }
-                        )
-                    }
 
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         OutlinedTextField(
                             value = jumlah, onValueChange = { jumlah = it },
-                            label = { Text("Jumlah") },
+                            label = { Text("Quantity") },
+                            shape = RoundedCornerShape(12.dp),
                             modifier = Modifier.weight(1f)
                         )
-                        OutlinedTextField(
-                            value = harga, onValueChange = { harga = it },
-                            label = { Text("Harga") },
-                            modifier = Modifier.weight(1f)
-                        )
+                        CurrencyInputField("Price", harga, {harga = it}, Modifier.weight(1f))
                     }
 
                     Button(
@@ -73,9 +75,9 @@ fun AddBarangDialog(
                             onDismiss()
                         },
                         modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(Color.Blue)
+                        colors = ButtonDefaults.buttonColors(Color(0xFF2D6CE9))
                     ) {
-                        Text("Tambah", color = Color.White)
+                        Text("Add", color = Color.White)
                     }
                 }
             }

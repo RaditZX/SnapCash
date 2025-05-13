@@ -32,7 +32,7 @@ fun BottomNavigationBar(navController: NavController) {
 
         NavigationBar(
             containerColor = backgroundColor,
-            modifier = Modifier.height(68.dp).offset(y=21.dp) // Menyesuaikan tinggi navbar
+            modifier = Modifier.height(100.dp)
         ) {
             NavigationBarItem(
                 modifier = Modifier.offset(y = 5.dp),
@@ -48,14 +48,14 @@ fun BottomNavigationBar(navController: NavController) {
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = navPrimaryColor,
                     unselectedIconColor = Color.Gray,
-                    selectedTextColor = navPrimaryColor,          // 👈 change label color when selected
+                    selectedTextColor = navPrimaryColor,
                     unselectedTextColor = Color.Gray,
                     indicatorColor = Color.Transparent
                 ),
                 onClick = { navController.navigate("dashboard") }
             )
             NavigationBarItem(
-                modifier = Modifier.offset(y = 5.dp),
+                modifier = Modifier.offset(y = 5.dp).offset(x = (-10).dp),
                 icon = {
                     Icon(
                         Icons.Default.Search,
@@ -63,11 +63,11 @@ fun BottomNavigationBar(navController: NavController) {
                     )
                 },
                 label = { Text("Catat" ) },
-                selected = currentRoute == "catat",
+                selected = currentRoute == "tambah/pengeluaran" || currentRoute == "tambah/pemasukan",
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = navPrimaryColor,
                     unselectedIconColor = Color.Gray,
-                    selectedTextColor = navPrimaryColor,          // 👈 change label color when selected
+                    selectedTextColor = navPrimaryColor,
                     unselectedTextColor = Color.Gray,
                     indicatorColor = Color.Transparent
                 ),
@@ -75,7 +75,7 @@ fun BottomNavigationBar(navController: NavController) {
             )
             Spacer(modifier = Modifier.weight(1f))
             NavigationBarItem(
-                modifier = Modifier.offset(y = 5.dp),
+                modifier = Modifier.offset(y = 5.dp).offset(x = 10.dp),
                 icon = {
                     Icon(
                         Icons.Default.CheckCircle,
@@ -87,7 +87,7 @@ fun BottomNavigationBar(navController: NavController) {
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = navPrimaryColor,
                     unselectedIconColor = Color.Gray,
-                    selectedTextColor = navPrimaryColor,          // 👈 change label color when selected
+                    selectedTextColor = navPrimaryColor,
                     unselectedTextColor = Color.Gray,
                     indicatorColor = Color.Transparent
                 ),
@@ -106,7 +106,7 @@ fun BottomNavigationBar(navController: NavController) {
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = navPrimaryColor,
                     unselectedIconColor = Color.Gray,
-                    selectedTextColor = navPrimaryColor,          // 👈 change label color when selected
+                    selectedTextColor = navPrimaryColor,
                     unselectedTextColor = Color.Gray,
                     indicatorColor = Color.Transparent
                 ),
@@ -119,12 +119,11 @@ fun BottomNavigationBar(navController: NavController) {
             containerColor = Color(0xFF2D6CE9),
             shape = CircleShape,
             modifier = Modifier
-                .size(90.dp)
-                .offset(y = (-10).dp)
+                .size(100.dp)
                 .align(Alignment.Center)
                 .border(
                     width = 4.dp,
-                    color = Color(0xFFA9C0FF), // 👈 stroke color
+                    color = Color(0xFFA9C0FF),
                     shape = CircleShape
                 )
         ) {

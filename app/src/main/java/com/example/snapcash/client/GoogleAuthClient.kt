@@ -35,7 +35,6 @@ class GoogleAuthUiClient(
                         FirebaseAuth.getInstance().currentUser?.getIdToken(true)
                             ?.addOnSuccessListener { result ->
                                 val firebaseIdToken = result.token
-                                Log.d("GoogleLogin", "Firebase ID Token: $firebaseIdToken")
                                 onTokenReady(firebaseIdToken) // Kirim ke backend
                             }
                             ?.addOnFailureListener {
