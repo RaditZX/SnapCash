@@ -137,6 +137,7 @@ fun EditProfileScreen(navController: NavController, viewModel: currencyViewModel
 
 
             Image(
+
                 painter = painter,
                 contentDescription = null,
                 modifier = Modifier

@@ -4,7 +4,6 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -49,7 +48,7 @@ fun SplashScreen(onTimeout: () -> Unit){
         contentAlignment = Alignment.Center
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Image(painter = painterResource(R.drawable.logo), contentDescription = null)
+            Image(painter = painterResource(R.drawable.snapcash), contentDescription = null)
             Spacer(Modifier.height(20.dp))
             Text(fontWeight = FontWeight.Bold, fontSize = 20.sp, text = "SnapCash", color = Color.White)
         }

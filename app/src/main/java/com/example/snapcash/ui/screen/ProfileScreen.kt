@@ -74,7 +74,9 @@ fun ProfileScreen(navController: NavController,viewModel: AuthViewModel = hiltVi
             )
 
             Image(
+
                 painter = rememberAsyncImagePainter(userData.foto),// ganti sesuai gambar Anda
+
                 contentDescription = null,
                 modifier = Modifier
                     .size(120.dp)
