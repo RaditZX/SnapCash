@@ -106,7 +106,7 @@ dependencies {
     implementation ("androidx.compose.material3:material3:1.2.0")
     implementation ("com.google.accompanist:accompanist-systemuicontroller:0.30.1")
     implementation ("com.maxkeppeler.sheets-compose-dialogs:core:1.1.1") // Optional: for better date pickers
-
+    implementation("com.squareup.okhttp3:okhttp:4.10.0") // Or the latest version
     implementation ("co.yml:ycharts:2.1.0")
 
 }

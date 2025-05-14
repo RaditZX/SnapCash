@@ -249,7 +249,15 @@ fun PemasukanEntryScreen(
                                 addProperty("isPengeluaran", false)
                             }
 
-                            viewModel.addPemasukan(request, navController)
+                            if (isUpdate) {
+                                viewModel.updatePemasukanUserById(
+                                    id.toString(),
+                                    request,
+                                    navController
+                                )
+                            } else {
+                                viewModel.addPemasukan(request, navController)
+                            }
                         }
                     },
                     colors = ButtonColors(

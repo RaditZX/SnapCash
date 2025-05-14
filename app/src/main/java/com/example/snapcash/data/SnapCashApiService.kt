@@ -2,6 +2,7 @@ package com.example.snapcash.data
 
 import com.google.gson.JsonObject
 import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -107,4 +108,26 @@ interface SnapCashApiService {
     suspend fun getCurrency(
         @Header("Authorization") token: String,
     ) : DefaultResponse
+
+    @GET("getUser")
+    suspend fun getUserData(
+        @Header("Authorization") token: String,
+    ) : userResponse
+
+    @GET("currency/{id}")
+    suspend fun getCurrencyData(
+        @Header("Authorization") token: String,
+        @Path("id") id: String,
+    ) : currencyResponse
+
+    @Multipart
+    @PUT("updateProfile")
+    suspend fun updateUserData(
+        @Header("Authorization") token: String,
+        @Part("username") username: RequestBody?,
+        @Part("currencyChoice") currencyChoice: RequestBody?,
+        @Part("no_hp") noHp: RequestBody?,
+        @Part photo: MultipartBody.Part?
+    ): userResponse
+
 }
