@@ -1,92 +1,110 @@
 package com.example.snapcash.ui.component
 
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
-import co.yml.charts.axis.AxisData
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import co.yml.charts.common.model.Point
 import co.yml.charts.ui.linechart.LineChart
 import co.yml.charts.ui.linechart.model.GridLines
 import co.yml.charts.ui.linechart.model.LineChartData
-import co.yml.charts.ui.linechart.model.*
-import androidx.compose.ui.unit.dp
 
 @Composable
-fun LineChart() {
-    val steps = 5
-    val pointsData = listOf(
-        Point(0f, 40f),
-        Point(1f, 90f),
-        Point(2f, 10f),
-        Point(3f, 60f),
-        Point(4f, 30f)
-    )
+fun LineChart(
+    modifier: Modifier,
+    lineChartData: LineChartData,
+    allPointsData: List<Point>,
+    allDays: List<String>
+) {
+    val scrollState = rememberScrollState()
+    val dayWidthPx = 100.dp // Lebar setiap hari (sesuai axisStepSize)
 
-    val xAxisData = AxisData.Builder()
-        .axisStepSize(100.dp)
-        .backgroundColor(Color.Transparent)
-        .steps(pointsData.size - 1)
-        .labelData { i -> i.toString() }
-        .labelAndAxisLinePadding(15.dp)
-        .axisLineColor(MaterialTheme.colorScheme.tertiary)
-        .axisLabelColor(MaterialTheme.colorScheme.tertiary)
-        .build()
-
-    val yAxisData = AxisData.Builder()
-        .steps(steps)
-        .backgroundColor(Color.Transparent)
-        .labelData { i ->
-            val yScale = 100 / steps
-            (i * yScale).toString()
+    // Hitung offset label hari berdasarkan posisi scroll
+    val labelOffset by remember {
+        derivedStateOf {
+            -(scrollState.value).toFloat()
         }
-        .labelAndAxisLinePadding(20.dp)
-        .axisLineColor(MaterialTheme.colorScheme.tertiary)
-        .axisLabelColor(MaterialTheme.colorScheme.tertiary)
-        .build()
+    }
 
-    val lineChartData = LineChartData(
-        linePlotData = LinePlotData(
-            lines = listOf(
-                Line(
-                    dataPoints = pointsData,
-                    lineStyle = LineStyle(
-                        color = MaterialTheme.colorScheme.tertiary,
-                        lineType = LineType.SmoothCurve(isDotted = false)
-                    ),
-                    intersectionPoint = IntersectionPoint(
-                        color = MaterialTheme.colorScheme.tertiary
-                    ),
-                    selectionHighlightPoint = SelectionHighlightPoint(
-                        color = MaterialTheme.colorScheme.tertiary
-                    ),
-                    shadowUnderLine = ShadowUnderLine(
-                        alpha = 0.5f,
-                        brush = Brush.verticalGradient(
-                            colors = listOf(
-                                MaterialTheme.colorScheme.inversePrimary,
-                                Color.Transparent
-                            )
-                        )
-                    ),
-                    selectionHighlightPopUp = SelectionHighlightPopUp()
+    Column(
+        modifier = modifier
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(20.dp)
+                .horizontalScroll(scrollState, enabled = false) // Sinkronkan scroll, tapi non-interaktif
+        ) {
+            Row(
+                modifier = Modifier
+                    .wrapContentWidth()
+                    .offset(x = labelOffset.dp) // Geser label sesuai scroll
+            ) {
+                allDays.forEach { day ->
+                    Text(
+                        text = day,
+                        color = Color.White,
+                        fontSize = 12.sp,
+                        modifier = Modifier
+                            .width(dayWidthPx) // Lebar setiap label sama dengan axisStepSize
+                            .wrapContentHeight(),
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
+        }
+
+        // Chart dengan Scroll Horizontal
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clipToBounds() // Pastikan konten tidak terpotong secara visual
+                .horizontalScroll(scrollState)
+        ) {
+            val updatedLineChartData = lineChartData.copy(
+                linePlotData = lineChartData.linePlotData.copy(
+                    lines = lineChartData.linePlotData.lines.map { line ->
+                        line.copy(dataPoints = allPointsData)
+                    }
+                ),
+                xAxisData = lineChartData.xAxisData.copy(
+                    labelData = { "" }, // Kosongkan label sumbu X
+                    axisLineColor = Color.Transparent,
+                    axisLabelColor = Color.Transparent,
+                    shouldDrawAxisLineTillEnd = false,
+                    steps = allPointsData.size - 1, // Jumlah langkah untuk garis vertikal
+                    axisStepSize = dayWidthPx
+                ),
+                yAxisData = lineChartData.yAxisData.copy(
+                    labelData = { "" }, // Kosongkan label sumbu Y
+                    axisLineColor = Color.Transparent,
+                    axisLabelColor = Color.Transparent,
+                    shouldDrawAxisLineTillEnd = false
+                ),
+                gridLines = GridLines(
+                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
+                    enableVerticalLines = true,
+                    enableHorizontalLines = false
                 )
-            ),
-        ),
-        backgroundColor = MaterialTheme.colorScheme.surface,
-        xAxisData = xAxisData,
-        yAxisData = yAxisData,
-        gridLines = GridLines(color = MaterialTheme.colorScheme.outline)
-    )
+            )
 
-    LineChart(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(300.dp),
-        lineChartData = lineChartData
-    )
+            LineChart(
+                modifier = Modifier
+                    .width(dayWidthPx * allPointsData.size) // Lebar total chart sesuai jumlah hari
+                    .height(200.dp),
+                lineChartData = updatedLineChartData
+            )
+        }
+    }
 }
-
