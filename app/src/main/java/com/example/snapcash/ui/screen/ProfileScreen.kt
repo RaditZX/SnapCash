@@ -19,11 +19,15 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -33,13 +37,21 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.example.snapcash.R
+import coil3.compose.rememberAsyncImagePainter
+import com.example.snapcash.ViewModel.AuthViewModel
 
 @Composable
-fun ProfileScreen(navController: NavController) {
+fun ProfileScreen(navController: NavController,viewModel: AuthViewModel = hiltViewModel()) {
+
+    val userData by remember { viewModel.userDatas }
+
+    LaunchedEffect(Unit) {
+        viewModel.getUserData()
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -62,7 +74,7 @@ fun ProfileScreen(navController: NavController) {
             )
 
             Image(
-                painter = painterResource(id = R.drawable.logo), // ganti sesuai gambar Anda
+                painter = rememberAsyncImagePainter(userData.foto),// ganti sesuai gambar Anda
                 contentDescription = null,
                 modifier = Modifier
                     .size(120.dp)
@@ -75,10 +87,10 @@ fun ProfileScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(80.dp))
         Column (modifier = Modifier.padding(horizontal = 24.dp)){
-            ProfileField(Icons.Default.Person, "Name", "Your Name")
-            ProfileField(Icons.Default.Person, "Username", "Your Username")
-            ProfileField(Icons.Default.Email, "Email", "yourgmail@gmail.com")
-            ProfileField(Icons.Default.Phone, "Number", "Your Number")
+            ProfileField(Icons.Default.Person, "Name", userData.username.toString())
+            ProfileField(Icons.Default.Email, "Email", userData.email.toString())
+            ProfileField(Icons.Default.Phone, "Number", userData.no_hp.toString())
+            ProfileField(Icons.Default.ShoppingCart, "Currency", userData.currencyChoice.toString())
 
             Spacer(modifier = Modifier.height(32.dp))
 
