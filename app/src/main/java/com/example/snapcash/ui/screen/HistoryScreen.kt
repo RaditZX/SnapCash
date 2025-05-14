@@ -48,17 +48,10 @@ import com.example.snapcash.data.SessionManager
 import com.example.snapcash.ui.component.SearchWithFilterBar
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
+import java.util.*
+import com.example.snapcash.data.Transaction
 import java.util.Date
 import java.util.Locale
-
-data class Transaction(
-    val title: String,
-    val category: String,
-    val amount: Int,
-    val date: String,
-    val id: String,
-    val isPengeluaran: Boolean
-)
 
 @Composable
 fun HistoryScreen(
@@ -90,7 +83,7 @@ fun HistoryScreen(
             CircularProgressIndicator()
         }
     } else {
-        val incomeTransactions by remember(pengeluaranData) {
+        val incomeTransactions by remember(pemasukanData) {
             derivedStateOf {
                 pemasukanData.map { item ->
                     Log.d("pemasukan", item.toString())

@@ -69,7 +69,6 @@ import com.example.snapcash.ui.component.DropdownMenu
 import com.example.snapcash.ui.theme.night
 import java.text.SimpleDateFormat
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PengeluaranEntryScreen(
@@ -472,7 +471,6 @@ fun PengeluaranEntryScreen(
         }
     )
 }
-
 
 fun formatRupiah(amount: Int): String {
     val format = NumberFormat.getCurrencyInstance(Locale("id", "ID"))
