@@ -89,7 +89,7 @@ fun EditProfileScreen(navController: NavController, viewModel: currencyViewModel
             )
 
             Image(
-                painter = painterResource(id = R.drawable.logo),
+                painter = painterResource(id = R.drawable.snapcash),
                 contentDescription = null,
                 modifier = Modifier
                     .size(120.dp)

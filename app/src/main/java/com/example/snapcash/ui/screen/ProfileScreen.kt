@@ -62,7 +62,7 @@ fun ProfileScreen(navController: NavController) {
             )
 
             Image(
-                painter = painterResource(id = R.drawable.logo), // ganti sesuai gambar Anda
+                painter = painterResource(id = R.drawable.snapcash), // ganti sesuai gambar Anda
                 contentDescription = null,
                 modifier = Modifier
                     .size(120.dp)
