@@ -387,7 +387,7 @@ fun PengeluaranEntryScreen(
                             }
                         ) {
                             Icon(
-                                imageVector = Icons.Default.Create,
+                                imageVector = Icons.Default.Add,
                                 contentDescription = "Tambah Barang",
                                 tint = Color(0xFF2D6CE9)
                             )
