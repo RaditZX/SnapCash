@@ -114,6 +114,7 @@ fun CameraScreen(
             if (file != null) {
                 scope.launch {
                     viewModel.addPengeluaranOrPemasukanByGPT(file, onResult = { success, message ->
+                        isSuccess.value = success
                         dialogMessage.value = message  // Update the popup message
                         showDialog.value = true  // Show the popup
                     })
@@ -180,6 +181,8 @@ fun CameraScreen(
                 }
 
                 if (showDialog.value) {
+                    Log.d("DIALOG_CHECK", "isSuccess = ${isSuccess.value}")
+
                     if (!isSuccess.value) {
                         ModernAlertDialog(
                             showDialog,
