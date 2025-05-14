@@ -4,6 +4,7 @@ import android.app.DatePickerDialog
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,9 +15,11 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -52,15 +55,23 @@ fun DashboardScreen(
     navController: NavController,
     openSidebar: () -> Unit
 ) {
+    Column(modifier = Modifier.fillMaxSize()) {
+
+        IconButton(
+            onClick = openSidebar,
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Icon(imageVector = Icons.Default.Menu, contentDescription = "Sidebar Menu")
+        }
+    }
+
+    val itemsPerPage = 3
     val chartItems = listOf(
         ChartItem("HOUSE", 122.00f, Color(0xFFF53844)),  // Merah
         ChartItem("CAR", 4528.00f, Color(0xFF2D6CE9)),    // Biru
         ChartItem("FOOD", 201.00f, Color(0xFF20BF55)),    // Hijau
         ChartItem("EXTRA", 1000.00f, Color(0xFFFFA500))   // Oranye
     )
-
-    // Kelompokkan data menjadi halaman dengan 3 item per halaman
-    val itemsPerPage = 3
     val pages = chartItems.chunked(itemsPerPage)
 
     // Inisialisasi PagerState untuk Progress Circle Charts
