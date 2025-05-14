@@ -65,17 +65,15 @@ fun DashboardScreen(
 
     val itemsPerPage = 3
     val chartItems = listOf(
-        ChartItem("HOUSE", 122.00f, Color(0xFFF53844)),  // Merah
-        ChartItem("CAR", 4528.00f, Color(0xFF2D6CE9)),    // Biru
+        ChartItem("Trasport", 122.00f, Color(0xFFF53844)),  // Merah
+        ChartItem("Belanja", 4528.00f, Color(0xFF2D6CE9)),    // Biru
         ChartItem("FOOD", 201.00f, Color(0xFF20BF55)),    // Hijau
         ChartItem("EXTRA", 1000.00f, Color(0xFFFFA500))   // Oranye
     )
     val pages = chartItems.chunked(itemsPerPage)
 
-    // Inisialisasi PagerState untuk Progress Circle Charts
     val pagerState = rememberPagerState(pageCount = { pages.size })
 
-    // Data untuk Gradient Area Chart (contoh data 12 hari)
     val allPointsData = listOf(
         Point(0f, 40f),
         Point(1f, 90f),
@@ -97,7 +95,6 @@ fun DashboardScreen(
         "Sun", "Mon", "Tue", "Wed", "Thu", "Fri"
     )
 
-    // Data awal untuk LineChartData (akan dimodifikasi di LineChart.kt)
     val lineChartData = LineChartData(
         linePlotData = LinePlotData(
             lines = listOf(
@@ -143,7 +140,7 @@ fun DashboardScreen(
     ) {
         // Welcome Message
         Text(
-            text = "Welcome Back DWIKA 100!",
+            text = "Welcome Back USER!",
             color = Color.White,
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
@@ -205,15 +202,15 @@ fun DashboardScreen(
                 modifier = Modifier.weight(1f),
                 horizontalAlignment = Alignment.Start
             ) {
-                Text("MONEY SPENT", color = Color.White, fontSize = 14.sp)
-                Text("$10,345.00", color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold)
-                Text("COMPARISON TO LAST YEAR", color = Color.White, fontSize = 12.sp)
-                Text("$9,905.00", color = Color.White, fontSize = 16.sp)
+                Text("MONEY SPENT", color = Color.White, fontSize = 20.sp)
+                Text("$10,345.00", color = Color.White, fontSize = 30.sp, fontWeight = FontWeight.Bold)
+                Text("COMPARISON TO LAST YEAR", color = Color.White, fontSize = 16.sp)
+                Text("$9,905.00", color = Color.White, fontSize =30.sp, fontWeight = FontWeight.Bold)
             }
             Text(
                 text = "+$440",
                 color = Color.Red,
-                fontSize = 20.sp,
+                fontSize = 30.sp,
                 fontWeight = FontWeight.Bold
             )
         }
