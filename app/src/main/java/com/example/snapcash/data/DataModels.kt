@@ -85,7 +85,28 @@ data class FilterModel(
     val kategori: String = ""
 )
 
-data class Currency(
-    val currency: String,
-    val country: String
+data class userResponse(
+    val data: userData,
+    val message: String,
+    val isSucces: Boolean
+)
+
+data class userData(
+    val email: String,
+    val username: String?,
+    val currencyChoice: String?,
+    val foto: String?,
+    val no_hp: String?
+)
+
+data class currencyResponse(
+    val data: currencyData,
+    val message: String,
+    val isSucces: Boolean
+)
+
+data class currencyData(
+    val currency_code: String,
+    val locale: String,
+    val currency_symbol: String
 )

@@ -44,6 +44,7 @@ import androidx.navigation.NavController
 import com.example.snapcash.ViewModel.PemasukanViewModel
 import com.example.snapcash.ViewModel.PengeluaranViewModel
 import com.example.snapcash.data.FilterModel
+import com.example.snapcash.data.SessionManager
 import com.example.snapcash.ui.component.SearchWithFilterBar
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
@@ -274,7 +275,11 @@ fun HistoryScreen(
 
 
 fun formatCurrencyWithSign(amount: Int, isPengeluaran: Boolean): String {
-    val format = NumberFormat.getCurrencyInstance(Locale("id", "ID"))
+    val localeString = SessionManager.locale?.toString() ?: "id_ID"
+    val localeParts = localeString.split("_")
+    val locale = Locale(localeParts[0], localeParts[1])
+
+    val format = NumberFormat.getCurrencyInstance(locale)
     format.maximumFractionDigits = 0
     val absoluteAmount = format.format(kotlin.math.abs(amount))
     return if (isPengeluaran) "-$absoluteAmount" else "+$absoluteAmount"

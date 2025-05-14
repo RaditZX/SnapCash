@@ -14,8 +14,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.example.snapcash.data.SessionManager
 import java.text.NumberFormat
-import java.util.Currency
 import java.util.Locale
 
 @OptIn(ExperimentalPerfettoCaptureApi::class)
@@ -53,9 +53,12 @@ fun CurrencyInputField(
 
 
 fun formatCurrency(amount: Int): String {
-    val format = NumberFormat.getCurrencyInstance(Locale("id", "ID")).apply {
+    val localeString = SessionManager.locale?.toString() ?: "id_ID"
+    val localeParts = localeString.split("_")
+    val locale = Locale(localeParts[0], localeParts[1])
+
+    val format = NumberFormat.getCurrencyInstance(locale).apply {
         maximumFractionDigits = 0
-        currency = Currency.getInstance("IDR")
     }
     return format.format(amount)
 }
