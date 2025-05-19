@@ -54,6 +54,16 @@ interface SnapCashApiService {
         @Query("nominalMax") max: Int
     ): DefaultResponse
 
+    @GET("getDashboardAnalytics")
+    suspend fun getDashboardAnalytics(
+        @Header("Authorization") token: String,
+        @Query("jenis") jenis: String = "Pemasukan",
+        @Query("filter") filter: String = "tahun",
+        @Query("tahun") tahun: Int,
+        @Query("bulan") bulan: Int? = null,
+        @Query("hari") hari: Int? = null
+    ): DashboardResponse
+
     @GET("pemasukanUser/{id}")
     suspend fun getPemasukanUserById(
         @Header("Authorization") token: String,
