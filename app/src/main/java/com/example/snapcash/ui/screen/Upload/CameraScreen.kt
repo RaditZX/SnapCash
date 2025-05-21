@@ -92,7 +92,10 @@ fun CameraScreen(
     val showDialog = remember { mutableStateOf(false) }
     val dialogMessage = remember { mutableStateOf("") }
     val isLoading by viewModel.isLoading
-    val isSuccess by viewModel.isSucces
+//    val isSuccess by viewModel.isSucces
+
+
+    val isSuccess = remember { mutableStateOf(false) }
 
 
     val pengeluaranData by remember { viewModel2.pengeluaranDataById }
@@ -115,6 +118,7 @@ fun CameraScreen(
             if (file != null) {
                 scope.launch {
                     viewModel.addPengeluaranOrPemasukanByGPT(file, onResult = { success, message ->
+                        isSuccess.value = success
                         dialogMessage.value = message  // Update the popup message
                         showDialog.value = true  // Show the popup
                     })
@@ -128,6 +132,7 @@ fun CameraScreen(
     LaunchedEffect(fileToSend) {
         fileToSend?.let { file ->
             viewModel.addPengeluaranOrPemasukanByGPT(file,onResult = { success, message ->
+                isSuccess.value = success
                 dialogMessage.value = message  // Update the popup message
                 showDialog.value = true  // Show the popup
             })
@@ -178,12 +183,10 @@ fun CameraScreen(
                 ) {
                     Text(text = "Upload Invoice",color = Color.White)
                 }
-                if(!isSuccess){
+                if(!isSuccess.value){
                     ModernAlertDialog(showDialog, "Fail To Extract Data",
                         dialogMessage.toString(), "camera", navController  )
                 }else {
-
-
                     if (showDialog.value) {
                         val id = viewModel.data.value.get("id")?.asString ?: ""
                         val isPengeluaran =
@@ -252,8 +255,7 @@ fun CameraScreen(
                                         tanggal = pemasukanData.get("tanggal")?.asString ?: ""
                                         total = pemasukanData.get("total")?.asInt ?: 0
 
-                                        val biayaJsonArray =
-                                            pemasukanData.get("tambahanBiaya")?.asJsonArray
+                                        val biayaJsonArray = pemasukanData.get("tambahanBiaya")?.asJsonArray
                                         biayalist = biayaJsonArray?.map {
                                             val obj = it.asJsonObject
                                             Tambahanbiaya(
@@ -267,7 +269,7 @@ fun CameraScreen(
 
                             PemasukanDialog(
                                 navController = navController,
-                                id = id.toString(),
+                                id = id,
                                 judul = judul,
                                 toko = toko,
                                 tanggal = tanggal,

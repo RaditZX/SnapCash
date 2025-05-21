@@ -5,6 +5,7 @@ import android.app.TimePickerDialog
 import android.icu.util.Calendar
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -28,6 +29,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -43,6 +45,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -194,9 +197,6 @@ fun PemasukanEntryScreen(
                         )
                     }
                 }
-                FloatingActionButton(onClick = { showDialogBiaya = true }, containerColor = Color(0xFF2D6CE9)) {
-                    Icon(Icons.Default.Add, contentDescription = "Tambah Biaya")
-                }
             }
         },
         bottomBar = {
@@ -334,25 +334,58 @@ fun PemasukanEntryScreen(
                         value = tanggal,
                         onValueChange = {},
                         label = { Text("Date") },
-                        readOnly = true,
+                        modifier = Modifier
+                            .weight(1f)
+                            .pointerInput(Unit){
+                                detectTapGestures{datePicker.show()}
+                            },
+                        shape = RoundedCornerShape(12.dp),
                         trailingIcon = {
                             IconButton(onClick = { datePicker.show() }) {
                                 Icon(Icons.Default.DateRange, contentDescription = "Pilih Tanggal")
                             }
                         },
-                        modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(12.dp)
+                        colors = OutlinedTextFieldDefaults.colors(
+                            unfocusedBorderColor = Color.Gray,
+                            focusedBorderColor = Color.Blue,
+                            disabledBorderColor = Color.Gray,
+                            disabledTextColor = MaterialTheme.colorScheme.onSurface,
+                            disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            disabledTrailingIconColor = MaterialTheme.colorScheme.onSurface
+                        ),
+                        readOnly = true,
+                        enabled = false
                     )
                 }
             }
 
             item {
-                Column {
-                    Text("Additional Add", fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    if (biayalist.isEmpty()) {
-                        Text("There are no additional add", color = Color.Gray)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        "Additional Add",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    IconButton(
+                        onClick = {
+                            showDialogBiaya = false
+                            showDialogBiaya = true
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = "Tambah Biaya",
+                            tint = Color(0xFF2D6CE9)
+                        )
                     }
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+                if (biayalist.isEmpty()) {
+                    Text("There are no additional add", color = Color.Gray)
                 }
             }
 

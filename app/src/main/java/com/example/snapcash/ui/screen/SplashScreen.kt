@@ -48,7 +48,7 @@ fun SplashScreen(onTimeout: () -> Unit){
         contentAlignment = Alignment.Center
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Image(painter = painterResource(R.drawable.logos), contentDescription = null)
+            Image(painter = painterResource(R.drawable.snapcash), contentDescription = null)
             Spacer(Modifier.height(20.dp))
             Text(fontWeight = FontWeight.Bold, fontSize = 20.sp, text = "SnapCash", color = Color.White)
         }

@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -76,26 +75,20 @@ fun ProfileScreen(navController: NavController, viewModel: AuthViewModel = hiltV
                     )
             )
 
-            Box( // Box luar
+
+            // Lingkaran foto
+            Box(
                 modifier = Modifier
-                    .size(120.dp)
-                    .align(Alignment.BottomCenter)
-                    .offset(y = 60.dp) // offset DI SINI, bukan di dalam!
+                    .fillMaxSize()
+                    .clip(CircleShape)
+                    .background(Color.Gray) // bantu debug
             ) {
-                // Lingkaran foto
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .clip(CircleShape)
-                        .background(Color.Gray) // bantu debug
-                ) {
-                    Image(
-                        painter = rememberAsyncImagePainter(userData.foto),
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                }
+                Image(
+                    painter = rememberAsyncImagePainter(userData.foto),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
+                )
             }
 
 

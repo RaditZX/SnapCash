@@ -110,3 +110,18 @@ data class currencyData(
     val locale: String,
     val currency_symbol: String
 )
+
+data class DashboardResponse(
+    val message: String,
+    val isSucces: Boolean,
+    val data: DashboardData
+)
+
+data class DashboardData(
+    val total: Int,
+    val totalTahunSebelumnya: Int,
+    val perubahanPersentase: Int,
+    val perubahanTotal: Int,
+    val TotalByKategori: Map<String, Int>,
+    val TotalByRange: Map<String, Int>
+)

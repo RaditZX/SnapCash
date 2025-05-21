@@ -66,7 +66,11 @@ import com.google.gson.JsonObject
 import java.io.File
 
 @Composable
-fun EditProfileScreen(navController: NavController, viewModel: currencyViewModel = hiltViewModel(), userViewModel: AuthViewModel = hiltViewModel(),) {
+fun EditProfileScreen(
+    navController: NavController,
+    viewModel: currencyViewModel = hiltViewModel(),
+    userViewModel: AuthViewModel = hiltViewModel(),
+) {
     val userData by remember { userViewModel.userDatas }
     var email by remember { mutableStateOf("") }
     var name by remember { mutableStateOf("") }
@@ -137,102 +141,97 @@ fun EditProfileScreen(navController: NavController, viewModel: currencyViewModel
                     )
             )
 
-            Box( // Box luar
-                modifier = Modifier
-                    .size(120.dp)
-                    .align(Alignment.BottomCenter)
-                    .offset(y = 60.dp) // offset DI SINI, bukan di dalam!
-            ) {
-                // Lingkaran foto
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .clip(CircleShape)
-                        .background(Color.Gray) // bantu debug
-                ) {
-                    Image(
-                        painter = painter,
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                }
-            }
-        }
 
-        Spacer(modifier = Modifier.height(80.dp))
-        LazyColumn(modifier = Modifier.padding(horizontal = 24.dp)) {
-            item {
-                EditProfileField(Icons.Default.Person, "Name", name.toString()) { name = it }
-                EditProfileField(Icons.Default.Email, "Email", email.toString()) { email = it }
-                EditProfileField(Icons.Default.Phone, "Number", number.toString()) { number = it }
-
-                EditProfileImageField(
-                    icon = Icons.Default.Person,
-                    label = "Photo"
-                ) { uri ->
-                    url = uri
-                }
-
-                EditProfileDropdownField(
-                    icon = Icons.Default.ShoppingCart,
-                    label = "Currency",
-                    options = currencyList,
-                    selectedOption = currency.toString()
-                ) { selected ->
-                    currency = selected
-                }
-
-                Spacer(modifier = Modifier.height(32.dp))
-
-                Button(
-                    onClick = {
-
-                        userViewModel.updateUserData(
-                            data = request,
-                            photo = uriToFile(context, url),
-                            onResult = { success, message ->
-                                dialogMessage.value = message
-                                showDialog.value = true
-                            }
-                        )
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2979FF))
-                ) {
-                    Text("Save", color = Color.White)
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-            }
-        }
-
-        // 🔄 Overlay Loading
-        if (isLoading) {
+            // Lingkaran foto
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.3f)),
-                contentAlignment = Alignment.Center
+                    .clip(CircleShape)
+                    .background(Color.Gray) // bantu debug
             ) {
-                CircularProgressIndicator()
+                Image(
+                    painter = painter,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
+                )
             }
         }
+    }
 
-        // 📦 Overlay Dialog
-        if (showDialog.value) {
-            ModernAlertDialog(
-                showDialog,
-                "UpdateProfile",
-                dialogMessage.value,
-                if (isSuccess) "profile" else "profile/edit",
-                navController
-            )
+    Spacer(modifier = Modifier.height(80.dp))
+    LazyColumn(modifier = Modifier.padding(horizontal = 24.dp)) {
+        item {
+            EditProfileField(Icons.Default.Person, "Name", name.toString()) { name = it }
+            EditProfileField(Icons.Default.Email, "Email", email.toString()) { email = it }
+            EditProfileField(Icons.Default.Phone, "Number", number.toString()) { number = it }
 
+            EditProfileImageField(
+                icon = Icons.Default.Person,
+                label = "Photo"
+            ) { uri ->
+                url = uri
+            }
+
+            EditProfileDropdownField(
+                icon = Icons.Default.ShoppingCart,
+                label = "Currency",
+                options = currencyList,
+                selectedOption = currency.toString()
+            ) { selected ->
+                currency = selected
+            }
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            Button(
+                onClick = {
+
+                    userViewModel.updateUserData(
+                        data = request,
+                        photo = uriToFile(context, url),
+                        onResult = { success, message ->
+                            dialogMessage.value = message
+                            showDialog.value = true
+                        }
+                    )
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2979FF))
+            ) {
+                Text("Save", color = Color.White)
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
         }
     }
+
+    // 🔄 Overlay Loading
+    if (isLoading) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.3f)),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
+        }
+    }
+
+    // 📦 Overlay Dialog
+    if (showDialog.value) {
+        ModernAlertDialog(
+            showDialog,
+            "UpdateProfile",
+            dialogMessage.value,
+            if (isSuccess) "profile" else "profile/edit",
+            navController
+        )
+
+    }
+
 }
 
 @Composable
@@ -242,9 +241,10 @@ fun EditProfileField(
     value: String,
     onValueChange: (String) -> Unit
 ) {
-    Column(modifier = Modifier
-        .fillMaxWidth()
-        .padding(vertical = 8.dp)
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
@@ -364,9 +364,10 @@ fun EditProfileImageField(
         }
     }
 
-    Column(modifier = Modifier
-        .fillMaxWidth()
-        .padding(vertical = 8.dp)
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
@@ -380,14 +381,15 @@ fun EditProfileImageField(
         }
         Spacer(modifier = Modifier.height(4.dp))
 
-        Box(modifier = Modifier
-            .fillMaxWidth()
-            .clickable {
-                pickImageLauncher.launch("image/*")
-            }
-            .padding(16.dp)
-            .border(1.dp, Color.Gray, RoundedCornerShape(8.dp))
-            .padding(16.dp)
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable {
+                    pickImageLauncher.launch("image/*")
+                }
+                .padding(16.dp)
+                .border(1.dp, Color.Gray, RoundedCornerShape(8.dp))
+                .padding(16.dp)
         ) {
             // Placeholder: tampilkan ikon saat tidak ada gambar yang dipilih
             Icon(

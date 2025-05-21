@@ -89,7 +89,7 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel = hiltVie
             verticalArrangement = Arrangement.Center
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.logos),
+                painter = painterResource(id = R.drawable.snapcash),
                 contentDescription = "App Logo",
                 tint = Color.White,
                 modifier = Modifier.size(64.dp)

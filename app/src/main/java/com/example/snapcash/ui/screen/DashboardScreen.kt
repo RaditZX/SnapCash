@@ -1,6 +1,5 @@
 package com.example.snapcash.ui.screen
 
-import android.app.DatePickerDialog
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -46,7 +45,6 @@ import co.yml.charts.ui.linechart.model.LineType
 import co.yml.charts.ui.linechart.model.SelectionHighlightPoint
 import co.yml.charts.ui.linechart.model.ShadowUnderLine
 import com.example.snapcash.ui.component.ProgressCircleChart
-import com.example.snapcash.ui.component.LineChart
 
 @Composable
 fun DashboardScreen(
@@ -281,12 +279,12 @@ fun DashboardScreen(
             colors = CardDefaults.cardColors(containerColor = Color(0xFF2A2A2A))
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
-                LineChart(
-                    modifier = Modifier.fillMaxWidth(),
-                    lineChartData = lineChartData,
-                    allPointsData = allPointsData,
-                    allDays = allDays
-                )
+//                LineChartDashboard(
+//                    modifier = Modifier.fillMaxWidth(),
+//                    lineChartData = lineChartData,
+//                    allPointsData = allPointsData,
+//                    allDays = allDays
+//                )
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()

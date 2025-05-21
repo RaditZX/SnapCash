@@ -6,6 +6,7 @@ import android.icu.util.Calendar
 import android.util.Log
 import com.example.snapcash.ui.component.AddBarangDialog
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -65,6 +66,7 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
+import androidx.compose.ui.input.pointer.pointerInput
 import com.example.snapcash.ui.component.DropdownMenu
 import com.example.snapcash.ui.theme.night
 import java.text.SimpleDateFormat
@@ -238,28 +240,6 @@ fun PengeluaranEntryScreen(
                 }
             },
             floatingActionButton = {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                    horizontalAlignment = Alignment.End
-                ) {
-                    FloatingActionButton(containerColor = Color(0xFF2D6CE9),onClick = {
-                        // show dialog untuk biaya
-                        showDialog = false // pastikan dialog barang tertutup dulu
-                        showDialogBiaya = true
-                    }) {
-                        Icon(imageVector = Icons.Default.Add, contentDescription = "Tambah Biaya")
-                    }
-
-                    FloatingActionButton(containerColor = Color(0xFF2D6CE9),onClick = {
-                        // show dialog untuk barang
-                        showDialogBiaya = false // pastikan dialog biaya tertutup dulu
-                        showDialog = true
-                    }) {
-                        Icon(
-                            imageVector = Icons.Default.Create,
-                            contentDescription = "Tambah Barang"
-                        )
-                    }
                     if (isUpdate){
                         FloatingActionButton(containerColor = Color(0xFF2D6CE9),onClick = {
                             viewModel.deletePengeluaranById(id.toString(), navController)
@@ -270,8 +250,6 @@ fun PengeluaranEntryScreen(
                             )
                         }
                     }
-
-                }
             },
             bottomBar = {
                 Column(
@@ -353,19 +331,32 @@ fun PengeluaranEntryScreen(
 
                         OutlinedTextField(
                             value = tanggal,
-                            onValueChange = { tanggal = it },
+                            onValueChange = { /* Read-only */ },
                             label = { Text("Date") },
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .pointerInput(Unit) {
+                                    detectTapGestures { datePicker.show() }
+                                },
                             shape = RoundedCornerShape(12.dp),
                             trailingIcon = {
                                 IconButton(onClick = { datePicker.show() }) {
-                                    Icon(Icons.Default.DateRange, contentDescription = "Pilih Tanggal")
+                                    Icon(
+                                        Icons.Default.DateRange,
+                                        contentDescription = "Pilih Tanggal"
+                                    )
                                 }
                             },
                             colors = OutlinedTextFieldDefaults.colors(
                                 unfocusedBorderColor = Color.Gray,
-                                focusedBorderColor = Color.Blue
-                            )
+                                focusedBorderColor = Color.Blue,
+                                disabledBorderColor = Color.Gray,
+                                disabledTextColor = MaterialTheme.colorScheme.onSurface,
+                                disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                disabledTrailingIconColor = MaterialTheme.colorScheme.onSurface
+                            ),
+                            readOnly = true,
+                            enabled = false
                         )
 
                         DropdownMenu(
@@ -378,14 +369,33 @@ fun PengeluaranEntryScreen(
                     }
                 }
 
-                // Header Barang
                 item {
-                    Column {
-                        Text("List Item", fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                        Spacer(modifier = Modifier.height(8.dp))
-                        if (barangList.isEmpty()) {
-                            Text("There are no item", color = Color.Gray)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            "List Item",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                        IconButton(
+                            onClick = {
+                                showDialogBiaya = false
+                                showDialog = true
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Add,
+                                contentDescription = "Tambah Barang",
+                                tint = Color(0xFF2D6CE9)
+                            )
                         }
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                    if (barangList.isEmpty()) {
+                        Text("There are no items", color = Color.Gray)
                     }
                 }
 
@@ -421,12 +431,32 @@ fun PengeluaranEntryScreen(
 
                 // Header Biaya
                 item {
-                    Column {
-                        Text("Additional Cost", fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                        Spacer(modifier = Modifier.height(8.dp))
-                        if (biayalist.isEmpty()) {
-                            Text("There are no additional cost", color = Color.Gray)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            "Additional Cost",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                        IconButton(
+                            onClick = {
+                                showDialog = false
+                                showDialogBiaya = true
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Add,
+                                contentDescription = "Tambah Biaya",
+                                tint = Color(0xFF2D6CE9)
+                            )
                         }
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                    if (biayalist.isEmpty()) {
+                        Text("There are no additional costs", color = Color.Gray)
                     }
                 }
 
