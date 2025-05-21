@@ -26,7 +26,7 @@ class PemasukanViewModel @Inject constructor(private val apiService: SnapCashApi
 
     val isLoading = mutableStateOf(false)
 
-    fun getPemasukanUser(filterData: FilterModel) {
+    fun getPemasukanUser(filterData: FilterModel, searchQuery: String) {
         viewModelScope.launch {
             isLoading.value = true
             try {
@@ -36,7 +36,8 @@ class PemasukanViewModel @Inject constructor(private val apiService: SnapCashApi
                     filterData.startDate,
                     filterData.endDate,
                     filterData.min,
-                    filterData.max
+                    filterData.max,
+                    searchQuery
                 )
 
                 if (response.isSucces) {

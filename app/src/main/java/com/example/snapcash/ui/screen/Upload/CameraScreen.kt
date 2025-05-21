@@ -57,6 +57,7 @@ import com.example.snapcash.ViewModel.PemasukanViewModel
 import com.example.snapcash.ViewModel.PengeluaranViewModel
 import com.example.snapcash.data.Barang
 import com.example.snapcash.data.Tambahanbiaya
+import com.example.snapcash.ui.component.ModernAlertDialog
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -69,7 +70,6 @@ import java.util.Date
 import java.util.Locale
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-import com.example.snapcash.ui.component.ModernAlertDialog
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
@@ -92,7 +92,11 @@ fun CameraScreen(
     val showDialog = remember { mutableStateOf(false) }
     val dialogMessage = remember { mutableStateOf("") }
     val isLoading by viewModel.isLoading
+//    val isSuccess by viewModel.isSucces
+
+
     val isSuccess = remember { mutableStateOf(false) }
+
 
     val pengeluaranData by remember { viewModel2.pengeluaranDataById }
     val pemasukanData by remember { viewModel1.pemasukanDataById }
@@ -179,37 +183,30 @@ fun CameraScreen(
                 ) {
                     Text(text = "Upload Invoice",color = Color.White)
                 }
-
-                if (showDialog.value) {
-                    Log.d("DIALOG_CHECK", "isSuccess = ${isSuccess.value}")
-
-                    if (!isSuccess.value) {
-                        ModernAlertDialog(
-                            showDialog,
-                            "Invoice Capture",
-                            dialogMessage.value,
-                            "camera",
-                            navController
-                        )
-                    } else {
-                        // Ambil ID dan tipe data (pengeluaran/pemasukan)
+                if(!isSuccess.value){
+                    ModernAlertDialog(showDialog, "Fail To Extract Data",
+                        dialogMessage.toString(), "camera", navController  )
+                }else {
+                    if (showDialog.value) {
                         val id = viewModel.data.value.get("id")?.asString ?: ""
-                        val isPengeluaran = viewModel.data.value.get("isPengeluaran")?.asBoolean ?: true
+                        val isPengeluaran =
+                            viewModel.data.value.get("isPengeluaran")?.asBoolean ?: true
 
                         if (isPengeluaran) {
-                            if (id.isNotEmpty()) {
+                            if (id != null) {
                                 LaunchedEffect(Unit) {
-                                    viewModel2.getPengluaranUserById(id)
+                                    viewModel2.getPengluaranUserById(id.toString())
                                 }
                                 LaunchedEffect(pengeluaranData) {
                                     if (pengeluaranData.size() > 0) {
-                                        judul = pengeluaranData.get("namaPengeluaran")?.asString ?: ""
+                                        judul =
+                                            pengeluaranData.get("namaPengeluaran")?.asString ?: ""
                                         toko = pengeluaranData.get("toko")?.asString ?: ""
                                         tanggal = pengeluaranData.get("tanggal")?.asString ?: ""
                                         kategori = pengeluaranData.get("kategori")?.asString ?: ""
                                         total = pengeluaranData.get("total").asInt
-
-                                        val barangJsonArray = pengeluaranData.get("barang")?.asJsonArray
+                                        val barangJsonArray =
+                                            pengeluaranData.get("barang")?.asJsonArray
                                         barangList = barangJsonArray?.map { item ->
                                             val obj = item.asJsonObject
                                             Barang(
@@ -219,7 +216,8 @@ fun CameraScreen(
                                             )
                                         } ?: emptyList()
 
-                                        val biayaJsonArray = pengeluaranData.get("tambahanBiaya")?.asJsonArray
+                                        val biayaJsonArray =
+                                            pengeluaranData.get("tambahanBiaya")?.asJsonArray
                                         biayalist = biayaJsonArray?.map { item ->
                                             val obj = item.asJsonObject
                                             Tambahanbiaya(
@@ -233,7 +231,7 @@ fun CameraScreen(
 
                             PengeluaranDialog(
                                 navController = navController,
-                                id = id,
+                                id = id.toString(),
                                 judul = judul,
                                 toko = toko,
                                 tanggal = tanggal,
@@ -244,9 +242,9 @@ fun CameraScreen(
                             )
 
                         } else {
-                            if (id.isNotEmpty()) {
+                            if (id != null) {
                                 LaunchedEffect(Unit) {
-                                    viewModel1.getPemasukanUserById(id)
+                                    viewModel1.getPemasukanUserById(id.toString())
                                 }
 
                                 LaunchedEffect(pemasukanData) {

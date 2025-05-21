@@ -22,11 +22,13 @@ import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,9 +46,13 @@ import coil3.compose.rememberAsyncImagePainter
 import com.example.snapcash.ViewModel.AuthViewModel
 
 @Composable
-fun ProfileScreen(navController: NavController,viewModel: AuthViewModel = hiltViewModel()) {
+fun ProfileScreen(navController: NavController, viewModel: AuthViewModel = hiltViewModel()) {
 
     val userData by remember { viewModel.userDatas }
+    val showDialog = remember { mutableStateOf(false) }
+    val dialogMessage = remember { mutableStateOf("") }
+    val isSucces = remember { mutableStateOf(false) }
+    val isLoading by viewModel.isLoading
 
     LaunchedEffect(Unit) {
         viewModel.getUserData()
@@ -55,12 +61,15 @@ fun ProfileScreen(navController: NavController,viewModel: AuthViewModel = hiltVi
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF0D0F13))
-            ,
+            .background(Color(0xFF0D0F13)),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        Box {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(180.dp) // Pastikan tinggi cukup untuk offset
+        ) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -73,22 +82,34 @@ fun ProfileScreen(navController: NavController,viewModel: AuthViewModel = hiltVi
                     )
             )
 
-            Image(
 
-                painter = rememberAsyncImagePainter(userData.foto),// ganti sesuai gambar Anda
-
-                contentDescription = null,
+            Box( // Box luar
                 modifier = Modifier
                     .size(120.dp)
-                    .clip(CircleShape)
                     .align(Alignment.BottomCenter)
-                    .offset(y = 50.dp), // mendorong ke bawah
-                contentScale = ContentScale.Crop
-            )
+                    .offset(y = 60.dp) // offset DI SINI, bukan di dalam!
+            ) {
+                // Lingkaran foto
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clip(CircleShape)
+                        .background(Color.Gray) // bantu debug
+                ) {
+                    Image(
+                        painter = rememberAsyncImagePainter(userData.foto),
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+            }
+
+
         }
 
         Spacer(modifier = Modifier.height(80.dp))
-        Column (modifier = Modifier.padding(horizontal = 24.dp)){
+        Column(modifier = Modifier.padding(horizontal = 24.dp)) {
             ProfileField(Icons.Default.Person, "Name", userData.username.toString())
             ProfileField(Icons.Default.Email, "Email", userData.email.toString())
             ProfileField(Icons.Default.Phone, "Number", userData.no_hp.toString())
@@ -97,7 +118,7 @@ fun ProfileScreen(navController: NavController,viewModel: AuthViewModel = hiltVi
             Spacer(modifier = Modifier.height(32.dp))
 
             Button(
-                onClick = { navController.navigate("profile/edit")},
+                onClick = { navController.navigate("profile/edit") },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
@@ -105,16 +126,50 @@ fun ProfileScreen(navController: NavController,viewModel: AuthViewModel = hiltVi
             ) {
                 Text("Edit Profile", color = Color.White)
             }
+            Spacer(modifier = Modifier.height(15.dp))
+            Button(
+                onClick = {
+                    viewModel.signOut(onResult = { success, message ->
+                        dialogMessage.value = message
+                        showDialog.value = true
+                        isSucces.value = success
+
+                        if (success) {
+                            navController.navigate("signIn") {
+                                popUpTo("home") { inclusive = true } // opsional, hapus history
+                            }
+                        }
+                    })},
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+            ) {
+                Text("Sign Out", color = Color.White)
+            }
         }
+        // 🔄 Overlay Loading
+        if (isLoading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.3f)),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+
 
     }
 }
 
 @Composable
 fun ProfileField(icon: ImageVector, label: String, value: String) {
-    Column(modifier = Modifier
-        .fillMaxWidth()
-        .padding(vertical = 8.dp)
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(

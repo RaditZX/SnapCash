@@ -66,7 +66,11 @@ import com.google.gson.JsonObject
 import java.io.File
 
 @Composable
-fun EditProfileScreen(navController: NavController, viewModel: currencyViewModel = hiltViewModel(), userViewModel: AuthViewModel = hiltViewModel(),) {
+fun EditProfileScreen(
+    navController: NavController,
+    viewModel: currencyViewModel = hiltViewModel(),
+    userViewModel: AuthViewModel = hiltViewModel(),
+) {
     val userData by remember { userViewModel.userDatas }
     var email by remember { mutableStateOf("") }
     var name by remember { mutableStateOf("") }
@@ -120,7 +124,11 @@ fun EditProfileScreen(navController: NavController, viewModel: currencyViewModel
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        Box {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(180.dp) // Pastikan tinggi cukup untuk offset
+        ) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -134,20 +142,29 @@ fun EditProfileScreen(navController: NavController, viewModel: currencyViewModel
             )
 
 
-
-
-            Image(
-
-                painter = painter,
-                contentDescription = null,
+            Box( // Box luar
                 modifier = Modifier
                     .size(120.dp)
-                    .clip(CircleShape)
                     .align(Alignment.BottomCenter)
-                    .offset(y = 50.dp),
-                contentScale = ContentScale.Crop
-            )
+                    .offset(y = 60.dp) // offset DI SINI, bukan di dalam!
+            ) {
+                // Lingkaran foto
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clip(CircleShape)
+                        .background(Color.Gray) // bantu debug
+                ) {
+                    Image(
+                        painter = rememberAsyncImagePainter(userData.foto),
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+            }
         }
+
 
         Spacer(modifier = Modifier.height(80.dp))
         LazyColumn(modifier = Modifier.padding(horizontal = 24.dp)) {
@@ -222,6 +239,7 @@ fun EditProfileScreen(navController: NavController, viewModel: currencyViewModel
 
         }
     }
+
 }
 
 @Composable
@@ -231,9 +249,10 @@ fun EditProfileField(
     value: String,
     onValueChange: (String) -> Unit
 ) {
-    Column(modifier = Modifier
-        .fillMaxWidth()
-        .padding(vertical = 8.dp)
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
@@ -353,9 +372,10 @@ fun EditProfileImageField(
         }
     }
 
-    Column(modifier = Modifier
-        .fillMaxWidth()
-        .padding(vertical = 8.dp)
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
@@ -369,14 +389,15 @@ fun EditProfileImageField(
         }
         Spacer(modifier = Modifier.height(4.dp))
 
-        Box(modifier = Modifier
-            .fillMaxWidth()
-            .clickable {
-                pickImageLauncher.launch("image/*")
-            }
-            .padding(16.dp)
-            .border(1.dp, Color.Gray, RoundedCornerShape(8.dp))
-            .padding(16.dp)
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable {
+                    pickImageLauncher.launch("image/*")
+                }
+                .padding(16.dp)
+                .border(1.dp, Color.Gray, RoundedCornerShape(8.dp))
+                .padding(16.dp)
         ) {
             // Placeholder: tampilkan ikon saat tidak ada gambar yang dipilih
             Icon(

@@ -16,19 +16,22 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.foundation.layout.size
 
 @Composable
 fun ProgressCircleChart(
     label: String,
     value: Float,
-    total: Float = 5000f, // Total maksimum untuk persentase (dapat disesuaikan)
+    total: Float,
     color: Color,
     modifier: Modifier = Modifier
 ) {
-    val progress = (value / total).coerceIn(0f, 1f) // Pastikan progress antara 0 dan 1
+    val progress = if (total == 0f) 0f else value / total
+
     Column(
-        modifier = modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier
     ) {
         Canvas(
             modifier = Modifier
@@ -70,7 +73,7 @@ fun ProgressCircleChart(
             fontWeight = FontWeight.Bold
         )
         Text(
-            text = "$$value",
+            text = "Rp$value",
             color = Color.White,
             fontSize = 14.sp
         )

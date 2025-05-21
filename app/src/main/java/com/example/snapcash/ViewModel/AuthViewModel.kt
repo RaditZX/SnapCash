@@ -268,6 +268,18 @@ class AuthViewModel @Inject constructor(private val apiService: SnapCashApiServi
         }
     }
 
-
-
+    fun signOut(onResult: (Boolean, String) -> Unit){
+        viewModelScope.launch {
+            try{
+                val response = apiService.signOut();
+                if(response.isSucces){
+                    onResult(true, response.message)
+                }else{
+                    onResult(false, response.message)
+                }
+            }catch(e: Exception){
+                onResult(false, "Terjadi kesalahan: ${e.localizedMessage}")
+            }
+        }
+    }
 }
