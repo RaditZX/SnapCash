@@ -33,13 +33,6 @@ fun ProgressCircleChart(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
     ) {
-<<<<<<< Updated upstream
-        CircularProgressIndicator(
-            progress = progress,
-            color = color,
-            strokeWidth = 8.dp,
-            modifier = Modifier.size(72.dp)
-=======
         Canvas(
             modifier = Modifier
                 .height(100.dp)
@@ -83,10 +76,6 @@ fun ProgressCircleChart(
             text = "Rp$value",
             color = Color.White,
             fontSize = 14.sp
->>>>>>> Stashed changes
         )
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(label, color = Color.White)
-        Text("Rp ${value.toInt()}", color = Color.White, fontSize = 12.sp)
     }
 }

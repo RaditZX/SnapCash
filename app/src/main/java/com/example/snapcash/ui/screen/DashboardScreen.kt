@@ -51,6 +51,7 @@ import co.yml.charts.ui.linechart.model.LineStyle
 import co.yml.charts.ui.linechart.model.LineType
 import co.yml.charts.ui.linechart.model.SelectionHighlightPoint
 import co.yml.charts.ui.linechart.model.ShadowUnderLine
+import com.example.snapcash.ui.component.LineChart
 import com.example.snapcash.ui.component.ProgressCircleChart
 
 @Composable
@@ -326,12 +327,12 @@ fun DashboardScreen(
             colors = CardDefaults.cardColors(containerColor = Color(0xFF2A2A2A))
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
-//                LineChartDashboard(
-//                    modifier = Modifier.fillMaxWidth(),
-//                    lineChartData = lineChartData,
-//                    allPointsData = allPointsData,
-//                    allDays = allDays
-//                )
+                LineChart(
+                    modifier = Modifier.fillMaxWidth(),
+                    lineChartData = lineChartData,
+                    allPointsData = allPointsData,
+                    allDays = allDays
+                )
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
