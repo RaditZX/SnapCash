@@ -349,7 +349,7 @@ fun PengeluaranDialog(
             }
         },
         confirmButton = {
-            Button(onClick = { navController.navigate("update/pengeluaran/$id") }) {
+            Button(onClick = { navController.navigate("preview/pengeluaran/$id") }) {
                 Text("Edit")
             }
         },
@@ -399,7 +399,7 @@ fun PemasukanDialog(
             }
         },
         confirmButton = {
-            Button(onClick = { navController.navigate("update/pemasukan/$id") }) {
+            Button(onClick = { navController.navigate("preview/pemasukan/$id") }) {
                 Text("Edit")
             }
         },

@@ -63,16 +63,21 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import java.text.SimpleDateFormat
 import java.util.Locale
-
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.AlertDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PemasukanEntryScreen(
     navController: NavController,
     viewModel: PemasukanViewModel = hiltViewModel(),
-    id: String?
+    id: String?,
+    preview: Boolean
 ) {
     val context = LocalContext.current
+    var showCancelDialog by remember { mutableStateOf(false) }
 
     var judul by remember { mutableStateOf("") }
     var sumber by remember { mutableStateOf("") }
@@ -85,7 +90,8 @@ fun PemasukanEntryScreen(
     val kategoriList = listOf("Gaji", "Investasi", "Bisnis", "Hadiah")
     var showDialogBiaya by remember { mutableStateOf(false) }
     var isUpdate by remember { mutableStateOf(false) }
-    var totalIsUpdate by remember {mutableStateOf(0.0)}
+    var totalIsUpdate by remember { mutableStateOf(0.0) }
+
     if (id != null) {
         LaunchedEffect(Unit) {
             viewModel.getPemasukanUserById(id)
@@ -98,7 +104,6 @@ fun PemasukanEntryScreen(
                 kategori = pemasukanData.get("kategori")?.asString ?: ""
                 sumber = pemasukanData.get("sumber")?.asString ?: ""
                 tanggal = pemasukanData.get("tanggal")?.asString ?: ""
-                kategori = pemasukanData.get("kategori")?.asString ?: ""
                 nominal = pemasukanData.get("total")?.asInt ?: 0
                 subTotal = pemasukanData.get("subTotal")?.asInt ?: 0
 
@@ -111,62 +116,82 @@ fun PemasukanEntryScreen(
                     )
                 } ?: emptyList()
 
-                totalIsUpdate = (if (nominal == 0) {
+                totalIsUpdate = if (nominal == 0) {
                     0.0
                 } else {
                     val totalBiaya = biayalist.sumOf { it.jumlahbiaya }
-                    Log.d("biaya", totalBiaya.toString())
                     (nominal - totalBiaya)
-                })
+                }
             }
         }
     }
 
-        val dateTimeFormatter = SimpleDateFormat("dd MMMM yyyy, HH:mm:ss", Locale("id", "ID"))
-        val calendar = Calendar.getInstance()
-        val datePicker = DatePickerDialog(
-            context,
-            { _, year, month, dayOfMonth ->
-                calendar.set(year, month, dayOfMonth)
-                TimePickerDialog(
-                    context,
-                    { _, hourOfDay, minute ->
-                        calendar.set(Calendar.HOUR_OF_DAY, hourOfDay)
-                        calendar.set(Calendar.MINUTE, minute)
-                        calendar.set(Calendar.SECOND, 0) // Set detik ke 0
-                        tanggal = dateTimeFormatter.format(calendar.time)
-                    },
-                    calendar.get(Calendar.HOUR_OF_DAY),
-                    calendar.get(Calendar.MINUTE),
-                    true
-                ).show()
-            },
-            calendar.get(Calendar.YEAR),
-            calendar.get(Calendar.MONTH),
-            calendar.get(Calendar.DAY_OF_MONTH)
-        )
+    val dateTimeFormatter = SimpleDateFormat("dd MMMM yyyy, HH:mm:ss", Locale("id", "ID"))
+    val calendar = Calendar.getInstance()
+    val datePicker = DatePickerDialog(
+        context,
+        { _, year, month, dayOfMonth ->
+            calendar.set(year, month, dayOfMonth)
+            TimePickerDialog(
+                context,
+                { _, hourOfDay, minute ->
+                    calendar.set(Calendar.HOUR_OF_DAY, hourOfDay)
+                    calendar.set(Calendar.MINUTE, minute)
+                    calendar.set(Calendar.SECOND, 0)
+                    tanggal = dateTimeFormatter.format(calendar.time)
+                },
+                calendar.get(Calendar.HOUR_OF_DAY),
+                calendar.get(Calendar.MINUTE),
+                true
+            ).show()
+        },
+        calendar.get(Calendar.YEAR),
+        calendar.get(Calendar.MONTH),
+        calendar.get(Calendar.DAY_OF_MONTH)
+    )
 
     Scaffold(
-
         topBar = {
             Column {
-                Text(
-                    text = "CATAT",
-                    style = MaterialTheme.typography.titleLarge,
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 16.dp),
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    textAlign = TextAlign.Center
-                )
-
-                TabRow(selectedTabIndex = 0, contentColor = Color(0xFF2D6CE9),indicator = { tabPositions ->
-                    TabRowDefaults.Indicator(
-                        modifier = Modifier.tabIndicatorOffset(tabPositions[0]),
-                        color = Color(0xFF2D6CE9) // 👈 your custom underline color
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    if (preview) {
+                        IconButton(onClick = { showCancelDialog = true }) {
+                            Icon(
+                                imageVector = Icons.Default.ArrowBack,
+                                contentDescription = "Back",
+                                tint = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+                    } else {
+                        Spacer(modifier = Modifier.width(48.dp)) // Placeholder to align title
+                    }
+                    Text(
+                        text = "CATAT",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.weight(1f)
                     )
-                }) {
+                    Spacer(modifier = Modifier.width(48.dp)) // Balance the layout
+                }
+
+                TabRow(
+                    selectedTabIndex = 0,
+                    contentColor = Color(0xFF2D6CE9),
+                    indicator = { tabPositions ->
+                        TabRowDefaults.Indicator(
+                            modifier = Modifier.tabIndicatorOffset(tabPositions[0]),
+                            color = Color(0xFF2D6CE9)
+                        )
+                    }
+                ) {
                     Tab(
                         selected = true,
                         onClick = {},
@@ -174,9 +199,7 @@ fun PemasukanEntryScreen(
                     )
                     Tab(
                         selected = false,
-                        onClick = {
-                            navController.navigate("tambah/pengeluaran")
-                        },
+                        onClick = { navController.navigate("tambah/pengeluaran") },
                         text = { Text("OUTCOME", color = Color.Gray) }
                     )
                 }
@@ -188,9 +211,10 @@ fun PemasukanEntryScreen(
                 horizontalAlignment = Alignment.End
             ) {
                 if (isUpdate) {
-                    FloatingActionButton(containerColor = Color(0xFF2D6CE9), onClick = {
-                        viewModel.deletePemasukanById(id.toString(), navController)
-                    }) {
+                    FloatingActionButton(
+                        containerColor = Color(0xFF2D6CE9),
+                        onClick = { viewModel.deletePemasukanById(id.toString(), navController) }
+                    ) {
                         Icon(
                             imageVector = Icons.Default.Delete,
                             contentDescription = "Delete Pemasukan"
@@ -200,7 +224,7 @@ fun PemasukanEntryScreen(
             }
         },
         bottomBar = {
-            val nominalValue = nominal.toDouble() ?: 0.0
+            val nominalValue = nominal.toDouble()
             val totalTambahan = biayalist.sumOf { it.jumlahbiaya }
             val total = if (isUpdate) {
                 totalIsUpdate + totalTambahan
@@ -250,11 +274,7 @@ fun PemasukanEntryScreen(
                             }
 
                             if (isUpdate) {
-                                viewModel.updatePemasukanUserById(
-                                    id.toString(),
-                                    request,
-                                    navController
-                                )
+                                viewModel.updatePemasukanUserById(id.toString(), request, navController)
                             } else {
                                 viewModel.addPemasukan(request, navController)
                             }
@@ -266,11 +286,9 @@ fun PemasukanEntryScreen(
                         disabledContainerColor = Color.Gray,
                         disabledContentColor = Color.Gray,
                     ),
-
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp)
                 ) {
-
                     Text("SUBMIT")
                 }
             }
@@ -292,7 +310,6 @@ fun PemasukanEntryScreen(
                     shape = RoundedCornerShape(12.dp)
                 )
             }
-
             item {
                 OutlinedTextField(
                     value = sumber,
@@ -302,8 +319,7 @@ fun PemasukanEntryScreen(
                     shape = RoundedCornerShape(12.dp)
                 )
             }
-
-            item{
+            item {
                 DropdownMenu(
                     containerColor = night,
                     label = "Kategori",
@@ -312,33 +328,24 @@ fun PemasukanEntryScreen(
                     onOptionSelected = { kategori = it }
                 )
             }
-
             item {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-
                     CurrencyInputField(
                         "Nominal",
-                        if (isUpdate) {
-                            subTotal.toInt()
-                        } else {
-                            nominal
-                        },
-                        onValueChange = { nominal = it},
+                        if (isUpdate) subTotal else nominal,
+                        onValueChange = { nominal = it },
                         modifier = Modifier.weight(1f),
                     )
-
                     OutlinedTextField(
                         value = tanggal,
                         onValueChange = {},
                         label = { Text("Date") },
                         modifier = Modifier
                             .weight(1f)
-                            .pointerInput(Unit){
-                                detectTapGestures{datePicker.show()}
-                            },
+                            .pointerInput(Unit) { detectTapGestures { datePicker.show() } },
                         shape = RoundedCornerShape(12.dp),
                         trailingIcon = {
                             IconButton(onClick = { datePicker.show() }) {
@@ -358,7 +365,6 @@ fun PemasukanEntryScreen(
                     )
                 }
             }
-
             item {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -372,7 +378,6 @@ fun PemasukanEntryScreen(
                     )
                     IconButton(
                         onClick = {
-                            showDialogBiaya = false
                             showDialogBiaya = true
                         }
                     ) {
@@ -388,7 +393,6 @@ fun PemasukanEntryScreen(
                     Text("There are no additional add", color = Color.Gray)
                 }
             }
-
             itemsIndexed(biayalist) { index, biaya ->
                 Row(
                     modifier = Modifier
@@ -409,8 +413,6 @@ fun PemasukanEntryScreen(
                 }
             }
         }
-        // Modal Bottom Sheet that will show the filter
-
     }
 
     AddBiayaDialog(
@@ -420,6 +422,28 @@ fun PemasukanEntryScreen(
             biayalist = biayalist + Tambahanbiaya(namabiaya, jumlahbiaya.toDouble())
         }
     )
-}
 
+    if (showCancelDialog && preview) {
+        AlertDialog(
+            onDismissRequest = { showCancelDialog = false },
+            title = { Text("Konfirmasi") },
+            text = { Text("Apakah Anda yakin ingin kembali?") },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        viewModel.deletePemasukanById(id.toString(), navController)
+                        showCancelDialog = false
+                    }
+                ) {
+                    Text("Batal")
+                }
+            },
+            dismissButton = {
+                OutlinedButton(onClick = { showCancelDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+}
 

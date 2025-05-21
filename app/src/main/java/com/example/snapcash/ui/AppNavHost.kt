@@ -154,19 +154,28 @@ fun AppNavHost(
                         )
                     }
                     composable("tambah/pengeluaran") {
-                        PengeluaranEntryScreen(navController = navController, id = null)
+                        PengeluaranEntryScreen(navController = navController, id = null,  preview = false)
                     }
                     composable("tambah/pemasukan") {
-                        PemasukanEntryScreen(navController = navController, id = null)
+                        PemasukanEntryScreen(navController = navController, id = null,  preview = false)
                     }
                     composable("update/pengeluaran/{id}") { backStackEntry ->
                         val id = backStackEntry.arguments?.getString("id").toString()
-                        PengeluaranEntryScreen(navController = navController, id)
+                        PengeluaranEntryScreen(navController = navController, id = id, preview = false)
                     }
                     composable("update/pemasukan/{id}") { backStackEntry ->
                         val id = backStackEntry.arguments?.getString("id").toString()
-                        PemasukanEntryScreen(navController = navController, id = id)
+                        PemasukanEntryScreen(navController = navController, id = id, preview = false)
                     }
+                    composable("preview/pengeluaran/{id}") { backStackEntry ->
+                        val id = backStackEntry.arguments?.getString("id").toString()
+                        PengeluaranEntryScreen(navController = navController, id, preview = true )
+                    }
+                    composable("preview/pemasukan/{id}") { backStackEntry ->
+                        val id = backStackEntry.arguments?.getString("id").toString()
+                        PemasukanEntryScreen(navController = navController, id = id, preview = true)
+                    }
+
                     composable("history") {
                         HistoryScreen(
                             navController = navController,
