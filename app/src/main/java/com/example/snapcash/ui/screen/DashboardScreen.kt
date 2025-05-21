@@ -2,18 +2,8 @@ package com.example.snapcash.ui.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -21,21 +11,8 @@ import androidx.compose.material.TabRowDefaults.Divider
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -46,19 +23,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import co.yml.charts.axis.AxisData
-import co.yml.charts.common.model.Point
-import co.yml.charts.ui.linechart.model.GridLines
-import co.yml.charts.ui.linechart.model.IntersectionPoint
-import co.yml.charts.ui.linechart.model.Line
-import co.yml.charts.ui.linechart.model.LineChartData
-import co.yml.charts.ui.linechart.model.LinePlotData
-import co.yml.charts.ui.linechart.model.LineStyle
-import co.yml.charts.ui.linechart.model.LineType
-import co.yml.charts.ui.linechart.model.SelectionHighlightPoint
-import co.yml.charts.ui.linechart.model.ShadowUnderLine
+import com.example.snapcash.ViewModel.AuthViewModel
 import com.example.snapcash.ViewModel.DashboardViewModel
-import com.example.snapcash.ui.component.LineChart
+import com.example.snapcash.ui.component.LineChartDashboard
 import com.example.snapcash.ui.component.ProgressCircleChart
 import com.example.snapcash.ui.component.formatCurrency
 import java.util.Calendar
@@ -67,99 +34,41 @@ import java.util.Calendar
 fun DashboardScreen(
     navController: NavController,
     viewModel: DashboardViewModel = hiltViewModel(),
+    viewModel1: AuthViewModel = hiltViewModel(),
     openSidebar: () -> Unit
 ) {
-    val tahun = Calendar.getInstance().get(Calendar.YEAR);
-    val dashboardData by remember {mutableStateOf(viewModel.dashboardData)}
+    val userData by remember { viewModel1.userDatas }
+    val tahun = Calendar.getInstance().get(Calendar.YEAR)
+    val dashboardData by viewModel.dashboardData
     val isLoading by viewModel.isLoading
 
     LaunchedEffect(Unit) {
         viewModel.getDashboardAnalytics(tahun = tahun, jenis = "Pengeluaran")
-    }
-
-    Column(modifier = Modifier.fillMaxSize()) {
-
-        IconButton(
-            onClick = openSidebar,
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Icon(imageVector = Icons.Default.Menu, contentDescription = "Sidebar Menu")
-        }
+        viewModel1.getUserData()
     }
 
     var isIncomeMode by remember { mutableStateOf(false) }
-    val chartItemsOutcome = dashboardData.value?.TotalByKategori?.map { (key, value) ->
-        ChartItem(key, value.toFloat(), Color(0xFF2D6CE9))
+
+    val chartItems = dashboardData?.TotalByKategori?.map { (key, value) ->
+        ChartItem(key, value.toFloat(), if (isIncomeMode) Color(0xFF00FF00) else Color(0xFFFF1E00))
     } ?: emptyList()
-    val chartItemsIncome = listOf(
-        ChartItem("Gaji", 72448000f, Color(0xFF2D6CE9)),
-        ChartItem("Investasi", 1952000f, Color(0xFFF53844)),
-        ChartItem("Bisnis", 3216000f, Color(0xFF20BF55)),
-        ChartItem("BONUS", 16000000f, Color(0xFFFFA500)),
-        ChartItem("Extra", 16000000f, Color(0xFFFFA500))
-    )
-
-    val itemsPerPage = 3
-    val pages = if (isIncomeMode) chartItemsIncome.chunked(itemsPerPage) else chartItemsOutcome.chunked(itemsPerPage)
-
-    val pagerState = rememberPagerState(pageCount = { pages.size })
-
-    val dummyPoints = listOf(
-        Point(0f, 500000f),
-        Point(1f, 750000f),
-        Point(2f, 300000f),
-        Point(3f, 900000f),
-        Point(4f, 650000f)
-    )
-
-    val allPointsData = if (isIncomeMode) {
-        dashboardData.value?.TotalByRange?.values?.mapIndexed { index, value ->
-            Point(index.toFloat(), value.toFloat())
-        } ?: dummyPoints
-    } else {
-        dashboardData.value?.TotalByRange?.values?.mapIndexed { index, value ->
-            Point(index.toFloat(), value.toFloat())
-        } ?: dummyPoints
-    }
-
-
-    val allDays = listOf((tahun-4).toString(),(tahun-3).toString(),(tahun-2).toString(), (tahun -1).toString(), tahun.toString())
-
-    val lineChartData = LineChartData(
-        linePlotData = LinePlotData(
-            lines = listOf(
-                Line(
-                    dataPoints = allPointsData,
-                    lineStyle = LineStyle(
-                        color = MaterialTheme.colorScheme.tertiary,
-                        width = 2.dp.value,
-                        lineType = LineType.SmoothCurve(false)
-                    ),
-                    intersectionPoint = IntersectionPoint(
-                        color = MaterialTheme.colorScheme.tertiary
-                    ),
-                    selectionHighlightPoint = SelectionHighlightPoint(
-                        color = MaterialTheme.colorScheme.tertiary
-                    ),
-                    shadowUnderLine = ShadowUnderLine(
-                        alpha = 0.5f,
-                        brush = Brush.verticalGradient(
-                            colors = listOf(
-                                MaterialTheme.colorScheme.inversePrimary,
-                                Color.Transparent
-                            )
-                        )
-                    )
-                )
-            )
-        ),
-        backgroundColor = Color.Transparent,
-        xAxisData = AxisData.Builder().build(),
-        yAxisData = AxisData.Builder().build(),
-        gridLines = GridLines()
-    )
 
     val scrollState = rememberScrollState()
+    val horizontalScrollState = rememberScrollState()
+
+    var selectedFilter by remember { mutableStateOf("Year") }
+    var selectedValue by remember { mutableStateOf(tahun.toString()) }
+    var filterExpanded by remember { mutableStateOf(false) }
+    var valueExpanded by remember { mutableStateOf(false) }
+
+    val months = listOf(
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    )
+    val years = (tahun - 4..tahun).toList().reversed()
+    val days = getDays(selectedFilter, selectedValue, tahun, months)
+
+    val valueItems = getValueByFilter(selectedFilter, years, months, days)
 
     Column(
         modifier = Modifier
@@ -168,8 +77,15 @@ fun DashboardScreen(
             .padding(16.dp)
             .verticalScroll(scrollState)
     ) {
+        IconButton(
+            onClick = openSidebar,
+            modifier = Modifier.padding(bottom = 16.dp)
+        ) {
+            Icon(imageVector = Icons.Default.Menu, contentDescription = "Sidebar Menu", tint = Color.White)
+        }
+
         Text(
-            text = "Welcome Back USER",
+            text = "Welcome Back ${userData.username.toString()}",
             color = Color.White,
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
@@ -179,7 +95,8 @@ fun DashboardScreen(
             textAlign = TextAlign.Center
         )
 
-        var expanded by remember { mutableStateOf(false) }
+        // Dropdown for Income/Outcome
+        var incomeExpanded by remember { mutableStateOf(false) }
         Box {
             Row(
                 modifier = Modifier
@@ -193,7 +110,7 @@ fun DashboardScreen(
                     fontSize = 18.sp,
                     modifier = Modifier.weight(1f)
                 )
-                IconButton(onClick = { expanded = true }) {
+                IconButton(onClick = { incomeExpanded = true }) {
                     Icon(
                         imageVector = Icons.Default.ArrowDropDown,
                         contentDescription = "Dropdown",
@@ -202,45 +119,123 @@ fun DashboardScreen(
                 }
             }
             DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false }
+                expanded = incomeExpanded,
+                onDismissRequest = { incomeExpanded = false }
             ) {
                 DropdownMenuItem(
                     text = { Text("Money Income") },
                     onClick = {
                         isIncomeMode = true
-                        expanded = false
+                        Updatebyfilter(viewModel, isIncomeMode, selectedFilter, selectedValue, months, tahun)
+                        incomeExpanded = false
                     }
                 )
                 DropdownMenuItem(
                     text = { Text("Money Outcome") },
                     onClick = {
                         isIncomeMode = false
-                        expanded = false
+                        Updatebyfilter(viewModel, isIncomeMode, selectedFilter, selectedValue, months, tahun)
+                        incomeExpanded = false
                     }
                 )
             }
         }
 
+        // Filter + Value Dropdowns
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 16.dp),
-            verticalAlignment = Alignment.CenterVertically
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text(
-                text = "STATISTICS",
-                color = Color.White,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold
-            )
-            Spacer(modifier = Modifier.weight(1f))
-            Text(
-                text = "2020",
-                color = Color.Magenta,
-                fontSize = 16.sp
-            )
+            // Filter Type
+            Box(modifier = Modifier.weight(1f)) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .border(1.dp, Color.White, RoundedCornerShape(8.dp))
+                        .padding(12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = selectedFilter,
+                        color = Color.White,
+                        fontSize = 16.sp,
+                        modifier = Modifier.weight(1f)
+                    )
+                    IconButton(onClick = { filterExpanded = true }) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowDropDown,
+                            contentDescription = "Filter Dropdown",
+                            tint = Color.White
+                        )
+                    }
+                }
+                DropdownMenu(
+                    expanded = filterExpanded,
+                    onDismissRequest = { filterExpanded = false }
+                ) {
+                    listOf("Year", "Month", "Day").forEach { filter ->
+                        DropdownMenuItem(
+                            text = { Text(filter) },
+                            onClick = {
+                                selectedFilter = filter
+                                selectedValue = when (filter) {
+                                    "Year" -> tahun.toString()
+                                    "Month" -> "January"
+                                    "Day" -> "1"
+                                    else -> tahun.toString()
+                                }
+                                Updatebyfilter(viewModel, isIncomeMode, selectedFilter, selectedValue, months, tahun)
+                                filterExpanded = false
+                            }
+                        )
+                    }
+                }
+            }
+
+            // Value Type
+            Box(modifier = Modifier.weight(1f)) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .border(1.dp, Color.White, RoundedCornerShape(8.dp))
+                        .padding(12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = selectedValue,
+                        color = Color.White,
+                        fontSize = 16.sp,
+                        modifier = Modifier.weight(1f)
+                    )
+                    IconButton(onClick = { valueExpanded = true }) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowDropDown,
+                            contentDescription = "Value Dropdown",
+                            tint = Color.White
+                        )
+                    }
+                }
+                DropdownMenu(
+                    expanded = valueExpanded,
+                    onDismissRequest = { valueExpanded = false }
+                ) {
+                    valueItems.forEach { value ->
+                        DropdownMenuItem(
+                            text = { Text(value) },
+                            onClick = {
+                                selectedValue = value
+                                Updatebyfilter(viewModel, isIncomeMode, selectedFilter, selectedValue, months, tahun)
+                                valueExpanded = false
+                            }
+                        )
+                    }
+                }
+            }
         }
+
+        // Summary Data
         Row(
             horizontalArrangement = Arrangement.spacedBy(20.dp),
             modifier = Modifier
@@ -258,31 +253,23 @@ fun DashboardScreen(
                     fontSize = 20.sp
                 )
                 Text(
-                    text = formatCurrency(dashboardData.value?.total ?: 0),
+                    text = formatCurrency(dashboardData?.total ?: 0),
                     color = Color.White,
                     fontSize = 28.sp,
                     fontWeight = FontWeight.Bold
                 )
-                Text(
-                    text = "COMPARISON TO LAST YEAR",
-                    color = Color.White,
-                    fontSize = 14.sp
-                )
-                Text(
-                    text = formatCurrency(dashboardData.value?.totalTahunSebelumnya ?: 0),
-                    color = Color.White,
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold
-                )
+                Text("COMPARISON TO LAST YEAR", color = Color.White, fontSize = 14.sp)
+                Text(formatCurrency(dashboardData?.totalTahunSebelumnya ?: 0), color = Color.White, fontSize = 28.sp, fontWeight = FontWeight.Bold)
             }
             Text(
-                text = formatCurrency(dashboardData.value?.perubahanTotal ?: 0),
-                color = if (isIncomeMode) Color.Green else Color(0xFFFF1E00),
+                text = formatCurrency(dashboardData?.perubahanTotal ?: 0),
+                color = if (isIncomeMode) Color(0xFF00FF00) else Color(0xFFFF1E00),
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold
             )
         }
 
+        // Progress Chart
         Text(
             text = if (isIncomeMode) "Progress Earned Charts" else "Progress Spent Charts",
             color = Color.White,
@@ -290,33 +277,25 @@ fun DashboardScreen(
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(bottom = 8.dp)
         )
-        HorizontalPager(
-            state = pagerState,
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 16.dp)
-        ) { page ->
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                val currentPageItems = pages[page]
-                currentPageItems.forEach { item ->
-                    ProgressCircleChart(
-                        label = item.label,
-                        value = item.value,
-                        total = 160000000f,
-                        color = item.color,
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-                repeat(itemsPerPage - currentPageItems.size) {
-                    Spacer(modifier = Modifier.weight(1f))
-                }
+                .horizontalScroll(horizontalScrollState)
+                .padding(bottom = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            chartItems.forEach { item ->
+                ProgressCircleChart(
+                    label = item.label,
+                    value = item.value,
+                    total = dashboardData?.TotalByKategori?.values?.sum()?.toFloat() ?: 1f,
+                    color = item.color,
+                    modifier = Modifier.width(100.dp)
+                )
             }
         }
 
+        // Line Chart + Table
         Text(
             text = if (isIncomeMode) "Money Earned (Day)" else "Money Spent (Day)",
             color = Color.White,
@@ -328,143 +307,24 @@ fun DashboardScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 16.dp)
-                .border(
-                    width = 2.dp,
-                    brush = Brush.linearGradient(
-                        colors = listOf(
-                            Color.White.copy(alpha = 0.8f),
-                            Color.White.copy(alpha = 0.2f),
-                            Color.Transparent
-                        )
-                    ),
-                    shape = RoundedCornerShape(16.dp)
-                ),
+                .border(2.dp, Brush.linearGradient(listOf(Color.White.copy(alpha = 0.8f), Color.White.copy(alpha = 0.2f), Color.Transparent)), RoundedCornerShape(16.dp)),
             shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(containerColor = Color(0xFF2A2A2A))
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
-                LineChart(
-                    modifier = Modifier.fillMaxWidth(),
-                    lineChartData = lineChartData,
-                    allPointsData = allPointsData,
-                    allDays = allDays
-                )
-                Column (modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 8.dp).wrapContentWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(60.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally,modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = "Year ",
-                                color = Color.White,
-                                fontSize = 14.sp
-                            )
-
-                        }
-                        Column(horizontalAlignment = Alignment.CenterHorizontally,modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = "Spent",
-                                color = Color.White,
-                                fontSize = 14.sp
-                            )
-                        }
+                LineChartDashboard(totalByRange = dashboardData?.TotalByRange ?: emptyMap())
+                Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                    dashboardData?.TotalByRange?.forEach { (key, value) ->
+                        tableChartData(key, value)
                     }
-                    Divider(
-                        color = Color.White,
-                        thickness = 1.dp,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-
-                }
-                dashboardData.value?.TotalByRange?.forEach { (key, value) ->
-                    tableChartData(key, value)
                 }
             }
         }
-
-//        // Outcome Summary Section
-//        Text(
-//            text = if (isIncomeMode) "INCOME SUMMARY" else "OUTCOME SUMMARY",
-//            color = Color.White,
-//            fontSize = 18.sp,
-//            fontWeight = FontWeight.Bold,
-//            modifier = Modifier.padding(bottom = 8.dp)
-//        )
-//        Card(
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .border(
-//                    width = 2.dp,
-//                    brush = Brush.linearGradient(
-//                        colors = listOf(
-//                            Color.White.copy(alpha = 0.8f),
-//                            Color.White.copy(alpha = 0.2f),
-//                            Color.Transparent
-//                        )
-//                    ),
-//                    shape = RoundedCornerShape(16.dp)
-//                ),
-//            shape = RoundedCornerShape(16.dp),
-//            colors = CardDefaults.cardColors(containerColor = Color(0xFF2A2A2A))
-//        ) {
-//            Column(modifier = Modifier.padding(16.dp)) {
-//                Text(
-//                    text = if (isIncomeMode) "+Rp14,368,000" else "-Rp14,368,000",
-//                    color = if (isIncomeMode)
-//                                Color.Green
-//                            else
-//                                Color(0xFFFF1E00),
-//                    fontSize = 24.sp,
-//                    fontWeight = FontWeight.Bold,
-//                    modifier = Modifier.padding(bottom = 16.dp)
-//                )
-//                Text("CEDINT RENT APARTMENT", color = Color.White, fontSize = 14.sp)
-//                Text(
-//                    text = if (isIncomeMode) "+Rp7,969,600" else "-Rp7,969,600",
-//                    color = if (isIncomeMode) Color.Green else Color(0xFFFF1E00),
-//                    fontSize = 14.sp,
-//                    modifier = Modifier.padding(bottom = 8.dp)
-//                )
-//                Text("RESTAURANT BBQ", color = Color.White, fontSize = 14.sp)
-//                Text(
-//                    text = if (isIncomeMode) "+Rp2,830,400" else "-Rp2,830,400",
-//                    color = if (isIncomeMode) Color.Green else Color(0xFFFF1E00),
-//                    fontSize = 14.sp,
-//                    modifier = Modifier.padding(bottom = 8.dp)
-//                )
-//                Text("FOOD", color = Color.White, fontSize = 14.sp)
-//                Text(
-//                    text = if (isIncomeMode) "+Rp1,692,160" else "-Rp1,692,160",
-//                    color = if (isIncomeMode) Color.Green else Color(0xFFFF1E00),
-//                    fontSize = 14.sp,
-//                    modifier = Modifier.padding(bottom = 8.dp)
-//                )
-//                Text("ELECTRIC CAR", color = Color.White, fontSize = 14.sp)
-//                Text(
-//                    text = if (isIncomeMode) "+Rp531,200" else "-Rp531,200",
-//                    color = if (isIncomeMode) Color.Green else Color(0xFFFF1E00),
-//                    fontSize = 14.sp,
-//                    modifier = Modifier.padding(bottom = 8.dp)
-//                )
-//                Text("DRINKS AND DISCO PARTY", color = Color.White, fontSize = 14.sp)
-//                Text(
-//                    text = if (isIncomeMode) "+Rp531,200" else "-Rp531,200",
-//                    color = if (isIncomeMode) Color.Green else Color(0xFFFF1E00),
-//                    fontSize = 14.sp
-//                )
-//            }
-//        }
     }
-    // 🔄 Overlay Loading
+
     if (isLoading) {
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Black.copy(alpha = 1f)),
+            modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.5f)),
             contentAlignment = Alignment.Center
         ) {
             CircularProgressIndicator()
@@ -472,25 +332,38 @@ fun DashboardScreen(
     }
 }
 
+// ======================
+// Utility & Helper Functions
+// ======================
+
 @Composable
-fun tableChartData(year: String, amount: Int){
-    Column (modifier = Modifier.fillMaxWidth(),horizontalAlignment = Alignment.CenterHorizontally) {
+fun tableChartData(year: String, amount: Int) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 8.dp).wrapContentWidth(),
+                .padding(top = 8.dp)
+                .wrapContentWidth(),
             horizontalArrangement = Arrangement.spacedBy(60.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f)) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.weight(1f)
+            ) {
                 Text(
                     text = year,
                     color = Color.White,
                     fontSize = 14.sp
                 )
-
             }
-            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f)) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.weight(1f)
+            ) {
                 Text(
                     text = formatCurrency(amount),
                     color = Color.White,
@@ -499,7 +372,53 @@ fun tableChartData(year: String, amount: Int){
             }
         }
     }
+}
 
+fun getDays(filter: String, selectedValue: String, tahun: Int, months: List<String>): List<Int> {
+    if (filter != "Day") return (1..31).toList()
+    val selectedMonth = months.indexOf(selectedValue).takeIf { it >= 0 } ?: 0
+    val calendar = Calendar.getInstance().apply {
+        set(Calendar.YEAR, tahun)
+        set(Calendar.MONTH, selectedMonth)
+    }
+    return (1..calendar.getActualMaximum(Calendar.DAY_OF_MONTH)).toList()
+}
+
+fun getValueByFilter(
+    filter: String,
+    years: List<Int>,
+    months: List<String>,
+    days: List<Int>
+): List<String> {
+    return when (filter) {
+        "Year" -> years.map { it.toString() }
+        "Month" -> months
+        "Day" -> days.map { it.toString() }
+        else -> years.map { it.toString() }
+    }
+}
+
+fun Updatebyfilter(
+    viewModel: DashboardViewModel,
+    isIncomeMode: Boolean,
+    selectedFilter: String,
+    selectedValue: String,
+    months: List<String>,
+    defaultYear: Int
+) {
+    val jenis = if (isIncomeMode) "Pemasukan" else "Pengeluaran"
+    val filter = selectedFilter.lowercase()
+    val tahun = if (filter == "year") selectedValue.toIntOrNull() ?: defaultYear else defaultYear
+    val bulan = if (filter == "month") months.indexOf(selectedValue) + 1 else 1
+    val hari = if (filter == "day") selectedValue.toIntOrNull() ?: 1 else 1
+
+    viewModel.getDashboardAnalytics(
+        jenis = jenis,
+        filter = filter,
+        tahun = tahun,
+        bulan = bulan,
+        hari = hari
+    )
 }
 
 data class ChartItem(
