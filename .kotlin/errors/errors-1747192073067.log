@@ -1,0 +1,235 @@
+kotlin version: 2.0.0
+error message: org.jetbrains.kotlin.backend.common.BackendException: Backend Internal error: Exception during IR lowering
+File being compiled: C:/Code/Project/SnapCash/SnapCash-Client/SnapCash/app/src/main/java/com/example/snapcash/ui/component/ExportToPDFButton.kt
+The root cause java.lang.RuntimeException was thrown at: org.jetbrains.kotlin.backend.jvm.codegen.FunctionCodegen.generate(FunctionCodegen.kt:50)
+	at org.jetbrains.kotlin.backend.common.CodegenUtil.reportBackendException(CodegenUtil.kt:253)
+	at org.jetbrains.kotlin.backend.common.CodegenUtil.reportBackendException$default(CodegenUtil.kt:236)
+	at org.jetbrains.kotlin.backend.common.phaser.PerformByIrFilePhase.invokeSequential(performByIrFile.kt:65)
+	at org.jetbrains.kotlin.backend.common.phaser.PerformByIrFilePhase.invoke(performByIrFile.kt:52)
+	at org.jetbrains.kotlin.backend.common.phaser.PerformByIrFilePhase.invoke(performByIrFile.kt:38)
+	at org.jetbrains.kotlin.backend.common.phaser.NamedCompilerPhase.phaseBody(CompilerPhase.kt:166)
+	at org.jetbrains.kotlin.backend.common.phaser.AbstractNamedCompilerPhase.invoke(CompilerPhase.kt:113)
+	at org.jetbrains.kotlin.backend.common.phaser.CompositePhase.invoke(PhaseBuilders.kt:29)
+	at org.jetbrains.kotlin.backend.common.phaser.CompositePhase.invoke(PhaseBuilders.kt:16)
+	at org.jetbrains.kotlin.backend.common.phaser.NamedCompilerPhase.phaseBody(CompilerPhase.kt:166)
+	at org.jetbrains.kotlin.backend.common.phaser.AbstractNamedCompilerPhase.invoke(CompilerPhase.kt:113)
+	at org.jetbrains.kotlin.backend.common.phaser.CompilerPhaseKt.invokeToplevel(CompilerPhase.kt:62)
+	at org.jetbrains.kotlin.backend.jvm.JvmIrCodegenFactory.invokeCodegen(JvmIrCodegenFactory.kt:371)
+	at org.jetbrains.kotlin.codegen.CodegenFactory.generateModule(CodegenFactory.kt:47)
+	at org.jetbrains.kotlin.backend.jvm.JvmIrCodegenFactory.generateModuleInFrontendIRMode(JvmIrCodegenFactory.kt:433)
+	at org.jetbrains.kotlin.cli.jvm.compiler.pipeline.JvmCompilerPipelineKt.generateCodeFromIr(jvmCompilerPipeline.kt:241)
+	at org.jetbrains.kotlin.cli.jvm.compiler.pipeline.JvmCompilerPipelineKt.compileModulesUsingFrontendIrAndLightTree(jvmCompilerPipeline.kt:140)
+	at org.jetbrains.kotlin.cli.jvm.K2JVMCompiler.doExecute(K2JVMCompiler.kt:155)
+	at org.jetbrains.kotlin.cli.jvm.K2JVMCompiler.doExecute(K2JVMCompiler.kt:50)
+	at org.jetbrains.kotlin.cli.common.CLICompiler.execImpl(CLICompiler.kt:104)
+	at org.jetbrains.kotlin.cli.common.CLICompiler.execImpl(CLICompiler.kt:48)
+	at org.jetbrains.kotlin.cli.common.CLITool.exec(CLITool.kt:101)
+	at org.jetbrains.kotlin.incremental.IncrementalJvmCompilerRunner.runCompiler(IncrementalJvmCompilerRunner.kt:453)
+	at org.jetbrains.kotlin.incremental.IncrementalJvmCompilerRunner.runCompiler(IncrementalJvmCompilerRunner.kt:62)
+	at org.jetbrains.kotlin.incremental.IncrementalCompilerRunner.doCompile(IncrementalCompilerRunner.kt:506)
+	at org.jetbrains.kotlin.incremental.IncrementalCompilerRunner.compileImpl(IncrementalCompilerRunner.kt:423)
+	at org.jetbrains.kotlin.incremental.IncrementalCompilerRunner.tryCompileIncrementally$lambda$9$compile(IncrementalCompilerRunner.kt:249)
+	at org.jetbrains.kotlin.incremental.IncrementalCompilerRunner.tryCompileIncrementally(IncrementalCompilerRunner.kt:267)
+	at org.jetbrains.kotlin.incremental.IncrementalCompilerRunner.compile(IncrementalCompilerRunner.kt:120)
+	at org.jetbrains.kotlin.daemon.CompileServiceImplBase.execIncrementalCompiler(CompileServiceImpl.kt:676)
+	at org.jetbrains.kotlin.daemon.CompileServiceImplBase.access$execIncrementalCompiler(CompileServiceImpl.kt:92)
+	at org.jetbrains.kotlin.daemon.CompileServiceImpl.compile(CompileServiceImpl.kt:1661)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(Unknown Source)
+	at java.base/java.lang.reflect.Method.invoke(Unknown Source)
+	at java.rmi/sun.rmi.server.UnicastServerRef.dispatch(Unknown Source)
+	at java.rmi/sun.rmi.transport.Transport$1.run(Unknown Source)
+	at java.rmi/sun.rmi.transport.Transport$1.run(Unknown Source)
+	at java.base/java.security.AccessController.doPrivileged(Unknown Source)
+	at java.rmi/sun.rmi.transport.Transport.serviceCall(Unknown Source)
+	at java.rmi/sun.rmi.transport.tcp.TCPTransport.handleMessages(Unknown Source)
+	at java.rmi/sun.rmi.transport.tcp.TCPTransport$ConnectionHandler.run0(Unknown Source)
+	at java.rmi/sun.rmi.transport.tcp.TCPTransport$ConnectionHandler.lambda$run$0(Unknown Source)
+	at java.base/java.security.AccessController.doPrivileged(Unknown Source)
+	at java.rmi/sun.rmi.transport.tcp.TCPTransport$ConnectionHandler.run(Unknown Source)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source)
+	at java.base/java.lang.Thread.run(Unknown Source)
+Caused by: java.lang.RuntimeException: Exception while generating code for:
+FUN name:createReportPdf visibility:public modality:FINAL <> (context:android.content.Context, fileName:kotlin.String, data:kotlin.collections.List<com.example.snapcash.data.Transaction>) returnType:kotlin.Unit
+  VALUE_PARAMETER name:context index:0 type:android.content.Context
+  VALUE_PARAMETER name:fileName index:1 type:kotlin.String
+  VALUE_PARAMETER name:data index:2 type:kotlin.collections.List<com.example.snapcash.data.Transaction>
+  BLOCK_BODY
+    VAR name:pdfDocument type:android.graphics.pdf.PdfDocument [val]
+      CONSTRUCTOR_CALL 'public constructor <init> () declared in android.graphics.pdf.PdfDocument' type=android.graphics.pdf.PdfDocument origin=null
+    VAR name:pageInfo type:@[FlexibleNullability] android.graphics.pdf.PdfDocument.PageInfo? [val]
+      CALL 'public open fun create (): @[FlexibleNullability] android.graphics.pdf.PdfDocument.PageInfo? declared in android.graphics.pdf.PdfDocument.PageInfo.Builder' type=@[FlexibleNullability] android.graphics.pdf.PdfDocument.PageInfo? origin=null
+        $this: CONSTRUCTOR_CALL 'public constructor <init> (p0: kotlin.Int, p1: kotlin.Int, p2: kotlin.Int) declared in android.graphics.pdf.PdfDocument.PageInfo.Builder' type=android.graphics.pdf.PdfDocument.PageInfo.Builder origin=null
+          p0: CONST Int type=kotlin.Int value=595
+          p1: CONST Int type=kotlin.Int value=842
+          p2: CONST Int type=kotlin.Int value=1
+    VAR name:page type:@[FlexibleNullability] android.graphics.pdf.PdfDocument.Page? [val]
+      CALL 'public open fun startPage (p0: @[FlexibleNullability] android.graphics.pdf.PdfDocument.PageInfo?): @[FlexibleNullability] android.graphics.pdf.PdfDocument.Page? declared in android.graphics.pdf.PdfDocument' type=@[FlexibleNullability] android.graphics.pdf.PdfDocument.Page? origin=null
+        $this: GET_VAR 'val pdfDocument: android.graphics.pdf.PdfDocument [val] declared in com.example.snapcash.ui.component.ExportToPDFButtonKt.createReportPdf' type=android.graphics.pdf.PdfDocument origin=null
+        p0: GET_VAR 'val pageInfo: @[FlexibleNullability] android.graphics.pdf.PdfDocument.PageInfo? [val] declared in com.example.snapcash.ui.component.ExportToPDFButtonKt.createReportPdf' type=@[FlexibleNullability] android.graphics.pdf.PdfDocument.PageInfo? origin=null
+    VAR name:canvas type:@[FlexibleNullability] android.graphics.Canvas? [val]
+      CALL 'public open fun getCanvas (): @[FlexibleNullability] android.graphics.Canvas? declared in android.graphics.pdf.PdfDocument.Page' type=@[FlexibleNullability] android.graphics.Canvas? origin=GET_PROPERTY
+        $this: GET_VAR 'val page: @[FlexibleNullability] android.graphics.pdf.PdfDocument.Page? [val] declared in com.example.snapcash.ui.component.ExportToPDFButtonKt.createReportPdf' type=@[FlexibleNullability] android.graphics.pdf.PdfDocument.Page? origin=null
+    VAR name:paint type:androidx.compose.ui.graphics.Paint [val]
+      CALL 'public final fun apply <T> (block: @[ExtensionFunctionType] kotlin.Function1<T of kotlin.StandardKt.apply, kotlin.Unit>): T of kotlin.StandardKt.apply [inline] declared in kotlin.StandardKt' type=androidx.compose.ui.graphics.Paint origin=null
+        <T>: androidx.compose.ui.graphics.Paint
+        $receiver: CALL 'public final fun Paint (): androidx.compose.ui.graphics.Paint declared in androidx.compose.ui.graphics.AndroidPaint_androidKt' type=androidx.compose.ui.graphics.Paint origin=null
+        block: BLOCK type=@[ExtensionFunctionType] kotlin.Function1<androidx.compose.ui.graphics.Paint, kotlin.Unit> origin=LAMBDA
+          COMPOSITE type=kotlin.Unit origin=null
+          FUNCTION_REFERENCE 'private final fun createReportPdf$lambda$2 (): kotlin.Unit declared in com.example.snapcash.ui.component.ExportToPDFButtonKt' type=@[ExtensionFunctionType] kotlin.Function1<androidx.compose.ui.graphics.Paint, kotlin.Unit> origin=INLINE_LAMBDA reflectionTarget=null
+    COMPOSITE type=kotlin.Unit origin=null
+      VAR name:yPosition type:kotlin.jvm.internal.Ref.FloatRef [val]
+        CONSTRUCTOR_CALL 'public constructor <init> () declared in kotlin.jvm.internal.Ref.FloatRef' type=kotlin.jvm.internal.Ref.FloatRef origin=null
+      SET_FIELD 'FIELD IR_BUILTINS_STUB name:element type:kotlin.Float visibility:public' type=kotlin.Unit origin=null
+        receiver: GET_VAR 'val yPosition: kotlin.jvm.internal.Ref.FloatRef [val] declared in com.example.snapcash.ui.component.ExportToPDFButtonKt.createReportPdf' type=kotlin.jvm.internal.Ref.FloatRef origin=null
+        value: CONST Float type=kotlin.Float value=50.0
+    CALL 'public open fun drawText (p0: @[EnhancedNullability] kotlin.String, p1: kotlin.Float, p2: kotlin.Float, p3: @[EnhancedNullability] android.graphics.Paint): kotlin.Unit declared in android.graphics.Canvas' type=kotlin.Unit origin=null
+      $this: GET_VAR 'val canvas: @[FlexibleNullability] android.graphics.Canvas? [val] declared in com.example.snapcash.ui.component.ExportToPDFButtonKt.createReportPdf' type=@[FlexibleNullability] android.graphics.Canvas? origin=null
+      p0: CONST String type=kotlin.String value="Laporan Transaksi"
+      p1: CONST Float type=kotlin.Float value=20.0
+      p2: GET_FIELD 'FIELD IR_BUILTINS_STUB name:element type:kotlin.Float visibility:public' type=kotlin.Float origin=null
+        receiver: GET_VAR 'val yPosition: kotlin.jvm.internal.Ref.FloatRef [val] declared in com.example.snapcash.ui.component.ExportToPDFButtonKt.createReportPdf' type=kotlin.jvm.internal.Ref.FloatRef origin=null
+      p3: BLOCK type=android.graphics.Paint origin=null
+        CALL 'public final fun checkNotNull (object: kotlin.Any?, message: kotlin.String): kotlin.Unit declared in kotlin.jvm.internal.Intrinsics' type=kotlin.Unit origin=null
+          object: GET_VAR 'val paint: androidx.compose.ui.graphics.Paint [val] declared in com.example.snapcash.ui.component.ExportToPDFButtonKt.createReportPdf' type=androidx.compose.ui.graphics.Paint origin=null
+          message: CONST String type=kotlin.String value="null cannot be cast to non-null type android.graphics.Paint"
+        TYPE_OP type=android.graphics.Paint? origin=CAST typeOperand=android.graphics.Paint?
+          GET_VAR 'val paint: androidx.compose.ui.graphics.Paint [val] declared in com.example.snapcash.ui.component.ExportToPDFButtonKt.createReportPdf' type=androidx.compose.ui.graphics.Paint origin=null
+    SET_FIELD 'FIELD IR_BUILTINS_STUB name:element type:kotlin.Float visibility:public' type=kotlin.Unit origin=EQ
+      receiver: GET_VAR 'val yPosition: kotlin.jvm.internal.Ref.FloatRef [val] declared in com.example.snapcash.ui.component.ExportToPDFButtonKt.createReportPdf' type=kotlin.jvm.internal.Ref.FloatRef origin=null
+      value: CALL 'public final fun plus (other: kotlin.Float): kotlin.Float [operator] declared in kotlin.Float' type=kotlin.Float origin=PLUSEQ
+        $this: GET_FIELD 'FIELD IR_BUILTINS_STUB name:element type:kotlin.Float visibility:public' type=kotlin.Float origin=PLUSEQ
+          receiver: GET_VAR 'val yPosition: kotlin.jvm.internal.Ref.FloatRef [val] declared in com.example.snapcash.ui.component.ExportToPDFButtonKt.createReportPdf' type=kotlin.jvm.internal.Ref.FloatRef origin=null
+        other: CONST Float type=kotlin.Float value=30.0
+    VAR name:header type:kotlin.String [val]
+      CONST String type=kotlin.String value="No | Tanggal      | Judul           | Kategori      | Jumlah     | Tipe"
+    CALL 'public open fun drawText (p0: @[EnhancedNullability] kotlin.String, p1: kotlin.Float, p2: kotlin.Float, p3: @[EnhancedNullability] android.graphics.Paint): kotlin.Unit declared in android.graphics.Canvas' type=kotlin.Unit origin=null
+      $this: GET_VAR 'val canvas: @[FlexibleNullability] android.graphics.Canvas? [val] declared in com.example.snapcash.ui.component.ExportToPDFButtonKt.createReportPdf' type=@[FlexibleNullability] android.graphics.Canvas? origin=null
+      p0: GET_VAR 'val header: kotlin.String [val] declared in com.example.snapcash.ui.component.ExportToPDFButtonKt.createReportPdf' type=kotlin.String origin=null
+      p1: CONST Float type=kotlin.Float value=20.0
+      p2: GET_FIELD 'FIELD IR_BUILTINS_STUB name:element type:kotlin.Float visibility:public' type=kotlin.Float origin=null
+        receiver: GET_VAR 'val yPosition: kotlin.jvm.internal.Ref.FloatRef [val] declared in com.example.snapcash.ui.component.ExportToPDFButtonKt.createReportPdf' type=kotlin.jvm.internal.Ref.FloatRef origin=null
+      p3: TYPE_OP type=android.graphics.Paint origin=IMPLICIT_CAST typeOperand=android.graphics.Paint
+        GET_VAR 'val paint: androidx.compose.ui.graphics.Paint [val] declared in com.example.snapcash.ui.component.ExportToPDFButtonKt.createReportPdf' type=androidx.compose.ui.graphics.Paint origin=null
+    SET_FIELD 'FIELD IR_BUILTINS_STUB name:element type:kotlin.Float visibility:public' type=kotlin.Unit origin=EQ
+      receiver: GET_VAR 'val yPosition: kotlin.jvm.internal.Ref.FloatRef [val] declared in com.example.snapcash.ui.component.ExportToPDFButtonKt.createReportPdf' type=kotlin.jvm.internal.Ref.FloatRef origin=null
+      value: CALL 'public final fun plus (other: kotlin.Float): kotlin.Float [operator] declared in kotlin.Float' type=kotlin.Float origin=PLUSEQ
+        $this: GET_FIELD 'FIELD IR_BUILTINS_STUB name:element type:kotlin.Float visibility:public' type=kotlin.Float origin=PLUSEQ
+          receiver: GET_VAR 'val yPosition: kotlin.jvm.internal.Ref.FloatRef [val] declared in com.example.snapcash.ui.component.ExportToPDFButtonKt.createReportPdf' type=kotlin.jvm.internal.Ref.FloatRef origin=null
+        other: CONST Float type=kotlin.Float value=20.0
+    CALL 'public open fun drawLine (p0: kotlin.Float, p1: kotlin.Float, p2: kotlin.Float, p3: kotlin.Float, p4: @[EnhancedNullability] android.graphics.Paint): kotlin.Unit declared in android.graphics.Canvas' type=kotlin.Unit origin=null
+      $this: GET_VAR 'val canvas: @[FlexibleNullability] android.graphics.Canvas? [val] declared in com.example.snapcash.ui.component.ExportToPDFButtonKt.createReportPdf' type=@[FlexibleNullability] android.graphics.Canvas? origin=null
+      p0: CONST Float type=kotlin.Float value=20.0
+      p1: GET_FIELD 'FIELD IR_BUILTINS_STUB name:element type:kotlin.Float visibility:public' type=kotlin.Float origin=null
+        receiver: GET_VAR 'val yPosition: kotlin.jvm.internal.Ref.FloatRef [val] declared in com.example.snapcash.ui.component.ExportToPDFButtonKt.createReportPdf' type=kotlin.jvm.internal.Ref.FloatRef origin=null
+      p2: CONST Float type=kotlin.Float value=570.0
+      p3: GET_FIELD 'FIELD IR_BUILTINS_STUB name:element type:kotlin.Float visibility:public' type=kotlin.Float origin=null
+        receiver: GET_VAR 'val yPosition: kotlin.jvm.internal.Ref.FloatRef [val] declared in com.example.snapcash.ui.component.ExportToPDFButtonKt.createReportPdf' type=kotlin.jvm.internal.Ref.FloatRef origin=null
+      p4: TYPE_OP type=android.graphics.Paint origin=IMPLICIT_CAST typeOperand=android.graphics.Paint
+        GET_VAR 'val paint: androidx.compose.ui.graphics.Paint [val] declared in com.example.snapcash.ui.component.ExportToPDFButtonKt.createReportPdf' type=androidx.compose.ui.graphics.Paint origin=null
+    SET_FIELD 'FIELD IR_BUILTINS_STUB name:element type:kotlin.Float visibility:public' type=kotlin.Unit origin=EQ
+      receiver: GET_VAR 'val yPosition: kotlin.jvm.internal.Ref.FloatRef [val] declared in com.example.snapcash.ui.component.ExportToPDFButtonKt.createReportPdf' type=kotlin.jvm.internal.Ref.FloatRef origin=null
+      value: CALL 'public final fun plus (other: kotlin.Float): kotlin.Float [operator] declared in kotlin.Float' type=kotlin.Float origin=PLUSEQ
+        $this: GET_FIELD 'FIELD IR_BUILTINS_STUB name:element type:kotlin.Float visibility:public' type=kotlin.Float origin=PLUSEQ
+          receiver: GET_VAR 'val yPosition: kotlin.jvm.internal.Ref.FloatRef [val] declared in com.example.snapcash.ui.component.ExportToPDFButtonKt.createReportPdf' type=kotlin.jvm.internal.Ref.FloatRef origin=null
+        other: CONST Float type=kotlin.Float value=20.0
+    CALL 'public final fun forEachIndexed <T> (action: kotlin.Function2<@[ParameterName(name = "index")] kotlin.Int, T of kotlin.collections.CollectionsKt.forEachIndexed, kotlin.Unit>): kotlin.Unit [inline] declared in kotlin.collections.CollectionsKt' type=kotlin.Unit origin=null
+      <T>: com.example.snapcash.data.Transaction
+      $receiver: GET_VAR 'data: kotlin.collections.List<com.example.snapcash.data.Transaction> declared in com.example.snapcash.ui.component.ExportToPDFButtonKt.createReportPdf' type=kotlin.collections.List<com.example.snapcash.data.Transaction> origin=null
+      action: BLOCK type=kotlin.Function2<@[ParameterName(name = "index")] kotlin.Int, com.example.snapcash.data.Transaction, kotlin.Unit> origin=LAMBDA
+        COMPOSITE type=kotlin.Unit origin=null
+        FUNCTION_REFERENCE 'private final fun createReportPdf$lambda$3 ($yPosition: kotlin.jvm.internal.Ref.FloatRef, $pdfDocument: android.graphics.pdf.PdfDocument, $page: @[FlexibleNullability] android.graphics.pdf.PdfDocument.Page?, $canvas: @[FlexibleNullability] android.graphics.Canvas?, $paint: androidx.compose.ui.graphics.Paint, index: @[ParameterName(name = "index")] kotlin.Int, item: com.example.snapcash.data.Transaction): kotlin.Unit declared in com.example.snapcash.ui.component.ExportToPDFButtonKt' type=kotlin.Function2<@[ParameterName(name = "index")] kotlin.Int, com.example.snapcash.data.Transaction, kotlin.Unit> origin=INLINE_LAMBDA reflectionTarget=null
+          $yPosition: GET_VAR 'val yPosition: kotlin.jvm.internal.Ref.FloatRef [val] declared in com.example.snapcash.ui.component.ExportToPDFButtonKt.createReportPdf' type=kotlin.jvm.internal.Ref.FloatRef origin=null
+          $pdfDocument: GET_VAR 'val pdfDocument: android.graphics.pdf.PdfDocument [val] declared in com.example.snapcash.ui.component.ExportToPDFButtonKt.createReportPdf' type=android.graphics.pdf.PdfDocument origin=null
+          $page: GET_VAR 'val page: @[FlexibleNullability] android.graphics.pdf.PdfDocument.Page? [val] declared in com.example.snapcash.ui.component.ExportToPDFButtonKt.createReportPdf' type=@[FlexibleNullability] android.graphics.pdf.PdfDocument.Page? origin=null
+          $canvas: GET_VAR 'val canvas: @[FlexibleNullability] android.graphics.Canvas? [val] declared in com.example.snapcash.ui.component.ExportToPDFButtonKt.createReportPdf' type=@[FlexibleNullability] android.graphics.Canvas? origin=null
+          $paint: GET_VAR 'val paint: androidx.compose.ui.graphics.Paint [val] declared in com.example.snapcash.ui.component.ExportToPDFButtonKt.createReportPdf' type=androidx.compose.ui.graphics.Paint origin=null
+    CALL 'public open fun finishPage (p0: @[FlexibleNullability] android.graphics.pdf.PdfDocument.Page?): kotlin.Unit declared in android.graphics.pdf.PdfDocument' type=kotlin.Unit origin=null
+      $this: GET_VAR 'val pdfDocument: android.graphics.pdf.PdfDocument [val] declared in com.example.snapcash.ui.component.ExportToPDFButtonKt.createReportPdf' type=android.graphics.pdf.PdfDocument origin=null
+      p0: GET_VAR 'val page: @[FlexibleNullability] android.graphics.pdf.PdfDocument.Page? [val] declared in com.example.snapcash.ui.component.ExportToPDFButtonKt.createReportPdf' type=@[FlexibleNullability] android.graphics.pdf.PdfDocument.Page? origin=null
+    VAR name:file type:java.io.File [val]
+      CONSTRUCTOR_CALL 'public constructor <init> (p0: @[FlexibleNullability] java.io.File?, p1: @[FlexibleNullability] kotlin.String?) declared in java.io.File' type=java.io.File origin=null
+        p0: CALL 'public abstract fun getExternalFilesDir (p0: @[EnhancedNullability] kotlin.String?): @[EnhancedNullability] java.io.File? declared in android.content.Context' type=@[EnhancedNullability] java.io.File? origin=null
+          $this: GET_VAR 'context: android.content.Context declared in com.example.snapcash.ui.component.ExportToPDFButtonKt.createReportPdf' type=android.content.Context origin=null
+          p0: CONST Null type=kotlin.Nothing? value=null
+        p1: STRING_CONCATENATION type=kotlin.String
+          GET_VAR 'fileName: kotlin.String declared in com.example.snapcash.ui.component.ExportToPDFButtonKt.createReportPdf' type=kotlin.String origin=null
+          CONST String type=kotlin.String value=".pdf"
+    CALL 'public open fun writeTo (p0: @[FlexibleNullability] java.io.OutputStream?): kotlin.Unit declared in android.graphics.pdf.PdfDocument' type=kotlin.Unit origin=null
+      $this: GET_VAR 'val pdfDocument: android.graphics.pdf.PdfDocument [val] declared in com.example.snapcash.ui.component.ExportToPDFButtonKt.createReportPdf' type=android.graphics.pdf.PdfDocument origin=null
+      p0: CONSTRUCTOR_CALL 'public constructor <init> (p0: @[FlexibleNullability] java.io.File?) declared in java.io.FileOutputStream' type=java.io.FileOutputStream origin=null
+        p0: GET_VAR 'val file: java.io.File [val] declared in com.example.snapcash.ui.component.ExportToPDFButtonKt.createReportPdf' type=java.io.File origin=null
+    CALL 'public open fun close (): kotlin.Unit declared in android.graphics.pdf.PdfDocument' type=kotlin.Unit origin=null
+      $this: GET_VAR 'val pdfDocument: android.graphics.pdf.PdfDocument [val] declared in com.example.snapcash.ui.component.ExportToPDFButtonKt.createReportPdf' type=android.graphics.pdf.PdfDocument origin=null
+    CALL 'public open fun show (): kotlin.Unit declared in android.widget.Toast' type=kotlin.Unit origin=null
+      $this: CALL 'public open fun makeText (p0: @[FlexibleNullability] android.content.Context?, p1: @[FlexibleNullability] kotlin.CharSequence?, p2: kotlin.Int): @[FlexibleNullability] android.widget.Toast? declared in android.widget.Toast' type=@[FlexibleNullability] android.widget.Toast? origin=null
+        p0: GET_VAR 'context: android.content.Context declared in com.example.snapcash.ui.component.ExportToPDFButtonKt.createReportPdf' type=android.content.Context origin=null
+        p1: STRING_CONCATENATION type=kotlin.String
+          CONST String type=kotlin.String value="PDF tersimpan: "
+          CALL 'public open fun getAbsolutePath (): @[FlexibleNullability] kotlin.String? declared in java.io.File' type=@[FlexibleNullability] kotlin.String? origin=GET_PROPERTY
+            $this: GET_VAR 'val file: java.io.File [val] declared in com.example.snapcash.ui.component.ExportToPDFButtonKt.createReportPdf' type=java.io.File origin=null
+        p2: CONST Int type=kotlin.Int value=1
+
+	at org.jetbrains.kotlin.backend.jvm.codegen.FunctionCodegen.generate(FunctionCodegen.kt:50)
+	at org.jetbrains.kotlin.backend.jvm.codegen.FunctionCodegen.generate$default(FunctionCodegen.kt:42)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ClassCodegen.generateMethodNode(ClassCodegen.kt:385)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ClassCodegen.generateMethod(ClassCodegen.kt:402)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ClassCodegen.generate(ClassCodegen.kt:169)
+	at org.jetbrains.kotlin.backend.jvm.FileCodegen.lower(JvmPhases.kt:41)
+	at org.jetbrains.kotlin.backend.common.phaser.PhaseBuildersKt.makeIrFilePhase$lambda$5(PhaseBuilders.kt:114)
+	at org.jetbrains.kotlin.backend.common.phaser.PhaseBuildersKt$createSimpleNamedCompilerPhase$1.phaseBody(PhaseBuilders.kt:71)
+	at org.jetbrains.kotlin.backend.common.phaser.SimpleNamedCompilerPhase.phaseBody(CompilerPhase.kt:226)
+	at org.jetbrains.kotlin.backend.common.phaser.AbstractNamedCompilerPhase.invoke(CompilerPhase.kt:113)
+	at org.jetbrains.kotlin.backend.common.phaser.PerformByIrFilePhase.invokeSequential(performByIrFile.kt:62)
+	... 44 more
+Caused by: java.lang.RuntimeException: Exception while generating code for:
+FUN INLINE_LAMBDA name:createReportPdf$lambda$2 visibility:private modality:FINAL <> ($receiver:androidx.compose.ui.graphics.Paint) returnType:kotlin.Unit
+  $receiver: VALUE_PARAMETER name:$this$apply type:androidx.compose.ui.graphics.Paint
+  BLOCK_BODY
+    VAR name:$i$a$-apply-ExportToPDFButtonKt$createReportPdf$paint$1 type:kotlin.Int [val]
+      CONST Int type=kotlin.Int value=0
+    SET_FIELD 'FIELD IR_EXTERNAL_JAVA_DECLARATION_STUB name:textSize type:kotlin.Int visibility:public [final,static]' type=kotlin.Unit origin=EQ
+      value: CONST Int type=kotlin.Int value=12
+    CALL 'public abstract fun setColor-8_81llA (value: androidx.compose.ui.graphics.Color): kotlin.Unit declared in androidx.compose.ui.graphics.Paint' type=kotlin.Unit origin=EQ
+      $this: GET_VAR '$this$apply: androidx.compose.ui.graphics.Paint declared in com.example.snapcash.ui.component.ExportToPDFButtonKt.createReportPdf$lambda$2' type=androidx.compose.ui.graphics.Paint origin=null
+      value: CALL 'public final fun getBlack-0d7_KjU (): androidx.compose.ui.graphics.Color declared in androidx.compose.ui.graphics.Color.Companion' type=androidx.compose.ui.graphics.Color origin=GET_PROPERTY
+        $this: GET_FIELD 'FIELD FIELD_FOR_OBJECT_INSTANCE name:Companion type:androidx.compose.ui.graphics.Color.Companion visibility:public [final,static]' type=androidx.compose.ui.graphics.Color.Companion origin=null
+
+	at org.jetbrains.kotlin.backend.jvm.codegen.FunctionCodegen.generate(FunctionCodegen.kt:50)
+	at org.jetbrains.kotlin.backend.jvm.codegen.IrSourceCompilerForInline.generateLambdaBody(IrSourceCompilerForInline.kt:67)
+	at org.jetbrains.kotlin.codegen.inline.ExpressionLambda.generateLambdaBody(LambdaInfo.kt:72)
+	at org.jetbrains.kotlin.backend.jvm.codegen.IrInlineCodegen.genValueAndPut(IrInlineCodegen.kt:99)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitCall$handleParameter(ExpressionCodegen.kt:610)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitCall(ExpressionCodegen.kt:638)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitCall(ExpressionCodegen.kt:137)
+	at org.jetbrains.kotlin.ir.expressions.IrCall.accept(IrCall.kt:24)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitVariable(ExpressionCodegen.kt:784)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitVariable(ExpressionCodegen.kt:137)
+	at org.jetbrains.kotlin.ir.declarations.IrVariable.accept(IrVariable.kt:36)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitStatementContainer(ExpressionCodegen.kt:573)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitBlockBody(ExpressionCodegen.kt:578)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitBlockBody(ExpressionCodegen.kt:137)
+	at org.jetbrains.kotlin.ir.expressions.IrBlockBody.accept(IrBlockBody.kt:20)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.generate(ExpressionCodegen.kt:239)
+	at org.jetbrains.kotlin.backend.jvm.codegen.FunctionCodegen.doGenerate(FunctionCodegen.kt:121)
+	at org.jetbrains.kotlin.backend.jvm.codegen.FunctionCodegen.generate(FunctionCodegen.kt:46)
+	... 54 more
+Caused by: java.lang.AssertionError: access of const val: SET_FIELD 'FIELD IR_EXTERNAL_JAVA_DECLARATION_STUB name:textSize type:kotlin.Int visibility:public [final,static]' type=kotlin.Unit origin=EQ
+  value: CONST Int type=kotlin.Int value=12
+
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitFieldAccess(ExpressionCodegen.kt:855)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitFieldAccess(ExpressionCodegen.kt:137)
+	at org.jetbrains.kotlin.ir.visitors.IrElementVisitor$DefaultImpls.visitSetField(IrElementVisitor.kt:206)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitSetField(ExpressionCodegen.kt:902)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitSetField(ExpressionCodegen.kt:137)
+	at org.jetbrains.kotlin.ir.expressions.IrSetField.accept(IrSetField.kt:21)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitStatementContainer(ExpressionCodegen.kt:573)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitBlockBody(ExpressionCodegen.kt:578)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitBlockBody(ExpressionCodegen.kt:137)
+	at org.jetbrains.kotlin.ir.expressions.IrBlockBody.accept(IrBlockBody.kt:20)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.generate(ExpressionCodegen.kt:239)
+	at org.jetbrains.kotlin.backend.jvm.codegen.FunctionCodegen.doGenerate(FunctionCodegen.kt:121)
+	at org.jetbrains.kotlin.backend.jvm.codegen.FunctionCodegen.generate(FunctionCodegen.kt:46)
+	... 71 more
+
+

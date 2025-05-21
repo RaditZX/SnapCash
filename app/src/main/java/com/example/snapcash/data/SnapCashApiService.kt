@@ -41,7 +41,8 @@ interface SnapCashApiService {
         @Query("startDate") startDate: String,
         @Query("endDate") endDate: String,
         @Query("nominalMin") min: Int,
-        @Query("nominalMax") max: Int
+        @Query("nominalMax") max: Int,
+        @Query("search") searcQuery: String
     ): DefaultResponse
 
     @GET("pemasukanUser")
@@ -51,8 +52,19 @@ interface SnapCashApiService {
         @Query("startDate") startDate: String,
         @Query("endDate") endDate: String,
         @Query("nominalMin") min: Int,
-        @Query("nominalMax") max: Int
+        @Query("nominalMax") max: Int,
+        @Query("search") searcQuery: String
     ): DefaultResponse
+
+    @GET("getDashboardAnalytics")
+    suspend fun getDashboardAnalytics(
+        @Header("Authorization") token: String,
+        @Query("jenis") jenis: String = "Pemasukan",
+        @Query("filter") filter: String = "tahun",
+        @Query("tahun") tahun: Int,
+        @Query("bulan") bulan: Int? = null,
+        @Query("hari") hari: Int? = null
+    ): DashboardResponse
 
     @GET("pemasukanUser/{id}")
     suspend fun getPemasukanUserById(
