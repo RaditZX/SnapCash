@@ -20,6 +20,7 @@ class GenerateFromInvoiceViewModel  @Inject constructor(private val apiService: 
 
     var isLoading = mutableStateOf(false)
     var data = mutableStateOf(JsonObject())
+    var isSucces = mutableStateOf(false)
 
     fun setLoading(loading: Boolean) {
         isLoading.value = loading
@@ -46,17 +47,18 @@ class GenerateFromInvoiceViewModel  @Inject constructor(private val apiService: 
                     if (!body.entrySet().isEmpty()) {
                         Log.d("API_SUCCESS", "Message: ${response.message}, Data: ${response.data}")
                         onResult(true, response.message)
+                        isSucces.value = true
                     } else {
-                        Log.e("API_FAIL", "Message: ${response.message}")
-                        onResult(false, response.message)
+                        Log.e("FAIL", "Message: ${response.message}")
+                        onResult(true, response.message)
                     }
                 } else {
-                    Log.e("API_ERROR", "Message: ${response.message}")
-                    onResult(false, response.message)
+                    Log.e("ERROR", "Message: ${response.message}")
+                    onResult(true, response.message)
                 }
             } catch (e: Exception) {
                 Log.e("EXCEPTION", "Exception: ${e.message}", e)
-                onResult(false, "failed:${e.message}" )
+                onResult(true, "failed:${e.message}" )
             } finally {
                 setLoading(false) // Hide loading spinner
             }
