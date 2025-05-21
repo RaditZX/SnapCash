@@ -142,4 +142,7 @@ interface SnapCashApiService {
         @Part photo: MultipartBody.Part?
     ): userResponse
 
+    @POST("signout")
+    suspend fun signOut(): DefaultResponse
+
 }
