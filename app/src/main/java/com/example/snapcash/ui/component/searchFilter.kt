@@ -1,5 +1,6 @@
 package com.example.snapcash.ui.component
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -10,10 +11,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -23,15 +25,24 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import com.example.snapcash.R
 
 @Composable
 fun SearchWithFilterBar(
     modifier: Modifier = Modifier,
     query: String,
     onQueryChange: (String) -> Unit,
-    onFilterClick: () -> Unit
+    onFilterClick: () -> Unit,
+    navController : NavController,
+    typeDone: (Boolean) -> Unit
 ) {
+    val keyboardController = LocalSoftwareKeyboardController.current
     Row(
         modifier = modifier
             .padding(2.dp)
@@ -66,7 +77,16 @@ fun SearchWithFilterBar(
                 disabledIndicatorColor = Color.Transparent,
                 textColor = Color.White
             ),
-            singleLine = true
+            singleLine = true,
+            keyboardOptions = KeyboardOptions.Default.copy(
+                imeAction = ImeAction.Done // "OK" or "Enter" key
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    typeDone(true)
+                    keyboardController?.hide() // Hide keyboard if needed
+                }
+            ),
         )
 
 
@@ -80,10 +100,13 @@ fun SearchWithFilterBar(
 //                .background(Color.Gray, shape = CircleShape)
                 .border(1.dp, Color.LightGray, shape = CircleShape)
         ) {
-            Icon(
-                imageVector = Icons.Default.MoreVert,
-                contentDescription = "Filter Icon"
+            Image(
+                painter = painterResource(R.drawable.baseline_filter_alt_24),
+                contentDescription = null,
+                colorFilter = ColorFilter.tint(Color.White)
             )
+
         }
+
     }
 }

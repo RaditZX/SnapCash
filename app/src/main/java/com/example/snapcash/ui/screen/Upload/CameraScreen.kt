@@ -57,6 +57,7 @@ import com.example.snapcash.ViewModel.PemasukanViewModel
 import com.example.snapcash.ViewModel.PengeluaranViewModel
 import com.example.snapcash.data.Barang
 import com.example.snapcash.data.Tambahanbiaya
+import com.example.snapcash.ui.component.ModernAlertDialog
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -91,6 +92,7 @@ fun CameraScreen(
     val showDialog = remember { mutableStateOf(false) }
     val dialogMessage = remember { mutableStateOf("") }
     val isLoading by viewModel.isLoading
+    val isSuccess by viewModel.isSucces
 
 
     val pengeluaranData by remember { viewModel2.pengeluaranDataById }
@@ -176,95 +178,104 @@ fun CameraScreen(
                 ) {
                     Text(text = "Upload Invoice",color = Color.White)
                 }
+                if(!isSuccess){
+                    ModernAlertDialog(showDialog, "Fail To Extract Data",
+                        dialogMessage.toString(), "camera", navController  )
+                }else {
 
-                if (showDialog.value) {
-                    val id = viewModel.data.value.get("id")?.asString ?: ""
-                    val isPengeluaran = viewModel.data.value.get("isPengeluaran")?.asBoolean ?: true
 
-                    if (isPengeluaran) {
-                        if (id != null) {
-                            LaunchedEffect(Unit) {
-                                viewModel2.getPengluaranUserById(id.toString())
-                            }
-                            LaunchedEffect(pengeluaranData) {
-                                if (pengeluaranData.size() > 0) {
-                                    judul = pengeluaranData.get("namaPengeluaran")?.asString ?: ""
-                                    toko = pengeluaranData.get("toko")?.asString ?: ""
-                                    tanggal = pengeluaranData.get("tanggal")?.asString ?: ""
-                                    kategori = pengeluaranData.get("kategori")?.asString ?: ""
-                                    total = pengeluaranData.get("total").asInt
-                                    val barangJsonArray = pengeluaranData.get("barang")?.asJsonArray
-                                    barangList = barangJsonArray?.map { item ->
-                                        val obj = item.asJsonObject
-                                        Barang(
-                                            nama = obj.get("namaBarang").asString,
-                                            jumlah = obj.get("jumlah").asInt,
-                                            harga = obj.get("harga").asDouble
-                                        )
-                                    } ?: emptyList()
+                    if (showDialog.value) {
+                        val id = viewModel.data.value.get("id")?.asString ?: ""
+                        val isPengeluaran =
+                            viewModel.data.value.get("isPengeluaran")?.asBoolean ?: true
 
-                                    val biayaJsonArray =
-                                        pengeluaranData.get("tambahanBiaya")?.asJsonArray
-                                    biayalist = biayaJsonArray?.map { item ->
-                                        val obj = item.asJsonObject
-                                        Tambahanbiaya(
-                                            namabiaya = obj.get("namaBiaya").asString,
-                                            jumlahbiaya = obj.get("jumlah").asDouble,
-                                        )
-                                    } ?: emptyList()
+                        if (isPengeluaran) {
+                            if (id != null) {
+                                LaunchedEffect(Unit) {
+                                    viewModel2.getPengluaranUserById(id.toString())
+                                }
+                                LaunchedEffect(pengeluaranData) {
+                                    if (pengeluaranData.size() > 0) {
+                                        judul =
+                                            pengeluaranData.get("namaPengeluaran")?.asString ?: ""
+                                        toko = pengeluaranData.get("toko")?.asString ?: ""
+                                        tanggal = pengeluaranData.get("tanggal")?.asString ?: ""
+                                        kategori = pengeluaranData.get("kategori")?.asString ?: ""
+                                        total = pengeluaranData.get("total").asInt
+                                        val barangJsonArray =
+                                            pengeluaranData.get("barang")?.asJsonArray
+                                        barangList = barangJsonArray?.map { item ->
+                                            val obj = item.asJsonObject
+                                            Barang(
+                                                nama = obj.get("namaBarang").asString,
+                                                jumlah = obj.get("jumlah").asInt,
+                                                harga = obj.get("harga").asDouble
+                                            )
+                                        } ?: emptyList()
+
+                                        val biayaJsonArray =
+                                            pengeluaranData.get("tambahanBiaya")?.asJsonArray
+                                        biayalist = biayaJsonArray?.map { item ->
+                                            val obj = item.asJsonObject
+                                            Tambahanbiaya(
+                                                namabiaya = obj.get("namaBiaya").asString,
+                                                jumlahbiaya = obj.get("jumlah").asDouble,
+                                            )
+                                        } ?: emptyList()
+                                    }
                                 }
                             }
-                        }
 
-                        PengeluaranDialog(
-                            navController = navController,
-                            id = id.toString(),
-                            judul = judul,
-                            toko = toko,
-                            tanggal = tanggal,
-                            kategori = kategori,
-                            total = total,
-                            barangList = barangList,
-                            biayalist = biayalist
-                        )
+                            PengeluaranDialog(
+                                navController = navController,
+                                id = id.toString(),
+                                judul = judul,
+                                toko = toko,
+                                tanggal = tanggal,
+                                kategori = kategori,
+                                total = total,
+                                barangList = barangList,
+                                biayalist = biayalist
+                            )
 
-                    } else {
-                        if (id != null) {
-                            LaunchedEffect(Unit) {
-                                viewModel1.getPemasukanUserById(id.toString())
-                            }
+                        } else {
+                            if (id != null) {
+                                LaunchedEffect(Unit) {
+                                    viewModel1.getPemasukanUserById(id.toString())
+                                }
 
-                            LaunchedEffect(pemasukanData) {
-                                if (pemasukanData.size() > 0) {
-                                    judul = pemasukanData.get("namaPemasukan")?.asString ?: ""
-                                    kategori = pemasukanData.get("kategori")?.asString ?: ""
-                                    sumber = pemasukanData.get("sumber")?.asString ?: ""
-                                    tanggal = pemasukanData.get("tanggal")?.asString ?: ""
-                                    total = pemasukanData.get("total")?.asInt ?: 0
+                                LaunchedEffect(pemasukanData) {
+                                    if (pemasukanData.size() > 0) {
+                                        judul = pemasukanData.get("namaPemasukan")?.asString ?: ""
+                                        kategori = pemasukanData.get("kategori")?.asString ?: ""
+                                        sumber = pemasukanData.get("sumber")?.asString ?: ""
+                                        tanggal = pemasukanData.get("tanggal")?.asString ?: ""
+                                        total = pemasukanData.get("total")?.asInt ?: 0
 
-                                    val biayaJsonArray =
-                                        pemasukanData.get("tambahanBiaya")?.asJsonArray
-                                    biayalist = biayaJsonArray?.map {
-                                        val obj = it.asJsonObject
-                                        Tambahanbiaya(
-                                            namabiaya = obj.get("namaBiaya").asString,
-                                            jumlahbiaya = obj.get("jumlah").asDouble,
-                                        )
-                                    } ?: emptyList()
+                                        val biayaJsonArray =
+                                            pemasukanData.get("tambahanBiaya")?.asJsonArray
+                                        biayalist = biayaJsonArray?.map {
+                                            val obj = it.asJsonObject
+                                            Tambahanbiaya(
+                                                namabiaya = obj.get("namaBiaya").asString,
+                                                jumlahbiaya = obj.get("jumlah").asDouble,
+                                            )
+                                        } ?: emptyList()
+                                    }
                                 }
                             }
-                        }
 
-                        PemasukanDialog(
-                            navController = navController,
-                            id = id.toString(),
-                            judul = judul,
-                            toko = toko,
-                            tanggal = tanggal,
-                            kategori = kategori,
-                            total = total,
-                            biayalist = biayalist
-                        )
+                            PemasukanDialog(
+                                navController = navController,
+                                id = id.toString(),
+                                judul = judul,
+                                toko = toko,
+                                tanggal = tanggal,
+                                kategori = kategori,
+                                total = total,
+                                biayalist = biayalist
+                            )
+                        }
                     }
                 }
             }

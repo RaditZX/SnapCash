@@ -32,6 +32,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.snapcash.data.FilterModel
 import com.example.snapcash.data.OnboardingPrefs
+import com.example.snapcash.data.Transaction
 import com.example.snapcash.ui.component.BottomNavigationBar
 import com.example.snapcash.ui.component.FilterBottomSheet
 import com.example.snapcash.ui.component.SidebarContent
@@ -80,6 +81,8 @@ fun AppNavHost(
     val coroutineScope = rememberCoroutineScope()
     var filterModel by remember { mutableStateOf(FilterModel()) }
     var isPemasukan by remember {mutableStateOf(false)}
+    var dataTransaction by remember { mutableStateOf(listOf<Transaction>()) }
+    var periode by remember {mutableStateOf("")}
     ModalNavigationDrawer(
         drawerContent = {
             Surface(
@@ -105,7 +108,7 @@ fun AppNavHost(
                     coroutineScope.launch { bottomSheetState.hide() }
                 }, filterData = { newFilterData ->
                     filterModel = newFilterData
-                }, isPemasukan = isPemasukan , navController = navController)
+                }, isPemasukan = isPemasukan , navController = navController, dataTransaction = dataTransaction, periode = periode)
             }
         ) {
             Scaffold(
@@ -156,6 +159,8 @@ fun AppNavHost(
                     composable("tambah/pengeluaran") {
                         PengeluaranEntryScreen(navController = navController, id = null)
                     }
+
+
                     composable("tambah/pemasukan") {
                         PemasukanEntryScreen(navController = navController, id = null)
                     }
@@ -178,7 +183,20 @@ fun AppNavHost(
                                     isPemasukan = value
                                 }
                             },
-                            filterData = filterModel
+                            filterData = filterModel,
+                            dataTransaction = {
+                                value ->
+                                coroutineScope.launch {
+                                    dataTransaction = value
+                                }
+                            },
+                            periode = {
+                                value ->
+                                coroutineScope.launch {
+                                    periode = value
+                                }
+
+                            }
                         )
 
                     }

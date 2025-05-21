@@ -108,5 +108,7 @@ dependencies {
     implementation ("com.maxkeppeler.sheets-compose-dialogs:core:1.1.1") // Optional: for better date pickers
     implementation("com.squareup.okhttp3:okhttp:4.10.0") // Or the latest version
     implementation ("co.yml:ycharts:2.1.0")
+    implementation("com.google.accompanist:accompanist-swiperefresh:0.31.5-beta")
+
 
 }

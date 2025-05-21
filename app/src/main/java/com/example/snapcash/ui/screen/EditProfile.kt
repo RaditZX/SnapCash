@@ -120,7 +120,11 @@ fun EditProfileScreen(navController: NavController, viewModel: currencyViewModel
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        Box {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(180.dp) // Pastikan tinggi cukup untuk offset
+        ) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -133,19 +137,27 @@ fun EditProfileScreen(navController: NavController, viewModel: currencyViewModel
                     )
             )
 
-
-
-
-            Image(
-                painter = painter,
-                contentDescription = null,
+            Box( // Box luar
                 modifier = Modifier
                     .size(120.dp)
-                    .clip(CircleShape)
                     .align(Alignment.BottomCenter)
-                    .offset(y = 50.dp),
-                contentScale = ContentScale.Crop
-            )
+                    .offset(y = 60.dp) // offset DI SINI, bukan di dalam!
+            ) {
+                // Lingkaran foto
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clip(CircleShape)
+                        .background(Color.Gray) // bantu debug
+                ) {
+                    Image(
+                        painter = painter,
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+            }
         }
 
         Spacer(modifier = Modifier.height(80.dp))

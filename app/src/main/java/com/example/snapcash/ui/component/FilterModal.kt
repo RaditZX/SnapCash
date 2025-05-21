@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.snapcash.data.FilterModel
+import com.example.snapcash.data.Transaction
 import com.example.snapcash.ui.theme.night
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -53,7 +54,9 @@ fun FilterBottomSheet(
     onDismiss: () -> Unit,
     isPemasukan: Boolean = false,
     filterData: (FilterModel) ->Unit,
-    navController: NavController
+    navController: NavController,
+    dataTransaction: List<Transaction>,
+    periode: String
 ) {
     var range by remember { mutableStateOf(0f..200000000f) }
     var minValue by remember { mutableStateOf(range.start.toInt()) }
@@ -247,7 +250,7 @@ fun FilterBottomSheet(
                 Text("Apply Filter")
             }
 
-
+            ExportPdfButton(dataTransaction, LocalContext.current, periode, isPemasukan)
 
             Spacer(Modifier.height(24.dp))
         }

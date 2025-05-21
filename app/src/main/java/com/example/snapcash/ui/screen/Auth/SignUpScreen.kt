@@ -21,8 +21,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -40,13 +38,11 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.snapcash.R
 import androidx.compose.material3.*
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.snapcash.ViewModel.AuthViewModel
 import com.example.snapcash.client.GoogleAuthUiClient
@@ -102,7 +98,7 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel = hilt
             verticalArrangement = Arrangement.Center
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.logo),
+                painter = painterResource(id = R.drawable.logos),
                 contentDescription = "App Logo",
                 tint = Color.White,
                 modifier = Modifier.size(64.dp)

@@ -26,15 +26,18 @@ class PengeluaranViewModel @Inject constructor(private val apiService: SnapCashA
 
     val isLoading = mutableStateOf(false)
 
-    fun getPengeluaranUser(filterData: FilterModel) {
+    fun getPengeluaranUser(filterData: FilterModel, searchQuery: String) {
         viewModelScope.launch {
             try {
                 isLoading.value = true
+                Log.d("date", filterData.startDate)
                 val response = apiService.getPengeluaranUser("Bearer ${SessionManager.idToken}",filterData.kategori,
                     filterData.startDate,
                     filterData.endDate,
                     filterData.min,
-                    filterData.max)
+                    filterData.max,
+                    searchQuery
+                )
                 if (response.isSucces) {
                     setPengeluaranData(response.data)
                 }

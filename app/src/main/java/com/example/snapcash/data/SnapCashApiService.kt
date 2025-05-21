@@ -41,7 +41,8 @@ interface SnapCashApiService {
         @Query("startDate") startDate: String,
         @Query("endDate") endDate: String,
         @Query("nominalMin") min: Int,
-        @Query("nominalMax") max: Int
+        @Query("nominalMax") max: Int,
+        @Query("search") searcQuery: String
     ): DefaultResponse
 
     @GET("pemasukanUser")
@@ -51,7 +52,8 @@ interface SnapCashApiService {
         @Query("startDate") startDate: String,
         @Query("endDate") endDate: String,
         @Query("nominalMin") min: Int,
-        @Query("nominalMax") max: Int
+        @Query("nominalMax") max: Int,
+        @Query("search") searcQuery: String
     ): DefaultResponse
 
     @GET("pemasukanUser/{id}")
