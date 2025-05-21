@@ -3,6 +3,7 @@ package com.example.snapcash.ui.screen
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -19,11 +20,17 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -44,6 +51,7 @@ import co.yml.charts.ui.linechart.model.LineStyle
 import co.yml.charts.ui.linechart.model.LineType
 import co.yml.charts.ui.linechart.model.SelectionHighlightPoint
 import co.yml.charts.ui.linechart.model.ShadowUnderLine
+import com.example.snapcash.ui.component.LineChart
 import com.example.snapcash.ui.component.ProgressCircleChart
 
 @Composable
@@ -61,49 +69,55 @@ fun DashboardScreen(
         }
     }
 
-    val itemsPerPage = 3
-    val chartItems = listOf(
-        ChartItem("HOUSE", 122.00f, Color(0xFFF53844)),  // Merah
-        ChartItem("CAR", 4528.00f, Color(0xFF2D6CE9)),    // Biru
-        ChartItem("FOOD", 201.00f, Color(0xFF20BF55)),    // Hijau
-        ChartItem("EXTRA", 1000.00f, Color(0xFFFFA500))   // Oranye
+    var isIncomeMode by remember { mutableStateOf(false) }
+    val chartItemsOutcome = listOf(
+        ChartItem("Pendidikan", 1952000f, Color(0xFFF53844)),
+        ChartItem("Belanja", 7244000f, Color(0xFF2D6CE9)),
+        ChartItem("Transportasi", 3216000f, Color(0xFF20BF55)),
+        ChartItem("Hiburan", 16000000f, Color(0xFFFFA500)),
+        ChartItem("Extra", 0f, Color(0xFFFFA500))
     )
-    val pages = chartItems.chunked(itemsPerPage)
+    val chartItemsIncome = listOf(
+        ChartItem("Gaji", 72448000f, Color(0xFF2D6CE9)),
+        ChartItem("Investasi", 1952000f, Color(0xFFF53844)),
+        ChartItem("Bisnis", 3216000f, Color(0xFF20BF55)),
+        ChartItem("BONUS", 16000000f, Color(0xFFFFA500)),
+        ChartItem("Extra", 16000000f, Color(0xFFFFA500))
+    )
 
-    // Inisialisasi PagerState untuk Progress Circle Charts
+    val itemsPerPage = 3
+    val pages = if (isIncomeMode) chartItemsIncome.chunked(itemsPerPage) else chartItemsOutcome.chunked(itemsPerPage)
+
     val pagerState = rememberPagerState(pageCount = { pages.size })
 
-    // Data untuk Gradient Area Chart (contoh data 12 hari)
-    val allPointsData = listOf(
-        Point(0f, 40f),
-        Point(1f, 90f),
-        Point(2f, 10f),
-        Point(3f, 60f),
-        Point(4f, 30f),
-        Point(5f, 70f),
-        Point(6f, 50f),
-        Point(7f, 20f),
-        Point(8f, 80f),
-        Point(9f, 30f),
-        Point(10f, 60f),
-        Point(11f, 40f)
+    val allPointsData = if (isIncomeMode) listOf(
+        Point(0f, 800000f),
+        Point(1f, 1280000f),
+        Point(2f, 320000f),
+        Point(3f, 1120000f),
+        Point(4f, 640000f),
+        Point(5f, 1440000f),
+        Point(6f, 960000f)
+    ) else listOf(
+        Point(0f, 640000f),
+        Point(1f, 1440000f),
+        Point(2f, 160000f),
+        Point(3f, 960000f),
+        Point(4f, 480000f),
+        Point(5f, 1120000f),
+        Point(6f, 800000f)
     )
 
-    // Label hari untuk 12 hari
-    val allDays = listOf(
-        "Mon", "Tue", "Wed", "Thu", "Fri", "Sat",
-        "Sun", "Mon", "Tue", "Wed", "Thu", "Fri"
-    )
+    val allDays = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
 
-    // Data awal untuk LineChartData (akan dimodifikasi di LineChart.kt)
     val lineChartData = LineChartData(
         linePlotData = LinePlotData(
             lines = listOf(
                 Line(
-                    dataPoints = allPointsData, // Gunakan semua data
+                    dataPoints = allPointsData,
                     lineStyle = LineStyle(
                         color = MaterialTheme.colorScheme.tertiary,
-                        width = 1.dp.value,
+                        width = 2.dp.value,
                         lineType = LineType.SmoothCurve(false)
                     ),
                     intersectionPoint = IntersectionPoint(
@@ -139,9 +153,8 @@ fun DashboardScreen(
             .padding(16.dp)
             .verticalScroll(scrollState)
     ) {
-        // Welcome Message
         Text(
-            text = "Welcome Back DWIKA 100!",
+            text = "Welcome Back USER",
             color = Color.White,
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
@@ -151,29 +164,49 @@ fun DashboardScreen(
             textAlign = TextAlign.Center
         )
 
-        // Dropdown Section
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "Money Outcome",
-                color = Color.White,
-                fontSize = 18.sp,
-                modifier = Modifier.weight(1f)
-            )
-            IconButton(onClick = { /* TODO: Handle dropdown */ }) {
-                Icon(
-                    imageVector = Icons.Default.ArrowDropDown,
-                    contentDescription = "Dropdown",
-                    tint = Color.White
+        var expanded by remember { mutableStateOf(false) }
+        Box {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = if (isIncomeMode) "Money Income" else "Money Outcome",
+                    color = Color.White,
+                    fontSize = 18.sp,
+                    modifier = Modifier.weight(1f)
+                )
+                IconButton(onClick = { expanded = true }) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowDropDown,
+                        contentDescription = "Dropdown",
+                        tint = Color.White
+                    )
+                }
+            }
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                DropdownMenuItem(
+                    text = { Text("Money Income") },
+                    onClick = {
+                        isIncomeMode = true
+                        expanded = false
+                    }
+                )
+                DropdownMenuItem(
+                    text = { Text("Money Outcome") },
+                    onClick = {
+                        isIncomeMode = false
+                        expanded = false
+                    }
                 )
             }
         }
 
-        // Statistics Section
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -188,8 +221,8 @@ fun DashboardScreen(
             )
             Spacer(modifier = Modifier.weight(1f))
             Text(
-                text = "2023",
-                color = Color.Blue,
+                text = "2020",
+                color = Color.Magenta,
                 fontSize = 16.sp
             )
         }
@@ -203,22 +236,39 @@ fun DashboardScreen(
                 modifier = Modifier.weight(1f),
                 horizontalAlignment = Alignment.Start
             ) {
-                Text("MONEY SPENT", color = Color.White, fontSize = 14.sp)
-                Text("$10,345.00", color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold)
-                Text("COMPARISON TO LAST YEAR", color = Color.White, fontSize = 12.sp)
-                Text("$9,905.00", color = Color.White, fontSize = 16.sp)
+                Text(
+                    text = if (isIncomeMode) "MONEY EARNED" else "MONEY SPENT",
+                    color = Color.White,
+                    fontSize = 20.sp
+                )
+                Text(
+                    text = if (isIncomeMode) "Rp165.520.000" else "Rp165.520.000",
+                    color = Color.White,
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = "COMPARISON TO LAST YEAR",
+                    color = Color.White,
+                    fontSize = 14.sp
+                )
+                Text(
+                    text = if (isIncomeMode) "Rp158.480.000" else "Rp158.480.000",
+                    color = Color.White,
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.Bold
+                )
             }
             Text(
-                text = "+$440",
-                color = Color.Red,
-                fontSize = 20.sp,
+                text = if (isIncomeMode) "+Rp7.040.000" else "+Rp7.040.000",
+                color = if (isIncomeMode) Color.Green else Color(0xFFFF1E00),
+                fontSize = 24.sp,
                 fontWeight = FontWeight.Bold
             )
         }
 
-        // Progress Circle Chart Section with HorizontalPager
         Text(
-            text = "Progress Circle Charts",
+            text = if (isIncomeMode) "Progress Earned Charts" else "Progress Spent Charts",
             color = Color.White,
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
@@ -240,21 +290,19 @@ fun DashboardScreen(
                     ProgressCircleChart(
                         label = item.label,
                         value = item.value,
-                        total = 5000f,
+                        total = 160000000f,
                         color = item.color,
                         modifier = Modifier.weight(1f)
                     )
                 }
-                // Tambahkan Spacer jika kurang dari 3 item untuk menjaga tata letak
                 repeat(itemsPerPage - currentPageItems.size) {
                     Spacer(modifier = Modifier.weight(1f))
                 }
             }
         }
 
-        // Gradient Area Chart Section
         Text(
-            text = "Money Spent (Day)",
+            text = if (isIncomeMode) "Money Earned (Day)" else "Money Spent (Day)",
             color = Color.White,
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
@@ -279,40 +327,40 @@ fun DashboardScreen(
             colors = CardDefaults.cardColors(containerColor = Color(0xFF2A2A2A))
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
-//                LineChartDashboard(
-//                    modifier = Modifier.fillMaxWidth(),
-//                    lineChartData = lineChartData,
-//                    allPointsData = allPointsData,
-//                    allDays = allDays
-//                )
+                LineChart(
+                    modifier = Modifier.fillMaxWidth(),
+                    lineChartData = lineChartData,
+                    allPointsData = allPointsData,
+                    allDays = allDays
+                )
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 8.dp),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Row {
+                    Column {
                         Text(
-                            text = "Pengeluaran Tertinggi: ",
+                            text = "Highest: ",
                             color = Color.White,
                             fontSize = 14.sp
                         )
                         Text(
-                            text = "4500",
-                            color = Color.Yellow,
+                            text = if (isIncomeMode) "Rp1,440,000" else "Rp1,440,000",
+                            color =  if (isIncomeMode) Color.Green else Color(0xFFFF1E00),
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold
                         )
                     }
-                    Row {
+                    Column {
                         Text(
-                            text = "Pengeluaran Hari Ini: ",
+                            text = "Today: ",
                             color = Color.White,
                             fontSize = 14.sp
                         )
                         Text(
-                            text = "2500",
-                            color = Color.Yellow,
+                            text = if (isIncomeMode) "Rp320,000" else "Rp160,000", // Sesuai hari ini (Rabu)
+                            color = if (isIncomeMode) Color.Green else Color(0xFFFF1E00),
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -321,6 +369,14 @@ fun DashboardScreen(
             }
         }
 
+        // Outcome Summary Section
+        Text(
+            text = if (isIncomeMode) "INCOME SUMMARY" else "OUTCOME SUMMARY",
+            color = Color.White,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -340,29 +396,49 @@ fun DashboardScreen(
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(
-                    text = "OUTCOME SUMMARY",
-                    color = Color.White,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-                Text(
-                    text = "-$898.00",
-                    color = Color.White,
+                    text = if (isIncomeMode) "+Rp14,368,000" else "-Rp14,368,000",
+                    color = if (isIncomeMode)
+                                Color.Green
+                            else
+                                Color(0xFFFF1E00),
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
                 Text("CEDINT RENT APARTMENT", color = Color.White, fontSize = 14.sp)
-                Text("-$498.10", color = Color.Red, fontSize = 14.sp, modifier = Modifier.padding(bottom = 8.dp))
+                Text(
+                    text = if (isIncomeMode) "+Rp7,969,600" else "-Rp7,969,600",
+                    color = if (isIncomeMode) Color.Green else Color(0xFFFF1E00),
+                    fontSize = 14.sp,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
                 Text("RESTAURANT BBQ", color = Color.White, fontSize = 14.sp)
-                Text("-$176.90", color = Color.Red, fontSize = 14.sp, modifier = Modifier.padding(bottom = 8.dp))
+                Text(
+                    text = if (isIncomeMode) "+Rp2,830,400" else "-Rp2,830,400",
+                    color = if (isIncomeMode) Color.Green else Color(0xFFFF1E00),
+                    fontSize = 14.sp,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
                 Text("FOOD", color = Color.White, fontSize = 14.sp)
-                Text("-$105.76", color = Color.Red, fontSize = 14.sp, modifier = Modifier.padding(bottom = 8.dp))
+                Text(
+                    text = if (isIncomeMode) "+Rp1,692,160" else "-Rp1,692,160",
+                    color = if (isIncomeMode) Color.Green else Color(0xFFFF1E00),
+                    fontSize = 14.sp,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
                 Text("ELECTRIC CAR", color = Color.White, fontSize = 14.sp)
-                Text("-$33.20", color = Color.Red, fontSize = 14.sp, modifier = Modifier.padding(bottom = 8.dp))
+                Text(
+                    text = if (isIncomeMode) "+Rp531,200" else "-Rp531,200",
+                    color = if (isIncomeMode) Color.Green else Color(0xFFFF1E00),
+                    fontSize = 14.sp,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
                 Text("DRINKS AND DISCO PARTY", color = Color.White, fontSize = 14.sp)
-                Text("-$33.20", color = Color.Red, fontSize = 14.sp)
+                Text(
+                    text = if (isIncomeMode) "+Rp531,200" else "-Rp531,200",
+                    color = if (isIncomeMode) Color.Green else Color(0xFFFF1E00),
+                    fontSize = 14.sp
+                )
             }
         }
     }

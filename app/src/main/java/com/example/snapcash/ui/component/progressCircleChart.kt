@@ -33,14 +33,49 @@ fun ProgressCircleChart(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
     ) {
-        CircularProgressIndicator(
-            progress = progress,
-            color = color,
-            strokeWidth = 8.dp,
-            modifier = Modifier.size(72.dp)
+        Canvas(
+            modifier = Modifier
+                .height(100.dp)
+                .fillMaxWidth()
+        ) {
+            val canvasWidth = size.width
+            val canvasHeight = size.height
+            val center = Offset(canvasWidth / 2, canvasHeight / 2)
+            val radius = canvasHeight.coerceAtMost(canvasWidth) / 2 * 0.7f
+
+            // Background circle (abu-abu)
+            drawArc(
+                color = Color.Gray,
+                startAngle = -90f,
+                sweepAngle = 360f,
+                useCenter = false,
+                topLeft = Offset(center.x - radius, center.y - radius),
+                size = Size(radius * 2, radius * 2),
+                style = Stroke(width = 20f)
+            )
+
+            // Progress circle
+            drawArc(
+                color = color,
+                startAngle = -90f,
+                sweepAngle = 360f * progress,
+                useCenter = false,
+                topLeft = Offset(center.x - radius, center.y - radius),
+                size = Size(radius * 2, radius * 2),
+                style = Stroke(width = 20f)
+            )
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = label,
+            color = Color.White,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Bold
         )
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(label, color = Color.White)
-        Text("Rp ${value.toInt()}", color = Color.White, fontSize = 12.sp)
+        Text(
+            text = "Rp$value",
+            color = Color.White,
+            fontSize = 14.sp
+        )
     }
 }
