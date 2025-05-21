@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -21,11 +22,13 @@ import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,6 +49,10 @@ import com.example.snapcash.ViewModel.AuthViewModel
 fun ProfileScreen(navController: NavController, viewModel: AuthViewModel = hiltViewModel()) {
 
     val userData by remember { viewModel.userDatas }
+    val showDialog = remember { mutableStateOf(false) }
+    val dialogMessage = remember { mutableStateOf("") }
+    val isSucces = remember { mutableStateOf(false) }
+    val isLoading by viewModel.isLoading
 
     LaunchedEffect(Unit) {
         viewModel.getUserData()
@@ -76,19 +83,26 @@ fun ProfileScreen(navController: NavController, viewModel: AuthViewModel = hiltV
             )
 
 
-            // Lingkaran foto
-            Box(
+            Box( // Box luar
                 modifier = Modifier
-                    .fillMaxSize()
-                    .clip(CircleShape)
-                    .background(Color.Gray) // bantu debug
+                    .size(120.dp)
+                    .align(Alignment.BottomCenter)
+                    .offset(y = 60.dp) // offset DI SINI, bukan di dalam!
             ) {
-                Image(
-                    painter = rememberAsyncImagePainter(userData.foto),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize()
-                )
+                // Lingkaran foto
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clip(CircleShape)
+                        .background(Color.Gray) // bantu debug
+                ) {
+                    Image(
+                        painter = rememberAsyncImagePainter(userData.foto),
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
             }
 
 
@@ -112,7 +126,40 @@ fun ProfileScreen(navController: NavController, viewModel: AuthViewModel = hiltV
             ) {
                 Text("Edit Profile", color = Color.White)
             }
+            Spacer(modifier = Modifier.height(15.dp))
+            Button(
+                onClick = {
+                    viewModel.signOut(onResult = { success, message ->
+                        dialogMessage.value = message
+                        showDialog.value = true
+                        isSucces.value = success
+
+                        if (success) {
+                            navController.navigate("signIn") {
+                                popUpTo("home") { inclusive = true } // opsional, hapus history
+                            }
+                        }
+                    })},
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+            ) {
+                Text("Sign Out", color = Color.White)
+            }
         }
+        // 🔄 Overlay Loading
+        if (isLoading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.3f)),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+
 
     }
 }
