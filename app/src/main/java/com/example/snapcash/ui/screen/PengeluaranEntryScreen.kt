@@ -1,17 +1,12 @@
 package com.example.snapcash.ui.screen
 
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.Density
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.icu.util.Calendar
 import android.util.Log
 import com.example.snapcash.ui.component.AddBarangDialog
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,6 +25,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -69,31 +66,41 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
+import androidx.compose.ui.input.pointer.pointerInput
 import com.example.snapcash.ui.component.DropdownMenu
 import com.example.snapcash.ui.theme.night
 import java.text.SimpleDateFormat
-
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.AlertDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PengeluaranEntryScreen(
     navController: NavController,
     id: String?,
-    viewModel: PengeluaranViewModel = hiltViewModel()
+    viewModel: PengeluaranViewModel = hiltViewModel(),
+    preview: Boolean
 ) {
     val context = LocalContext.current
+    var showCancelDialog by remember { mutableStateOf(false) }
 
-    // State untuk form input
     var judul by remember { mutableStateOf("") }
     var toko by remember { mutableStateOf("") }
     var tanggal by remember { mutableStateOf("") }
     var total by remember { mutableStateOf(0) }
     var request by remember { mutableStateOf(JsonObject()) }
-    var kategori by remember { mutableStateOf("")}
+    var kategori by remember { mutableStateOf("") }
     val pengeluaranData by remember { viewModel.pengeluaranDataById }
     val isLoading by viewModel.isLoading
     var isUpdate by remember { mutableStateOf(false) }
     val kategoriList = listOf("Transportasi", "Belanja", "Pendidikan", "Hiburan")
+    var showDialog by remember { mutableStateOf(false) }
+    var showDialogBiaya by remember { mutableStateOf(false) }
+    var barangList by remember { mutableStateOf(listOf<Barang>()) }
+    var biayalist by remember { mutableStateOf(listOf<Tambahanbiaya>()) }
+
     val dateTimeFormatter = SimpleDateFormat("dd MMMM yyyy, HH:mm:ss", Locale("id", "ID"))
     val calendar = Calendar.getInstance()
     val datePicker = DatePickerDialog(
@@ -105,7 +112,7 @@ fun PengeluaranEntryScreen(
                 { _, hourOfDay, minute ->
                     calendar.set(Calendar.HOUR_OF_DAY, hourOfDay)
                     calendar.set(Calendar.MINUTE, minute)
-                    calendar.set(Calendar.SECOND, 0) // Set detik ke 0
+                    calendar.set(Calendar.SECOND, 0)
                     tanggal = dateTimeFormatter.format(calendar.time)
                 },
                 calendar.get(Calendar.HOUR_OF_DAY),
@@ -118,17 +125,9 @@ fun PengeluaranEntryScreen(
         calendar.get(Calendar.DAY_OF_MONTH)
     )
 
-
-    // State untuk menampilkan dialog
-    var showDialog by remember { mutableStateOf(false) }
-    var showDialogBiaya by remember { mutableStateOf(false) }
-    var barangList by remember { mutableStateOf(listOf<Barang>()) }
-    var biayalist by remember { mutableStateOf(listOf<Tambahanbiaya>()) }
     if (id != null) {
         LaunchedEffect(Unit) {
             viewModel.getPengluaranUserById(id.toString())
-
-
         }
         LaunchedEffect(pengeluaranData) {
             if (pengeluaranData.size() > 0) {
@@ -155,11 +154,8 @@ fun PengeluaranEntryScreen(
                         jumlahbiaya = obj.get("jumlah").asDouble,
                     )
                 } ?: emptyList()
-
-
             }
         }
-
     }
 
     LaunchedEffect(barangList, biayalist) {
@@ -167,7 +163,6 @@ fun PengeluaranEntryScreen(
         val totalBiaya = biayalist.sumOf { it.jumlahbiaya.toInt() }
         total = totalBarang + totalBiaya
     }
-
 
     val barangArray = JsonArray()
     barangList.forEach { barang ->
@@ -196,10 +191,7 @@ fun PengeluaranEntryScreen(
         add("barang", barangArray)
         addProperty("kategori", kategori)
         add("tambahanBiaya", biayaArray)
-
     }
-
-
 
     if (isLoading) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -209,33 +201,53 @@ fun PengeluaranEntryScreen(
         Scaffold(
             topBar = {
                 Column {
-                    Text(
-                        text = "CATAT",
-                        style = MaterialTheme.typography.titleLarge,
+                    Row(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 16.dp),
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
-                    )
-
-                    TabRow(selectedTabIndex = 1,contentColor = Color(0xFF2D6CE9),indicator = { tabPositions ->
-                        TabRowDefaults.Indicator(
-                            modifier = Modifier.tabIndicatorOffset(tabPositions[1]),
-                            color = Color(0xFF2D6CE9) // 👈 your custom underline color
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        if (preview) {
+                            IconButton(onClick = { showCancelDialog = true }) {
+                                Icon(
+                                    imageVector = Icons.Default.ArrowBack,
+                                    contentDescription = "Back",
+                                    tint = MaterialTheme.colorScheme.onSurface
+                                )
+                            }
+                        } else {
+                            Spacer(modifier = Modifier.width(48.dp)) // Placeholder to align title
+                        }
+                        Text(
+                            text = "CATAT",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.weight(1f)
                         )
-                    }) {
+                        Spacer(modifier = Modifier.width(48.dp)) // Balance the layout
+                    }
+
+                    TabRow(
+                        selectedTabIndex = 1,
+                        contentColor = Color(0xFF2D6CE9),
+                        indicator = { tabPositions ->
+                            TabRowDefaults.Indicator(
+                                modifier = Modifier.tabIndicatorOffset(tabPositions[1]),
+                                color = Color(0xFF2D6CE9)
+                            )
+                        }
+                    ) {
                         Tab(
                             selected = false,
-                            onClick = {
-                                navController.navigate("tambah/pemasukan") // Sesuaikan dengan route-mu
-                            },
+                            onClick = { navController.navigate("tambah/pemasukan") },
                             text = { Text("INCOME", color = Color.Gray) }
                         )
                         Tab(
                             selected = true,
-                            onClick = { /* Stay here */ },
+                            onClick = {},
                             text = { Text("OUTCOME", fontWeight = FontWeight.Bold) }
                         )
                     }
@@ -244,8 +256,8 @@ fun PengeluaranEntryScreen(
             floatingActionButton = {
                 if (isUpdate) {
                     FloatingActionButton(
-                        onClick = { viewModel.deletePengeluaranById(id.toString(), navController) },
-                        containerColor = Color(0xFF2D6CE9)
+                        containerColor = Color(0xFF2D6CE9),
+                        onClick = { viewModel.deletePengeluaranById(id.toString(), navController) }
                     ) {
                         Icon(
                             imageVector = Icons.Default.Delete,
@@ -276,11 +288,7 @@ fun PengeluaranEntryScreen(
                     Button(
                         onClick = {
                             if (isUpdate) {
-                                viewModel.updatePengeluaranUserById(
-                                    id.toString(),
-                                    request,
-                                    navController
-                                )
+                                viewModel.updatePengeluaranUserById(id.toString(), request, navController)
                             } else {
                                 viewModel.addPengeluaran(request, navController)
                             }
@@ -305,7 +313,6 @@ fun PengeluaranEntryScreen(
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                // Form
                 item {
                     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                         OutlinedTextField(
@@ -319,7 +326,6 @@ fun PengeluaranEntryScreen(
                                 focusedBorderColor = Color.Blue
                             )
                         )
-
                         OutlinedTextField(
                             value = toko,
                             onValueChange = { toko = it },
@@ -331,23 +337,17 @@ fun PengeluaranEntryScreen(
                                 focusedBorderColor = Color.Blue
                             )
                         )
-
                         OutlinedTextField(
                             value = tanggal,
-                            onValueChange = { /* Read-only */ },
+                            onValueChange = {},
                             label = { Text("Date") },
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .pointerInput(Unit) {
-                                    detectTapGestures { datePicker.show() }
-                                },
+                                .pointerInput(Unit) { detectTapGestures { datePicker.show() } },
                             shape = RoundedCornerShape(12.dp),
                             trailingIcon = {
                                 IconButton(onClick = { datePicker.show() }) {
-                                    Icon(
-                                        Icons.Default.DateRange,
-                                        contentDescription = "Pilih Tanggal"
-                                    )
+                                    Icon(Icons.Default.DateRange, contentDescription = "Pilih Tanggal")
                                 }
                             },
                             colors = OutlinedTextFieldDefaults.colors(
@@ -361,7 +361,6 @@ fun PengeluaranEntryScreen(
                             readOnly = true,
                             enabled = false
                         )
-
                         DropdownMenu(
                             containerColor = night,
                             label = "Kategori",
@@ -371,8 +370,6 @@ fun PengeluaranEntryScreen(
                         )
                     }
                 }
-
-                // Header Barang
                 item {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -391,7 +388,7 @@ fun PengeluaranEntryScreen(
                             }
                         ) {
                             Icon(
-                                imageVector = Icons.Default.Create,
+                                imageVector = Icons.Default.Add,
                                 contentDescription = "Tambah Barang",
                                 tint = Color(0xFF2D6CE9)
                             )
@@ -402,8 +399,6 @@ fun PengeluaranEntryScreen(
                         Text("There are no items", color = Color.Gray)
                     }
                 }
-
-                // Daftar Barang
                 itemsIndexed(barangList) { index, barang ->
                     Row(
                         modifier = Modifier
@@ -417,7 +412,7 @@ fun PengeluaranEntryScreen(
                             Text(
                                 barang.nama,
                                 fontSize = 14.sp,
-                                color = MaterialTheme.colorScheme.onSurface
+                                color = Color.White
                             )
                             Text(
                                 "Quantity: ${barang.jumlah} | Price: ${formatRupiah(barang.harga.toInt())}",
@@ -428,16 +423,10 @@ fun PengeluaranEntryScreen(
                         IconButton(onClick = {
                             barangList = barangList.toMutableList().apply { removeAt(index) }
                         }) {
-                            Icon(
-                                Icons.Default.Delete,
-                                contentDescription = "Hapus",
-                                tint = Color.Red
-                            )
+                            Icon(Icons.Default.Delete, contentDescription = "Hapus", tint = Color.Red)
                         }
                     }
                 }
-
-                // Header Biaya
                 item {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -467,8 +456,6 @@ fun PengeluaranEntryScreen(
                         Text("There are no additional costs", color = Color.Gray)
                     }
                 }
-
-                // Daftar Biaya
                 itemsIndexed(biayalist) { index, biaya ->
                     Row(
                         modifier = Modifier
@@ -479,20 +466,12 @@ fun PengeluaranEntryScreen(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Column {
-                            Text(
-                                "${biaya.namabiaya} - ${formatRupiah(biaya.jumlahbiaya.toInt())}",
-                                fontSize = 14.sp,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
+                            Text("${biaya.namabiaya} - ${formatRupiah(biaya.jumlahbiaya.toInt())}", fontSize = 14.sp)
                         }
                         IconButton(onClick = {
                             biayalist = biayalist.toMutableList().apply { removeAt(index) }
                         }) {
-                            Icon(
-                                Icons.Default.Delete,
-                                contentDescription = "Hapus",
-                                tint = Color.Red
-                            )
+                            Icon(Icons.Default.Delete, contentDescription = "Hapus", tint = Color.Red)
                         }
                     }
                 }
@@ -500,7 +479,6 @@ fun PengeluaranEntryScreen(
         }
     }
 
-    // Panggil Dialog
     AddBarangDialog(
         showDialog = showDialog,
         onDismiss = { showDialog = false },
@@ -516,6 +494,29 @@ fun PengeluaranEntryScreen(
             biayalist = biayalist + Tambahanbiaya(namabiaya, jumlahbiaya.toDouble())
         }
     )
+
+    if (showCancelDialog && preview) {
+        AlertDialog(
+            onDismissRequest = { showCancelDialog = false },
+            title = { Text("Konfirmasi") },
+            text = { Text("Apakah Anda yakin ingin kembali?") },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        viewModel.deletePengeluaranById(id.toString(), navController)
+                        showCancelDialog = false
+                    }
+                ) {
+                    Text("Batal")
+                }
+            },
+            dismissButton = {
+                OutlinedButton(onClick = { showCancelDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
 }
 
 fun formatRupiah(amount: Int): String {

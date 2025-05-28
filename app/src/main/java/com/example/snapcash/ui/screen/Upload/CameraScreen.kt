@@ -1,6 +1,5 @@
 package com.example.snapcash.ui.screen.Upload
 
-
 import android.Manifest
 import android.content.Context
 import android.graphics.Bitmap
@@ -17,41 +16,69 @@ import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
-import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.content.ContextCompat
-import androidx.lifecycle.LifecycleOwner
-import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.rememberPermissionState
-import java.io.File
-import java.text.SimpleDateFormat
-import java.util.*
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavController
 import com.example.snapcash.ViewModel.GenerateFromInvoiceViewModel
+import com.example.snapcash.ViewModel.PemasukanViewModel
+import com.example.snapcash.ViewModel.PengeluaranViewModel
+import com.example.snapcash.data.Barang
+import com.example.snapcash.data.Tambahanbiaya
 import com.example.snapcash.ui.component.ModernAlertDialog
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 import com.google.common.util.concurrent.ListenableFuture
 import kotlinx.coroutines.launch
+import java.io.File
 import java.io.FileOutputStream
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun CameraScreen(navController: NavController,viewModel: GenerateFromInvoiceViewModel = hiltViewModel()) {
+fun CameraScreen(
+    navController: NavController,
+    viewModel: GenerateFromInvoiceViewModel = hiltViewModel(),
+    viewModel1: PemasukanViewModel = hiltViewModel(),
+    viewModel2: PengeluaranViewModel = hiltViewModel()
+) {
     val context = LocalContext.current
     val lifecycleOwner = context as LifecycleOwner
     val cameraProviderFuture = remember { ProcessCameraProvider.getInstance(context) }
@@ -64,10 +91,24 @@ fun CameraScreen(navController: NavController,viewModel: GenerateFromInvoiceView
 
     val showDialog = remember { mutableStateOf(false) }
     val dialogMessage = remember { mutableStateOf("") }
-
     val isLoading by viewModel.isLoading
-    Log.d("data",viewModel.data.value.get("namaPengeluaran")?.asString ?: ""
-    )
+//    val isSuccess by viewModel.isSucces
+
+
+    val isSuccess = remember { mutableStateOf(false) }
+
+
+    val pengeluaranData by remember { viewModel2.pengeluaranDataById }
+    val pemasukanData by remember { viewModel1.pemasukanDataById }
+
+    var barangList by remember { mutableStateOf(listOf<Barang>()) }
+    var biayalist by remember { mutableStateOf(listOf<Tambahanbiaya>()) }
+    var judul by remember { mutableStateOf("") }
+    var toko by remember { mutableStateOf("") }
+    var tanggal by remember { mutableStateOf("") }
+    var total by remember { mutableStateOf(0) }
+    var kategori by remember { mutableStateOf("")}
+    var sumber by remember { mutableStateOf("") }
 
     val pickImageLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -76,7 +117,8 @@ fun CameraScreen(navController: NavController,viewModel: GenerateFromInvoiceView
             val file = uriToFile(context, it)
             if (file != null) {
                 scope.launch {
-                    viewModel.addPengeluaranOrPemasukanByGPT(file,onResult = { success, message ->
+                    viewModel.addPengeluaranOrPemasukanByGPT(file, onResult = { success, message ->
+                        isSuccess.value = success
                         dialogMessage.value = message  // Update the popup message
                         showDialog.value = true  // Show the popup
                     })
@@ -90,6 +132,7 @@ fun CameraScreen(navController: NavController,viewModel: GenerateFromInvoiceView
     LaunchedEffect(fileToSend) {
         fileToSend?.let { file ->
             viewModel.addPengeluaranOrPemasukanByGPT(file,onResult = { success, message ->
+                isSuccess.value = success
                 dialogMessage.value = message  // Update the popup message
                 showDialog.value = true  // Show the popup
             })
@@ -140,15 +183,102 @@ fun CameraScreen(navController: NavController,viewModel: GenerateFromInvoiceView
                 ) {
                     Text(text = "Upload Invoice",color = Color.White)
                 }
+                if(!isSuccess.value){
+                    ModernAlertDialog(showDialog, "Fail To Extract Data",
+                        dialogMessage.toString(), "camera", navController  )
+                }else {
+                    if (showDialog.value) {
+                        val id = viewModel.data.value.get("id")?.asString ?: ""
+                        val isPengeluaran =
+                            viewModel.data.value.get("isPengeluaran")?.asBoolean ?: true
 
-                if (showDialog.value) {
-                    ModernAlertDialog(
-                        showDialog,
-                        "Invoice Capture",
-                        dialogMessage.value,
-                        "history",
-                        navController
-                    )
+                        if (isPengeluaran) {
+                            if (id != null) {
+                                LaunchedEffect(Unit) {
+                                    viewModel2.getPengluaranUserById(id.toString())
+                                }
+                                LaunchedEffect(pengeluaranData) {
+                                    if (pengeluaranData.size() > 0) {
+                                        judul =
+                                            pengeluaranData.get("namaPengeluaran")?.asString ?: ""
+                                        toko = pengeluaranData.get("toko")?.asString ?: ""
+                                        tanggal = pengeluaranData.get("tanggal")?.asString ?: ""
+                                        kategori = pengeluaranData.get("kategori")?.asString ?: ""
+                                        total = pengeluaranData.get("total").asInt
+                                        val barangJsonArray =
+                                            pengeluaranData.get("barang")?.asJsonArray
+                                        barangList = barangJsonArray?.map { item ->
+                                            val obj = item.asJsonObject
+                                            Barang(
+                                                nama = obj.get("namaBarang").asString,
+                                                jumlah = obj.get("jumlah").asInt,
+                                                harga = obj.get("harga").asDouble
+                                            )
+                                        } ?: emptyList()
+
+                                        val biayaJsonArray =
+                                            pengeluaranData.get("tambahanBiaya")?.asJsonArray
+                                        biayalist = biayaJsonArray?.map { item ->
+                                            val obj = item.asJsonObject
+                                            Tambahanbiaya(
+                                                namabiaya = obj.get("namaBiaya").asString,
+                                                jumlahbiaya = obj.get("jumlah").asDouble,
+                                            )
+                                        } ?: emptyList()
+                                    }
+                                }
+                            }
+
+                            PengeluaranDialog(
+                                navController = navController,
+                                id = id.toString(),
+                                judul = judul,
+                                toko = toko,
+                                tanggal = tanggal,
+                                kategori = kategori,
+                                total = total,
+                                barangList = barangList,
+                                biayalist = biayalist
+                            )
+
+                        } else {
+                            if (id != null) {
+                                LaunchedEffect(Unit) {
+                                    viewModel1.getPemasukanUserById(id.toString())
+                                }
+
+                                LaunchedEffect(pemasukanData) {
+                                    if (pemasukanData.size() > 0) {
+                                        judul = pemasukanData.get("namaPemasukan")?.asString ?: ""
+                                        kategori = pemasukanData.get("kategori")?.asString ?: ""
+                                        sumber = pemasukanData.get("sumber")?.asString ?: ""
+                                        tanggal = pemasukanData.get("tanggal")?.asString ?: ""
+                                        total = pemasukanData.get("total")?.asInt ?: 0
+
+                                        val biayaJsonArray = pemasukanData.get("tambahanBiaya")?.asJsonArray
+                                        biayalist = biayaJsonArray?.map {
+                                            val obj = it.asJsonObject
+                                            Tambahanbiaya(
+                                                namabiaya = obj.get("namaBiaya").asString,
+                                                jumlahbiaya = obj.get("jumlah").asDouble,
+                                            )
+                                        } ?: emptyList()
+                                    }
+                                }
+                            }
+
+                            PemasukanDialog(
+                                navController = navController,
+                                id = id,
+                                judul = judul,
+                                toko = toko,
+                                tanggal = tanggal,
+                                kategori = kategori,
+                                total = total,
+                                biayalist = biayalist
+                            )
+                        }
+                    }
                 }
             }
 
@@ -168,6 +298,117 @@ fun CameraScreen(navController: NavController,viewModel: GenerateFromInvoiceView
         LaunchedEffect(Unit) { cameraPermissionState.launchPermissionRequest() }
     }
 }
+
+@Composable
+fun PengeluaranDialog(
+    navController: NavController,
+    id: String,
+    judul: String,
+    toko: String,
+    tanggal: String,
+    kategori: String,
+    total: Int,
+    barangList: List<Barang>,
+    biayalist: List<Tambahanbiaya>
+) {
+    AlertDialog(
+        onDismissRequest = { },
+        title = { Text("Pengeluaran Invoice", style = MaterialTheme.typography.titleMedium) },
+        text = {
+            Column(
+                modifier = Modifier.verticalScroll(rememberScrollState())
+            ) {
+
+                Text("Judul: $judul")
+                Spacer(Modifier.height(4.dp))
+                Text("Toko: $toko")
+                Spacer(Modifier.height(4.dp))
+                Text("Tanggal: $tanggal")
+                Spacer(Modifier.height(4.dp))
+                Text("Kategori: $kategori")
+                Spacer(Modifier.height(4.dp))
+                Text("Total: Rp $total", fontWeight = FontWeight.Bold)
+                Spacer(Modifier.height(8.dp))
+
+                if (barangList.isNotEmpty()) {
+                    Text("Barang:", style = MaterialTheme.typography.titleSmall)
+                    barangList.forEach { barang ->
+                        Text("- ${barang.nama}: ${barang.jumlah} x Rp ${barang.harga}")
+                    }
+                    Spacer(Modifier.height(8.dp))
+                }
+
+                if (biayalist.isNotEmpty()) {
+                    Text("Biaya Tambahan:", style = MaterialTheme.typography.titleSmall)
+                    biayalist.forEach { biaya ->
+                        Text("- ${biaya.namabiaya}: Rp ${biaya.jumlahbiaya}")
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            Button(onClick = { navController.navigate("preview/pengeluaran/$id") }) {
+                Text("Edit")
+            }
+        },
+        dismissButton = {
+            OutlinedButton(onClick = { navController.navigate("history") }) {
+                Text("Lanjut")
+            }
+        }
+    )
+}
+
+@Composable
+fun PemasukanDialog(
+    navController: NavController,
+    id: String,
+    judul: String,
+    toko: String,
+    tanggal: String,
+    kategori: String,
+    total: Int,
+    biayalist: List<Tambahanbiaya>
+) {
+    AlertDialog(
+        onDismissRequest = { },
+        title = { Text("Pemasukan Invoice", style = MaterialTheme.typography.titleMedium) },
+        text = {
+            Column(
+                modifier = Modifier.verticalScroll(rememberScrollState())
+            ) {
+                Text("Judul: $judul")
+                Spacer(Modifier.height(4.dp))
+                Text("Toko: $toko")
+                Spacer(Modifier.height(4.dp))
+                Text("Tanggal: $tanggal")
+                Spacer(Modifier.height(4.dp))
+                Text("Kategori: $kategori")
+                Spacer(Modifier.height(4.dp))
+                Text("Total: Rp $total", fontWeight = FontWeight.Bold)
+                Spacer(Modifier.height(8.dp))
+
+                if (biayalist.isNotEmpty()) {
+                    Text("Biaya Tambahan:", style = MaterialTheme.typography.titleSmall)
+                    biayalist.forEach { biaya ->
+                        Text("- ${biaya.namabiaya}: Rp ${biaya.jumlahbiaya}")
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            Button(onClick = { navController.navigate("preview/pemasukan/$id") }) {
+                Text("Edit")
+            }
+        },
+        dismissButton = {
+            OutlinedButton(onClick = { navController.navigate("history") }) {
+                Text("Lanjut")
+            }
+        }
+    )
+}
+
 
 private fun startCamera(
     context: Context,

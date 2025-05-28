@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
+import com.example.snapcash.data.FilterModel
 import com.example.snapcash.data.SessionManager
 import com.example.snapcash.data.SnapCashApiService
 import com.google.gson.JsonObject
@@ -25,11 +26,18 @@ class PengeluaranViewModel @Inject constructor(private val apiService: SnapCashA
 
     val isLoading = mutableStateOf(false)
 
-    fun getPengeluaranUser() {
+    fun getPengeluaranUser(filterData: FilterModel, searchQuery: String) {
         viewModelScope.launch {
             try {
                 isLoading.value = true
-                val response = apiService.getPengeluaranUser("Bearer ${SessionManager.idToken}")
+                Log.d("date", filterData.startDate)
+                val response = apiService.getPengeluaranUser("Bearer ${SessionManager.idToken}",filterData.kategori,
+                    filterData.startDate,
+                    filterData.endDate,
+                    filterData.min,
+                    filterData.max,
+                    searchQuery
+                )
                 if (response.isSucces) {
                     setPengeluaranData(response.data)
                 }
