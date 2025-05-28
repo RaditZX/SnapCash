@@ -1,5 +1,6 @@
 package com.example.snapcash.ui.screen
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
@@ -25,7 +26,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -52,6 +52,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.core.graphics.ColorUtils
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.snapcash.ViewModel.AuthViewModel
@@ -60,6 +61,7 @@ import com.example.snapcash.ui.component.LineChartDashboard
 import com.example.snapcash.ui.component.ProgressCircleChart
 import com.example.snapcash.ui.component.formatCurrency
 import java.util.Calendar
+import kotlin.random.Random
 
 @Composable
 fun DashboardScreen(
@@ -72,29 +74,41 @@ fun DashboardScreen(
     val tahun = Calendar.getInstance().get(Calendar.YEAR)
     val dashboardData by viewModel.dashboardData
     val isLoading by viewModel.isLoading
-    var filter by remember {mutableStateOf(false)}
+    var isIncomeMode by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        viewModel.getDashboardAnalytics(tahun = tahun, jenis = "Pengeluaran")
+        if (isIncomeMode){
+            viewModel.getDashboardAnalytics(tahun = tahun, jenis = "Pemasukan")
+        }else{
+            viewModel.getDashboardAnalytics(tahun = tahun, jenis = "Pengeluaran")
+        }
+
         viewModel1.getUserData()
     }
 
-    var isIncomeMode by remember { mutableStateOf(false) }
+
     var showFilterDialog by remember { mutableStateOf(false) }
     var tempFilter by remember { mutableStateOf("Year") }
     var tempValue by remember { mutableStateOf(tahun.toString()) }
 
     val chartItems = dashboardData?.TotalByKategori?.map { (key, value) ->
-        ChartItem(key, value.toFloat(), if (isIncomeMode) Color(0xFF00FF00) else Color(0xFFFF1E00))
+        ChartItem(key, value.toFloat(), color = generateBrightRandomColor())
     } ?: emptyList()
 
     val scrollState = rememberScrollState()
     val horizontalScrollState = rememberScrollState()
 
-    var selectedFilter by remember { mutableStateOf("Year") }
+    var selectedFilter by remember { mutableStateOf("tahun") }
     var selectedValue by remember { mutableStateOf(tahun.toString()) }
-    var filterExpanded by remember { mutableStateOf(false) }
-    var valueExpanded by remember { mutableStateOf(false) }
+    var selectedFilterTranslate by remember { mutableStateOf("Year") }
+
+    if (selectedFilter === "bulan"){
+        selectedFilterTranslate = "MONTH"
+    }
+    if (selectedFilter === "hari"){
+        selectedFilterTranslate = "DAY"
+    }
+
 
 
     val months = listOf(
@@ -104,7 +118,6 @@ fun DashboardScreen(
     val years = (tahun - 4..tahun).toList().reversed()
     val days = getDays(selectedFilter, selectedValue, tahun, months)
 
-    val valueItems = getValueByFilter(selectedFilter, years, months, days)
 
     Column(
         modifier = Modifier
@@ -113,13 +126,6 @@ fun DashboardScreen(
             .padding(16.dp)
             .verticalScroll(scrollState)
     ) {
-        IconButton(
-            onClick = openSidebar,
-            modifier = Modifier.padding(bottom = 16.dp)
-        ) {
-            Icon(imageVector = Icons.Default.Menu, contentDescription = "Sidebar Menu", tint = Color.White)
-        }
-
         Text(
             text = "Welcome Back ${userData.username.toString()}",
             color = Color.White,
@@ -161,6 +167,7 @@ fun DashboardScreen(
                     onClick = {
                         isIncomeMode = true
                         Updatebyfilter(viewModel, isIncomeMode, selectedFilter, selectedValue, months, tahun)
+                        Log.d("income", isIncomeMode.toString())
                         incomeExpanded = false
                     }
                 )
@@ -411,15 +418,17 @@ fun DashboardScreen(
                 Text(
                     text = if (isIncomeMode) "MONEY EARNED" else "MONEY SPENT",
                     color = Color.White,
-                    fontSize = 20.sp
+                    fontSize = 20.sp,
+                    modifier = Modifier.padding(vertical = 4.dp)
                 )
                 Text(
                     text = formatCurrency(dashboardData?.total ?: 0),
                     color = Color.White,
                     fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(vertical = 4.dp)
                 )
-                Text("COMPARISON TO LAST YEAR", color = Color.White, fontSize = 14.sp)
+                Text("COMPARISON TO LAST ${selectedFilterTranslate}", color = Color.White, fontSize = 14.sp, modifier = Modifier.padding(top = 4.dp, bottom = 2.dp))
                 Text(formatCurrency(dashboardData?.totalTahunSebelumnya ?: 0), color = Color.White, fontSize = 28.sp, fontWeight = FontWeight.Bold)
             }
             Text(
@@ -458,7 +467,7 @@ fun DashboardScreen(
 
         // Line Chart + Table
         Text(
-            text = if (isIncomeMode) "Money Earned (Day)" else "Money Spent (Day)",
+            text = if (isIncomeMode) "Money Earned (${selectedFilterTranslate})" else "Money Spent (${selectedFilterTranslate})",
             color = Color.White,
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
@@ -492,10 +501,6 @@ fun DashboardScreen(
         }
     }
 }
-
-// ======================
-// Utility & Helper Functions
-// ======================
 
 @Composable
 fun tableChartData(year: String, amount: Int) {
@@ -588,3 +593,13 @@ data class ChartItem(
     val value: Float,
     val color: Color
 )
+
+fun generateBrightRandomColor(): Color {
+    val hue = Random.nextFloat() * 360f       // Hue 0 - 360
+    val saturation = 0.9f                     // High saturation
+    val lightness = 0.6f                      // Light color (bright enough)
+
+    val colorInt = ColorUtils.HSLToColor(floatArrayOf(hue, saturation, lightness))
+    return Color(colorInt)
+}
+
