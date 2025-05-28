@@ -27,6 +27,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.core.graphics.ColorUtils
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.snapcash.ViewModel.AuthViewModel
@@ -35,6 +36,7 @@ import com.example.snapcash.ui.component.LineChartDashboard
 import com.example.snapcash.ui.component.ProgressCircleChart
 import com.example.snapcash.ui.component.formatCurrency
 import java.util.Calendar
+import kotlin.random.Random
 
 @Composable
 fun DashboardScreen(
@@ -59,7 +61,7 @@ fun DashboardScreen(
     var tempValue by remember { mutableStateOf(tahun.toString()) }
 
     val chartItems = dashboardData?.TotalByKategori?.map { (key, value) ->
-        ChartItem(key, value.toFloat(), if (isIncomeMode) Color(0xFF00FF00) else Color(0xFFFF1E00))
+        ChartItem(key, value.toFloat(), color = generateBrightRandomColor())
     } ?: emptyList()
 
     val scrollState = rememberScrollState()
@@ -383,15 +385,17 @@ fun DashboardScreen(
                 Text(
                     text = if (isIncomeMode) "MONEY EARNED" else "MONEY SPENT",
                     color = Color.White,
-                    fontSize = 20.sp
+                    fontSize = 20.sp,
+                    modifier = Modifier.padding(vertical = 4.dp)
                 )
                 Text(
                     text = formatCurrency(dashboardData?.total ?: 0),
                     color = Color.White,
                     fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(vertical = 4.dp)
                 )
-                Text("COMPARISON TO LAST YEAR", color = Color.White, fontSize = 14.sp)
+                Text("COMPARISON TO LAST YEAR", color = Color.White, fontSize = 14.sp, modifier = Modifier.padding(top = 4.dp, bottom = 2.dp))
                 Text(formatCurrency(dashboardData?.totalTahunSebelumnya ?: 0), color = Color.White, fontSize = 28.sp, fontWeight = FontWeight.Bold)
             }
             Text(
@@ -557,3 +561,12 @@ data class ChartItem(
     val value: Float,
     val color: Color
 )
+
+fun generateBrightRandomColor(): Color {
+    val hue = Random.nextFloat() * 360f       // Hue 0 - 360
+    val saturation = 0.9f                     // High saturation
+    val lightness = 0.6f                      // Light color (bright enough)
+
+    val colorInt = ColorUtils.HSLToColor(floatArrayOf(hue, saturation, lightness))
+    return Color(colorInt)
+}
