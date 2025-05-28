@@ -7,17 +7,27 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -25,6 +35,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -40,6 +51,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.snapcash.ViewModel.AuthViewModel
@@ -67,9 +79,10 @@ fun DashboardScreen(
         viewModel1.getUserData()
     }
 
-
-
     var isIncomeMode by remember { mutableStateOf(false) }
+    var showFilterDialog by remember { mutableStateOf(false) }
+    var tempFilter by remember { mutableStateOf("Year") }
+    var tempValue by remember { mutableStateOf(tahun.toString()) }
 
     val chartItems = dashboardData?.TotalByKategori?.map { (key, value) ->
         ChartItem(key, value.toFloat(), if (isIncomeMode) Color(0xFF00FF00) else Color(0xFFFF1E00))
@@ -83,6 +96,7 @@ fun DashboardScreen(
     var filterExpanded by remember { mutableStateOf(false) }
     var valueExpanded by remember { mutableStateOf(false) }
 
+
     val months = listOf(
         "January", "February", "March", "April", "May", "June",
         "July", "August", "September", "October", "November", "December"
@@ -91,11 +105,6 @@ fun DashboardScreen(
     val days = getDays(selectedFilter, selectedValue, tahun, months)
 
     val valueItems = getValueByFilter(selectedFilter, years, months, days)
-
-//    LaunchedEffect(filter) {
-//        Updatebyfilter(viewModel, isIncomeMode, selectedFilter, selectedValue, months, tahun)
-//        filter = true;
-//    }
 
     Column(
         modifier = Modifier
@@ -122,13 +131,11 @@ fun DashboardScreen(
             textAlign = TextAlign.Center
         )
 
-        // Dropdown for Income/Outcome
         var incomeExpanded by remember { mutableStateOf(false) }
         Box {
             Row(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp),
+                    .fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
@@ -168,101 +175,228 @@ fun DashboardScreen(
             }
         }
 
-        // Filter + Value Dropdowns
-        Row(
+//
+        Button(
+            onClick = { showFilterDialog = true },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFF2A2A2A),
+                contentColor = Color.White
+            ),
+            shape = RoundedCornerShape(8.dp)
         ) {
-            // Filter Type
-            Box(modifier = Modifier.weight(1f)) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .border(1.dp, Color.White, RoundedCornerShape(8.dp))
-                        .padding(12.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = selectedFilter,
-                        color = Color.White,
-                        fontSize = 16.sp,
-                        modifier = Modifier.weight(1f)
-                    )
-                    IconButton(onClick = { filterExpanded = true }) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowDropDown,
-                            contentDescription = "Filter Dropdown",
-                            tint = Color.White
-                        )
-                    }
-                }
-                DropdownMenu(
-                    expanded = filterExpanded,
-                    onDismissRequest = { filterExpanded = false }
-                ) {
-                    listOf("tahun", "bulan", "hari").forEach { filter ->
-                        DropdownMenuItem(
-                            text = { Text(filter) },
-                            onClick = {
-                                selectedFilter = filter
-                                selectedValue = when (filter) {
-                                    "tahun" -> tahun.toString()
-                                    "bulan" -> "January"
-                                    "hari" -> "1"
-                                    else -> tahun.toString()
-                                }
-                                Updatebyfilter(viewModel, isIncomeMode, selectedFilter, selectedValue, months, tahun)
-                                filterExpanded = false
-                            }
-                        )
-                    }
-                }
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = "Filter: $selectedFilter - $selectedValue",
+                    fontSize = 16.sp
+                )
+                Icon(
+                    imageVector = Icons.Default.ArrowDropDown,
+                    contentDescription = "Filter Button"
+                )
             }
+        }
 
-            // Value Type
-            Box(modifier = Modifier.weight(1f)) {
-                Row(
+        // Improved Filter Dialog
+        if (showFilterDialog) {
+            Dialog(
+                onDismissRequest = { showFilterDialog = false }
+            ) {
+                Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .border(1.dp, Color.White, RoundedCornerShape(8.dp))
-                        .padding(12.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                        .wrapContentHeight(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A))
                 ) {
-                    Text(
-                        text = selectedValue,
-                        color = Color.White,
-                        fontSize = 16.sp,
-                        modifier = Modifier.weight(1f)
-                    )
-                    IconButton(onClick = { valueExpanded = true }) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowDropDown,
-                            contentDescription = "Value Dropdown",
-                            tint = Color.White
+                    Column(
+                        modifier = Modifier.padding(24.dp),
+                        verticalArrangement = Arrangement.spacedBy(20.dp)
+                    ) {
+                        Text(
+                            text = "Select Filter",
+                            color = Color.White,
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold
                         )
-                    }
-                }
-                DropdownMenu(
-                    expanded = valueExpanded,
-                    onDismissRequest = { valueExpanded = false }
-                ) {
-                    valueItems.forEach { value ->
-                        DropdownMenuItem(
-                            text = { Text(value) },
-                            onClick = {
-                                selectedValue = value
-                                Updatebyfilter(viewModel, isIncomeMode, selectedFilter, selectedValue, months, tahun)
-                                valueExpanded = false
+
+                        // Filter Type Selection
+                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Text(
+                                text = "Filter Type",
+                                color = Color.White,
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Medium
+                            )
+
+                            var filterExpanded by remember { mutableStateOf(false) }
+                            Box {
+                                OutlinedButton(
+                                    onClick = { filterExpanded = true },
+                                    modifier = Modifier.fillMaxWidth(),
+                                    colors = ButtonDefaults.outlinedButtonColors(
+                                        contentColor = Color.White
+                                    ),
+                                    border = androidx.compose.foundation.BorderStroke(1.dp, Color.White)
+                                ) {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(tempFilter)
+                                        Icon(
+                                            imageVector = Icons.Default.ArrowDropDown,
+                                            contentDescription = "Filter Dropdown"
+                                        )
+                                    }
+                                }
+
+                                DropdownMenu(
+                                    expanded = filterExpanded,
+                                    onDismissRequest = { filterExpanded = false },
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    listOf("tahun", "bulan", "hari").forEach { filter ->
+                                        DropdownMenuItem(
+                                            text = { Text(filter) },
+                                            onClick = {
+                                                tempFilter = filter
+                                                tempValue = when (filter) {
+                                                    "tahun" -> tahun.toString()
+                                                    "bulan" -> "January"
+                                                    "hari" -> "1"
+                                                    else -> tahun.toString()
+                                                }
+                                                filterExpanded = false
+                                            }
+                                        )
+                                    }
+                                }
                             }
-                        )
+                        }
+
+                        // Value Selection with improved display
+                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Text(
+                                text = "Select Value",
+                                color = Color.White,
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Medium
+                            )
+
+                            val tempValueItems = getValueByFilter(tempFilter, years, months, getDays(tempFilter, tempValue, tahun, months))
+
+                            if (tempFilter == "Day") {
+                                // Grid layout for days (1-31)
+                                LazyVerticalGrid(
+                                    columns = GridCells.Fixed(7),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .heightIn(max = 200.dp)
+                                        .border(1.dp, Color.White, RoundedCornerShape(8.dp))
+                                        .padding(8.dp),
+                                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                                ) {
+                                    items(tempValueItems) { day ->
+                                        val isSelected = day == tempValue
+                                        Card(
+                                            modifier = Modifier
+                                                .aspectRatio(1f)
+                                                .padding(2.dp),
+                                            colors = CardDefaults.cardColors(
+                                                containerColor = if (isSelected) Color(0xFF6200EE) else Color(0xFF2A2A2A)
+                                            ),
+                                            onClick = { tempValue = day }
+                                        ) {
+                                            Box(
+                                                modifier = Modifier.fillMaxSize(),
+                                                contentAlignment = Alignment.Center
+                                            ) {
+                                                Text(
+                                                    text = day,
+                                                    color = Color.White,
+                                                    fontSize = 12.sp,
+                                                    textAlign = TextAlign.Center
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            } else {
+                                // List layout for months and years
+                                LazyColumn(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .heightIn(max = 200.dp)
+                                        .border(1.dp, Color.White, RoundedCornerShape(8.dp))
+                                        .padding(8.dp),
+                                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                                ) {
+                                    items(tempValueItems) { value ->
+                                        val isSelected = value == tempValue
+                                        Card(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            colors = CardDefaults.cardColors(
+                                                containerColor = if (isSelected) Color(0xFF6200EE) else Color(0xFF2A2A2A)
+                                            ),
+                                            onClick = { tempValue = value }
+                                        ) {
+                                            Text(
+                                                text = value,
+                                                color = Color.White,
+                                                fontSize = 16.sp,
+                                                modifier = Modifier.padding(16.dp)
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        // Action buttons
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            OutlinedButton(
+                                onClick = { showFilterDialog = false },
+                                modifier = Modifier.weight(1f),
+                                colors = ButtonDefaults.outlinedButtonColors(
+                                    contentColor = Color.White
+                                ),
+                                border = androidx.compose.foundation.BorderStroke(1.dp, Color.White)
+                            ) {
+                                Text("Cancel")
+                            }
+
+                            Button(
+                                onClick = {
+                                    selectedFilter = tempFilter
+                                    selectedValue = tempValue
+                                    Updatebyfilter(viewModel, isIncomeMode, selectedFilter, selectedValue, months, tahun)
+                                    showFilterDialog = false
+                                },
+                                modifier = Modifier.weight(1f),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color(0xFF6200EE),
+                                    contentColor = Color.White
+                                )
+                            ) {
+                                Text("Apply")
+                            }
+                        }
                     }
                 }
             }
         }
-
-        // Summary Data
         Row(
             horizontalArrangement = Arrangement.spacedBy(20.dp),
             modifier = Modifier
@@ -438,6 +572,7 @@ fun Updatebyfilter(
     val tahun = if (filter == "tahun") selectedValue.toIntOrNull() ?: defaultYear else defaultYear
     val bulan = if (filter == "bulan") months.indexOf(selectedValue) + 1 else 1
     val hari = if (filter == "hari") selectedValue.toIntOrNull() ?: 1 else 1
+
 
     viewModel.getDashboardAnalytics(
         jenis = jenis,
