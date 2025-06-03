@@ -224,9 +224,9 @@ fun AppNavHost(
                     composable("help") {
                         HelpScreen(navController = navController)
                     }
-                }
-                composable("kategori"){
-                    ListKategoriScreen(navController = navController)
+                    composable("kategori"){
+                        ListKategoriScreen(navController = navController)
+                    }
                 }
             }
         }

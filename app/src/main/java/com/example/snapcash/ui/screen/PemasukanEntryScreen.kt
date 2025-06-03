@@ -67,15 +67,16 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.AlertDialog
+import com.example.snapcash.ViewModel.CategoryViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PemasukanEntryScreen(
     navController: NavController,
     viewModel: PemasukanViewModel = hiltViewModel(),
+    categoryViewModel: CategoryViewModel = hiltViewModel(),
     id: String?,
     preview: Boolean
-) {
+)  {
     val context = LocalContext.current
     var showCancelDialog by remember { mutableStateOf(false) }
 
@@ -88,9 +89,17 @@ fun PemasukanEntryScreen(
     var biayalist by remember { mutableStateOf(listOf<Tambahanbiaya>()) }
     val pemasukanData by remember { viewModel.pemasukanDataById }
     val kategoriList = listOf("Gaji", "Investasi", "Bisnis", "Hadiah")
+    val categories by categoryViewModel.categories
+    val allCategories = remember(categories) {
+        (kategoriList + categories.filter { !it.isPengeluaran }.map { it.nama }).distinct()
+    }
     var showDialogBiaya by remember { mutableStateOf(false) }
     var isUpdate by remember { mutableStateOf(false) }
     var totalIsUpdate by remember { mutableStateOf(0.0) }
+
+    LaunchedEffect(Unit) {
+        categoryViewModel.getAllCategories()
+    }
 
     if (id != null) {
         LaunchedEffect(Unit) {
@@ -323,7 +332,7 @@ fun PemasukanEntryScreen(
                 DropdownMenu(
                     containerColor = night,
                     label = "Kategori",
-                    options = kategoriList,
+                    options = allCategories,
                     selectedOption = kategori,
                     onOptionSelected = { kategori = it }
                 )

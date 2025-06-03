@@ -145,4 +145,35 @@ interface SnapCashApiService {
     @POST("signout")
     suspend fun signOut(): DefaultResponse
 
+    @GET("kategoriUser")
+    suspend fun getAllCategories(
+        @Header("Authorization") token: String,
+        @Query("search") search: String? = null,
+        @Query("isPengeluaran") isPengeluaran: Boolean? = null
+    ): DefaultResponse
+
+    @GET("kategoriUser/{id}")
+    suspend fun getCategoryById(
+        @Header("Authorization") token: String,
+        @Path("id") id: String
+    ): generateTextFromInvoiceResponse
+
+    @POST("kategoriUser/add")
+    suspend fun addCategory(
+        @Header("Authorization") token: String,
+        @Body data: JsonObject
+    ): generateTextFromInvoiceResponse
+
+    @PUT("kategoriUser/update/{id}")
+    suspend fun updateCategory(
+        @Header("Authorization") token: String,
+        @Path("id") id: String,
+        @Body data: JsonObject
+    ): generateTextFromInvoiceResponse
+
+    @DELETE("kategoriUser/delete/{id}")
+    suspend fun deleteCategory(
+        @Header("Authorization") token: String,
+        @Path("id") id: String
+    ): generateTextFromInvoiceResponse
 }
