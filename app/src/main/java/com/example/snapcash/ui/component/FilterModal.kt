@@ -135,6 +135,8 @@ fun FilterBottomSheet(
                 DatePickerDialogExample(onDatePicked = { selectedDate ->
                     startDate = selectedDate
                     showStartDatePicker = false
+                },onDismiss = {
+                    showStartDatePicker = false // reset saat dibatalkan
                 })
             }
 
@@ -142,6 +144,8 @@ fun FilterBottomSheet(
                 DatePickerDialogExample(onDatePicked = { selectedDate ->
                     endDate = selectedDate
                     showEndDatePicker = false
+                },onDismiss = {
+                    showEndDatePicker = false // reset saat dibatalkan
                 })
             }
 
@@ -262,7 +266,10 @@ fun FilterBottomSheet(
 
 
 @Composable
-fun DatePickerDialogExample(onDatePicked: (String) -> Unit) {
+fun DatePickerDialogExample(
+    onDatePicked: (String) -> Unit,
+    onDismiss: () -> Unit = {} // optional callback saat dialog dibatalkan
+) {
     val context = LocalContext.current
     val calendar = Calendar.getInstance()
     val dateTimeFormatter = SimpleDateFormat("dd MMMM yyyy, HH:mm:ss", Locale("id", "ID"))
@@ -289,7 +296,10 @@ fun DatePickerDialogExample(onDatePicked: (String) -> Unit) {
             calendar.get(Calendar.YEAR),
             calendar.get(Calendar.MONTH),
             calendar.get(Calendar.DAY_OF_MONTH)
-        )
+        ).apply {
+            setOnCancelListener { onDismiss() }
+            setOnDismissListener { onDismiss() }
+        }
     }
 
     LaunchedEffect(datePickerDialog) {

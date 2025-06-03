@@ -11,7 +11,15 @@ import androidx.compose.ui.unit.dp
 import co.yml.charts.axis.AxisData
 import co.yml.charts.common.model.Point
 import co.yml.charts.ui.linechart.LineChart
-import co.yml.charts.ui.linechart.model.*
+import co.yml.charts.ui.linechart.model.IntersectionPoint
+import co.yml.charts.ui.linechart.model.Line
+import co.yml.charts.ui.linechart.model.LineChartData
+import co.yml.charts.ui.linechart.model.LinePlotData
+import co.yml.charts.ui.linechart.model.LineStyle
+import co.yml.charts.ui.linechart.model.LineType
+import co.yml.charts.ui.linechart.model.SelectionHighlightPoint
+import co.yml.charts.ui.linechart.model.SelectionHighlightPopUp
+import co.yml.charts.ui.linechart.model.ShadowUnderLine
 
 @Composable
 fun LineChartDashboard(totalByRange: Map<String, Int>) {
@@ -40,7 +48,8 @@ fun LineChartDashboard(totalByRange: Map<String, Int>) {
         .backgroundColor(Color.Transparent)
         .labelData { i ->
             val step = (maxY / yAxisSteps).toInt()
-            "Rp ${i * step}"
+            val value = i * step
+            formatCurrency(value)
         }
         .labelAndAxisLinePadding(20.dp)
         .axisLineColor(MaterialTheme.colorScheme.tertiary)
