@@ -1,19 +1,25 @@
 package com.example.snapcash.ViewModel
 
 
+import android.app.Application
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresExtension
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.snapcash.R
 import com.example.snapcash.data.SessionManager
 import com.example.snapcash.data.SignInRequest
 import com.example.snapcash.data.SnapCashApiService
 import com.example.snapcash.data.userData
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.JsonObject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -26,7 +32,7 @@ import java.io.IOException
 import javax.inject.Inject
 
 @HiltViewModel
-class AuthViewModel @Inject constructor(private val apiService: SnapCashApiService) : ViewModel() {
+class AuthViewModel @Inject constructor(private val apiService: SnapCashApiService, application: Application) : AndroidViewModel(application){
 
     var isLoading = mutableStateOf(false)
 
@@ -99,7 +105,7 @@ class AuthViewModel @Inject constructor(private val apiService: SnapCashApiServi
                     val currencyResponse = apiService.getCurrencyData("Bearer ${SessionManager.idToken}",SessionManager.currencyChoice.toString() )
                     SessionManager.locale = currencyResponse.data.locale
                     SessionManager.currencySymbol = currencyResponse.data.currency_symbol
-
+                    SessionManager.loginMethodGoogle = false
                 }
 
                 onResult(true, response.message)
@@ -170,6 +176,7 @@ class AuthViewModel @Inject constructor(private val apiService: SnapCashApiServi
                     val currencyResponse = apiService.getCurrencyData("Bearer ${SessionManager.idToken}",SessionManager.currencyChoice.toString() )
                     SessionManager.locale = currencyResponse.data.locale
                     SessionManager.currencySymbol = currencyResponse.data.currency_symbol
+                    SessionManager.loginMethodGoogle = true
                 }
                 onResult(true, response.message)
             } catch (e: HttpException) {
@@ -268,18 +275,61 @@ class AuthViewModel @Inject constructor(private val apiService: SnapCashApiServi
         }
     }
 
-    fun signOut(onResult: (Boolean, String) -> Unit){
+    fun signOut(onResult: (Boolean, String) -> Unit) {
+
         viewModelScope.launch {
-            try{
-                val response = apiService.signOut();
-                if(response.isSucces){
-                    onResult(true, response.message)
-                }else{
-                    onResult(false, response.message)
+            try {
+                Log.d("auth", "Test")
+                Log.d("auth", SessionManager.loginMethodGoogle.toString())
+
+                if (SessionManager.loginMethodGoogle == true) {
+                    val firebaseAuth = FirebaseAuth.getInstance()
+                    val user = firebaseAuth.currentUser
+
+                    if (user == null) {
+                        onResult(false, "User belum login")
+                        return@launch
+                    }
+                    val context = getApplication<Application>().applicationContext
+                    val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                        .requestIdToken(context.getString(R.string.default_web_client_id))
+                        .requestEmail()
+                        .build()
+
+                    val googleSignInClient = GoogleSignIn.getClient(context, gso)
+
+                    // Sign out Google async dengan suspend
+                    val googleSignOutSuccess = suspendCancellableCoroutine<Boolean> { cont ->
+                        googleSignInClient.signOut()
+                            .addOnCompleteListener { task ->
+                                cont.resume(task.isSuccessful) {}
+                            }
+                            .addOnFailureListener {
+                                cont.resume(false) {}
+                            }
+                    }
+
+                    if (!googleSignOutSuccess) {
+                        onResult(false, "Gagal logout dari Google")
+                        return@launch
+                    }
+
+                    // Firebase sign out
+                    firebaseAuth.signOut()
+
+                    onResult(true, "Logout berhasil")
+                } else {
+                    val response = apiService.signOut()
+                    if (response.isSucces) {
+                        onResult(true, response.message)
+                    } else {
+                        onResult(false, response.message)
+                    }
                 }
-            }catch(e: Exception){
+            } catch (e: Exception) {
                 onResult(false, "Terjadi kesalahan: ${e.localizedMessage}")
             }
         }
     }
+
 }

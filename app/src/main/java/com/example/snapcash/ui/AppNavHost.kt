@@ -36,18 +36,15 @@ import com.example.snapcash.data.Transaction
 import com.example.snapcash.ui.component.BottomNavigationBar
 import com.example.snapcash.ui.component.FilterBottomSheet
 import com.example.snapcash.ui.component.SidebarContent
-import com.example.snapcash.ui.screen.AboutUsScreen
 import com.example.snapcash.ui.screen.Auth.LoginScreen
 import com.example.snapcash.ui.screen.Auth.RegisterScreen
 import com.example.snapcash.ui.screen.DashboardScreen
 import com.example.snapcash.ui.screen.EditProfileScreen
-import com.example.snapcash.ui.screen.HelpScreen
 import com.example.snapcash.ui.screen.HistoryScreen
 import com.example.snapcash.ui.screen.OnboardingScreen
 import com.example.snapcash.ui.screen.PemasukanEntryScreen
 import com.example.snapcash.ui.screen.PengeluaranEntryScreen
 import com.example.snapcash.ui.screen.ProfileScreen
-import com.example.snapcash.ui.screen.SettingScreen
 import com.example.snapcash.ui.screen.Upload.CameraScreen
 import  com.example.snapcash.ui.screen.ListKategoriScreen
 import kotlinx.coroutines.CoroutineScope
@@ -215,18 +212,7 @@ fun AppNavHost(
                     composable("profile/edit") {
                         EditProfileScreen(navController = navController)
                     }
-                    composable("settings") {
-                        SettingScreen(navController = navController)
-                    }
-                    composable("aboutus") {
-                        AboutUsScreen(navController)
-                    }
-                    composable("help") {
-                        HelpScreen(navController = navController)
-                    }
-                    composable("kategori"){
-                        ListKategoriScreen(navController = navController)
-                    }
+
                 }
             }
         }

@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.sp
 import kotlin.math.cos
 import kotlin.math.sin
 
+
 @Composable
 fun ProgressCircleChart(
     label: String,
@@ -80,6 +81,6 @@ fun ProgressCircleChart(
         }
         Spacer(modifier = Modifier.height(4.dp))
         Text(label, color = Color.White)
-        Text("Rp ${value.toInt()}", color = Color.White, fontSize = 12.sp)
+        Text(formatCurrency(value.toInt()), color = Color.White, fontSize = 12.sp)
     }
 }

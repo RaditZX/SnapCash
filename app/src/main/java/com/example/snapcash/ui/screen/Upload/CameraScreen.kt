@@ -5,12 +5,14 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresExtension
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
@@ -71,6 +73,7 @@ import java.util.Locale
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
+@RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun CameraScreen(
@@ -185,7 +188,7 @@ fun CameraScreen(
                 }
                 if(!isSuccess.value){
                     ModernAlertDialog(showDialog, "Fail To Extract Data",
-                        dialogMessage.toString(), "camera", navController  )
+                        dialogMessage.value.toString(), "camera", navController  )
                 }else {
                     if (showDialog.value) {
                         val id = viewModel.data.value.get("id")?.asString ?: ""

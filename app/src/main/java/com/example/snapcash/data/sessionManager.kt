@@ -5,5 +5,6 @@ object SessionManager {
     var currencyChoice: String? = null
     var currencySymbol: String? = null
     var locale : String? = null
+    var loginMethodGoogle: Boolean? = null
 
 }

@@ -1,9 +1,21 @@
 package com.example.snapcash.ui.screen
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -12,12 +24,25 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.TabRowDefaults.Divider
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -49,13 +74,19 @@ fun DashboardScreen(
     val tahun = Calendar.getInstance().get(Calendar.YEAR)
     val dashboardData by viewModel.dashboardData
     val isLoading by viewModel.isLoading
+    var isIncomeMode by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        viewModel.getDashboardAnalytics(tahun = tahun, jenis = "Pengeluaran")
+        if (isIncomeMode){
+            viewModel.getDashboardAnalytics(tahun = tahun, jenis = "Pemasukan")
+        }else{
+            viewModel.getDashboardAnalytics(tahun = tahun, jenis = "Pengeluaran")
+        }
+
         viewModel1.getUserData()
     }
 
-    var isIncomeMode by remember { mutableStateOf(false) }
+
     var showFilterDialog by remember { mutableStateOf(false) }
     var tempFilter by remember { mutableStateOf("Year") }
     var tempValue by remember { mutableStateOf(tahun.toString()) }
@@ -67,8 +98,18 @@ fun DashboardScreen(
     val scrollState = rememberScrollState()
     val horizontalScrollState = rememberScrollState()
 
-    var selectedFilter by remember { mutableStateOf("Year") }
+    var selectedFilter by remember { mutableStateOf("tahun") }
     var selectedValue by remember { mutableStateOf(tahun.toString()) }
+    var selectedFilterTranslate by remember { mutableStateOf("Year") }
+
+    if (selectedFilter === "bulan"){
+        selectedFilterTranslate = "MONTH"
+    }
+    if (selectedFilter === "hari"){
+        selectedFilterTranslate = "DAY"
+    }
+
+
 
     val months = listOf(
         "January", "February", "March", "April", "May", "June",
@@ -77,22 +118,14 @@ fun DashboardScreen(
     val years = (tahun - 4..tahun).toList().reversed()
     val days = getDays(selectedFilter, selectedValue, tahun, months)
 
-    val valueItems = getValueByFilter(selectedFilter, years, months, days)
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black)
+            .background(Color(0xFF0D0F13))
             .padding(16.dp)
             .verticalScroll(scrollState)
     ) {
-        IconButton(
-            onClick = openSidebar,
-            modifier = Modifier.padding(bottom = 16.dp)
-        ) {
-            Icon(imageVector = Icons.Default.Menu, contentDescription = "Sidebar Menu", tint = Color.White)
-        }
-
         Text(
             text = "Welcome Back ${userData.username.toString()}",
             color = Color.White,
@@ -108,8 +141,7 @@ fun DashboardScreen(
         Box {
             Row(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp),
+                    .fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
@@ -135,6 +167,7 @@ fun DashboardScreen(
                     onClick = {
                         isIncomeMode = true
                         Updatebyfilter(viewModel, isIncomeMode, selectedFilter, selectedValue, months, tahun)
+                        Log.d("income", isIncomeMode.toString())
                         incomeExpanded = false
                     }
                 )
@@ -149,6 +182,7 @@ fun DashboardScreen(
             }
         }
 
+//
         Button(
             onClick = { showFilterDialog = true },
             modifier = Modifier
@@ -236,15 +270,15 @@ fun DashboardScreen(
                                     onDismissRequest = { filterExpanded = false },
                                     modifier = Modifier.fillMaxWidth()
                                 ) {
-                                    listOf("Year", "Month", "Day").forEach { filter ->
+                                    listOf("tahun", "bulan", "hari").forEach { filter ->
                                         DropdownMenuItem(
                                             text = { Text(filter) },
                                             onClick = {
                                                 tempFilter = filter
                                                 tempValue = when (filter) {
-                                                    "Year" -> tahun.toString()
-                                                    "Month" -> "January"
-                                                    "Day" -> "1"
+                                                    "tahun" -> tahun.toString()
+                                                    "bulan" -> "January"
+                                                    "hari" -> "1"
                                                     else -> tahun.toString()
                                                 }
                                                 filterExpanded = false
@@ -370,7 +404,6 @@ fun DashboardScreen(
                 }
             }
         }
-
         Row(
             horizontalArrangement = Arrangement.spacedBy(20.dp),
             modifier = Modifier
@@ -395,7 +428,7 @@ fun DashboardScreen(
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(vertical = 4.dp)
                 )
-                Text("COMPARISON TO LAST YEAR", color = Color.White, fontSize = 14.sp, modifier = Modifier.padding(top = 4.dp, bottom = 2.dp))
+                Text("COMPARISON TO LAST ${selectedFilterTranslate}", color = Color.White, fontSize = 14.sp, modifier = Modifier.padding(top = 4.dp, bottom = 2.dp))
                 Text(formatCurrency(dashboardData?.totalTahunSebelumnya ?: 0), color = Color.White, fontSize = 28.sp, fontWeight = FontWeight.Bold)
             }
             Text(
@@ -406,6 +439,7 @@ fun DashboardScreen(
             )
         }
 
+        // Progress Chart
         Text(
             text = if (isIncomeMode) "Progress Earned Charts" else "Progress Spent Charts",
             color = Color.White,
@@ -431,8 +465,9 @@ fun DashboardScreen(
             }
         }
 
+        // Line Chart + Table
         Text(
-            text = if (isIncomeMode) "Money Earned (Day)" else "Money Spent (Day)",
+            text = if (isIncomeMode) "Money Earned (${selectedFilterTranslate})" else "Money Spent (${selectedFilterTranslate})",
             color = Color.White,
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
@@ -459,17 +494,13 @@ fun DashboardScreen(
 
     if (isLoading) {
         Box(
-            modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.5f)),
+            modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 1f)),
             contentAlignment = Alignment.Center
         ) {
             CircularProgressIndicator()
         }
     }
 }
-
-// ======================
-// Utility & Helper Functions
-// ======================
 
 @Composable
 fun tableChartData(year: String, amount: Int) {
@@ -526,9 +557,9 @@ fun getValueByFilter(
     days: List<Int>
 ): List<String> {
     return when (filter) {
-        "Year" -> years.map { it.toString() }
-        "Month" -> months
-        "Day" -> days.map { it.toString() }
+        "tahun" -> years.map { it.toString() }
+        "bulan" -> months
+        "hari" -> days.map { it.toString() }
         else -> years.map { it.toString() }
     }
 }
@@ -543,9 +574,10 @@ fun Updatebyfilter(
 ) {
     val jenis = if (isIncomeMode) "Pemasukan" else "Pengeluaran"
     val filter = selectedFilter.lowercase()
-    val tahun = if (filter == "year") selectedValue.toIntOrNull() ?: defaultYear else defaultYear
-    val bulan = if (filter == "month") months.indexOf(selectedValue) + 1 else 1
-    val hari = if (filter == "day") selectedValue.toIntOrNull() ?: 1 else 1
+    val tahun = if (filter == "tahun") selectedValue.toIntOrNull() ?: defaultYear else defaultYear
+    val bulan = if (filter == "bulan") months.indexOf(selectedValue) + 1 else 1
+    val hari = if (filter == "hari") selectedValue.toIntOrNull() ?: 1 else 1
+
 
     viewModel.getDashboardAnalytics(
         jenis = jenis,
@@ -570,3 +602,4 @@ fun generateBrightRandomColor(): Color {
     val colorInt = ColorUtils.HSLToColor(floatArrayOf(hue, saturation, lightness))
     return Color(colorInt)
 }
+
