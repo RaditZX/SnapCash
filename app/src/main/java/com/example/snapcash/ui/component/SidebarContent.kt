@@ -27,6 +27,7 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.filled.List
 import androidx.compose.ui.graphics.vector.ImageVector
 
 @Composable
@@ -77,7 +78,7 @@ fun SidebarContent(
         SidebarItem("Catat", Icons.Filled.Edit, navController, sidebarScope, sidebarState, "catat")
         SidebarItem("History", Icons.Filled.Refresh, navController, sidebarScope, sidebarState, "history")
         SidebarItem("Profile", Icons.Filled.Person, navController, sidebarScope, sidebarState, "profile")
-
+        SidebarItem("List Kategori", Icons.Filled.List,navController,sidebarScope,sidebarState, "kategori")
         Spacer(modifier = Modifier.weight(1f))
 
         // Bottom Items

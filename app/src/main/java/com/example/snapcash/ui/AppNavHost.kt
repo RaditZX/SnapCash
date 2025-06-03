@@ -49,10 +49,10 @@ import com.example.snapcash.ui.screen.PengeluaranEntryScreen
 import com.example.snapcash.ui.screen.ProfileScreen
 import com.example.snapcash.ui.screen.SettingScreen
 import com.example.snapcash.ui.screen.Upload.CameraScreen
+import  com.example.snapcash.ui.screen.ListKategoriScreen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-
 
 @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
 @Composable
@@ -223,6 +223,9 @@ fun AppNavHost(
                     }
                     composable("help") {
                         HelpScreen(navController = navController)
+                    }
+                    composable("kategori"){
+                        ListKategoriScreen(navController = navController)
                     }
                 }
             }
