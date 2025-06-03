@@ -74,6 +74,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.AlertDialog
+import com.example.snapcash.ViewModel.CategoryViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -81,6 +82,7 @@ fun PengeluaranEntryScreen(
     navController: NavController,
     id: String?,
     viewModel: PengeluaranViewModel = hiltViewModel(),
+    categoryViewModel: CategoryViewModel = hiltViewModel(),
     preview: Boolean
 ) {
     val context = LocalContext.current
@@ -95,11 +97,19 @@ fun PengeluaranEntryScreen(
     val pengeluaranData by remember { viewModel.pengeluaranDataById }
     val isLoading by viewModel.isLoading
     var isUpdate by remember { mutableStateOf(false) }
+    val categories by categoryViewModel.categories
     val kategoriList = listOf("Transportasi", "Belanja", "Pendidikan", "Hiburan")
+    val allCategories = remember(categories) {
+        (kategoriList + categories.filter { it.isPengeluaran }.map { it.nama }).distinct()
+    }
     var showDialog by remember { mutableStateOf(false) }
     var showDialogBiaya by remember { mutableStateOf(false) }
     var barangList by remember { mutableStateOf(listOf<Barang>()) }
     var biayalist by remember { mutableStateOf(listOf<Tambahanbiaya>()) }
+
+    LaunchedEffect(Unit) {
+        categoryViewModel.getAllCategories()
+    }
 
     val dateTimeFormatter = SimpleDateFormat("dd MMMM yyyy, HH:mm:ss", Locale("id", "ID"))
     val calendar = Calendar.getInstance()
@@ -151,7 +161,7 @@ fun PengeluaranEntryScreen(
                     val obj = item.asJsonObject
                     Tambahanbiaya(
                         namabiaya = obj.get("namaBiaya").asString,
-                        jumlahbiaya = obj.get("jumlah").asDouble,
+                        jumlahbiaya = obj.get("jumlah").asDouble
                     )
                 } ?: emptyList()
             }
@@ -294,12 +304,12 @@ fun PengeluaranEntryScreen(
                             }
                         },
                         modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonColors(
+                        colors = ButtonDefaults.buttonColors(
                             containerColor = Color(0xFF2D6CE9),
                             contentColor = Color.White,
                             disabledContainerColor = Color.Gray,
-                            disabledContentColor = Color.Gray,
-                        ),
+                            disabledContentColor = Color.Gray
+                        )
                     ) {
                         Text("SUBMIT")
                     }
@@ -364,7 +374,7 @@ fun PengeluaranEntryScreen(
                         DropdownMenu(
                             containerColor = night,
                             label = "Kategori",
-                            options = kategoriList,
+                            options = allCategories,
                             selectedOption = kategori,
                             onOptionSelected = { kategori = it }
                         )
