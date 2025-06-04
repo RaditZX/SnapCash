@@ -156,8 +156,9 @@ fun AppNavHost(
                     composable("tambah/pengeluaran") {
                         PengeluaranEntryScreen(navController = navController, id = null,  preview = false)
                     }
-
-
+                    composable("kategori") {
+                        ListKategoriScreen(navController = navController)
+                    }
                     composable("tambah/pemasukan") {
                         PemasukanEntryScreen(navController = navController, id = null,  preview = false)
                     }

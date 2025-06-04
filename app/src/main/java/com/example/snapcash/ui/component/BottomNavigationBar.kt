@@ -144,15 +144,3 @@ fun BottomNavigationBar(navController: NavController) {
         }
     }
 }
-
-
-
-
-@Preview("default", "rectangle")
-@Preview("dark theme", "rectangle", uiMode = UI_MODE_NIGHT_YES)
-@Preview("large font", "rectangle", fontScale = 2f)
-@Composable
-fun BottomNavigationBarPreview() {
-    val navController = rememberNavController()
-    BottomNavigationBar(navController)
-}

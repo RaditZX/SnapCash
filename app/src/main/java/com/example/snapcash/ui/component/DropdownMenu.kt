@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -26,7 +27,8 @@ fun DropdownMenu(
     options: List<String>,
     selectedOption: String,
     onOptionSelected: (String) -> Unit,
-    containerColor: Color
+    containerColor: Color,
+    customOptionContent: ((String) -> @Composable () -> Unit)? = null
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -47,7 +49,7 @@ fun DropdownMenu(
                     text = selectedOption.ifEmpty { "Pilih $label" },
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = if (selectedOption.isEmpty()) 0.5f else 1f)
                 )
-                Icon(Icons.Default.ArrowDropDown, contentDescription = null)
+                Icon(Icons.Default.ArrowDropDown, contentDescription = "Dropdown")
             }
         }
 
@@ -60,7 +62,13 @@ fun DropdownMenu(
         ) {
             options.forEach { option ->
                 DropdownMenuItem(
-                    text = { Text(option) },
+                    text = {
+                        if (customOptionContent != null && option == "Tambah Kategori") {
+                            customOptionContent(option)()
+                        } else {
+                            Text(option, modifier = Modifier.padding(8.dp))
+                        }
+                    },
                     onClick = {
                         onOptionSelected(option)
                         expanded = false
