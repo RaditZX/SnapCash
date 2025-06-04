@@ -102,6 +102,9 @@ fun PengeluaranEntryScreen(
     val allCategories = remember(categories) {
         (kategoriList + categories.filter { it.isPengeluaran }.map { it.nama }).distinct()
     }
+    val categoriesWithAddOption = remember(allCategories) {
+        allCategories + "Tambah Kategori"
+    }
     var showDialog by remember { mutableStateOf(false) }
     var showDialogBiaya by remember { mutableStateOf(false) }
     var barangList by remember { mutableStateOf(listOf<Barang>()) }
@@ -372,11 +375,38 @@ fun PengeluaranEntryScreen(
                             enabled = false
                         )
                         DropdownMenu(
-                            containerColor = night,
                             label = "Kategori",
-                            options = allCategories,
+                            options = categoriesWithAddOption,
                             selectedOption = kategori,
-                            onOptionSelected = { kategori = it }
+                            onOptionSelected = { selected ->
+                                if (selected == "Tambah Kategori") {
+                                    // Navigasi ke ListKategoriScreen
+                                    navController.navigate("kategori")
+                                } else {
+                                    // Update kategori jika bukan opsi "Tambah Kategori"
+                                    kategori = selected
+                                }
+                            },
+                            containerColor = night,
+                            customOptionContent = { option ->
+                                @Composable {
+                                    if (option == "Tambah Kategori") {
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            modifier = Modifier.padding(8.dp)
+                                        ) {
+                                            Text(option, modifier = Modifier.weight(1f))
+                                            Icon(
+                                                imageVector = Icons.Default.Add,
+                                                contentDescription = "Tambah Kategori",
+                                                tint = Color(0xFF2D6CE9) // Warna biru untuk konsistensi
+                                            )
+                                        }
+                                    } else {
+                                        Text(option, modifier = Modifier.padding(8.dp))
+                                    }
+                                }
+                            }
                         )
                     }
                 }
