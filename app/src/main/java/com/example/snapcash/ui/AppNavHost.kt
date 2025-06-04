@@ -41,12 +41,12 @@ import com.example.snapcash.ui.screen.Auth.RegisterScreen
 import com.example.snapcash.ui.screen.DashboardScreen
 import com.example.snapcash.ui.screen.EditProfileScreen
 import com.example.snapcash.ui.screen.HistoryScreen
+import com.example.snapcash.ui.screen.ListKategoriScreen
 import com.example.snapcash.ui.screen.OnboardingScreen
 import com.example.snapcash.ui.screen.PemasukanEntryScreen
 import com.example.snapcash.ui.screen.PengeluaranEntryScreen
 import com.example.snapcash.ui.screen.ProfileScreen
 import com.example.snapcash.ui.screen.Upload.CameraScreen
-import  com.example.snapcash.ui.screen.ListKategoriScreen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -211,6 +211,9 @@ fun AppNavHost(
                     }
                     composable("profile/edit") {
                         EditProfileScreen(navController = navController)
+                    }
+                    composable("kategori") {
+                        ListKategoriScreen(navController = navController)
                     }
 
                 }
