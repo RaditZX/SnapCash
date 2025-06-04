@@ -28,14 +28,24 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.List
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.snapcash.ViewModel.AuthViewModel
 
 @Composable
 fun SidebarContent(
     navController: NavController,
     sidebarScope: CoroutineScope,
-    sidebarState: DrawerState
+    sidebarState: DrawerState,
+    viewModel: AuthViewModel = hiltViewModel()
 ) {
+
+    val showDialog = remember { mutableStateOf(false) }
+    val dialogMessage = remember { mutableStateOf("") }
+    val isSucces = remember { mutableStateOf(false) }
+
     Column(
         modifier = Modifier
             .background(Color(0xFF0F1418))
@@ -73,19 +83,44 @@ fun SidebarContent(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Menu Items
-        SidebarItem("Home", Icons.Filled.Home, navController, sidebarScope, sidebarState, "home")
-        SidebarItem("Catat", Icons.Filled.Edit, navController, sidebarScope, sidebarState, "catat")
+        // Menu Items biasa
+        SidebarItem("Home", Icons.Filled.Home, navController, sidebarScope, sidebarState, "dashboard")
+        SidebarItem("Catat", Icons.Filled.Edit, navController, sidebarScope, sidebarState, "tambah/pengeluaran")
         SidebarItem("History", Icons.Filled.Refresh, navController, sidebarScope, sidebarState, "history")
         SidebarItem("Profile", Icons.Filled.Person, navController, sidebarScope, sidebarState, "profile")
-        SidebarItem("List Kategori", Icons.Filled.List,navController,sidebarScope,sidebarState, "kategori")
+        SidebarItem("List Kategori", Icons.Filled.List, navController, sidebarScope, sidebarState, "kategori")
+
         Spacer(modifier = Modifier.weight(1f))
 
-        // Bottom Items
-        SidebarItem("Settings", Icons.Filled.Settings, navController, sidebarScope, sidebarState, "settings")
-        SidebarItem("About Us", Icons.Filled.ThumbUp, navController, sidebarScope, sidebarState, "aboutus")
-        SidebarItem("Help", Icons.Filled.Info, navController, sidebarScope, sidebarState, "help")
-        SidebarItem("Logout", Icons.Filled.ExitToApp, navController, sidebarScope, sidebarState, "home")
+        Row(
+            modifier = Modifier
+                .clickable {
+                    sidebarScope.launch { sidebarState.close() }
+
+                    viewModel.signOut(onResult = { success, message ->
+                        dialogMessage.value = message
+                        showDialog.value = true
+                        isSucces.value = success
+
+                        if (success) {
+                            navController.navigate("signIn") {
+                                popUpTo("home") { inclusive = true }
+                            }
+                        }
+                    })
+                }
+                .padding(vertical = 12.dp, horizontal = 16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Filled.ExitToApp,
+                contentDescription = "Logout",
+                tint = Color.White,
+                modifier = Modifier.size(24.dp)
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+            Text("Logout", color = Color.White, fontSize = 16.sp)
+        }
 
         Spacer(modifier = Modifier.height(16.dp))
     }
