@@ -59,8 +59,8 @@ fun HistoryScreen(
     viewModel2: PemasukanViewModel = hiltViewModel(),
     onFilterClick: () -> Unit,
     isPemasukan: (Boolean) -> Unit,
-    filterData : FilterModel,
-    dataTransaction: (List<Transaction>)-> Unit,
+    filterData: FilterModel,
+    dataTransaction: (List<Transaction>) -> Unit,
     periode: (String) -> Unit
 ) {
     var selectedType by remember { mutableStateOf("Money Outcome") }
@@ -70,7 +70,7 @@ fun HistoryScreen(
     val isLoading by viewModel.isLoading
     val isLoadingPemasukan by viewModel2.isLoading
     var searchQuery by remember { mutableStateOf("") }
-    var typeDone by remember {mutableStateOf(false)}
+    var typeDone by remember { mutableStateOf(false) }
     var isRefreshing by remember { mutableStateOf(false) }
 
     val periode = if (filterData.startDate != null) {
@@ -89,9 +89,9 @@ fun HistoryScreen(
 
     LaunchedEffect(typeDone) {
         Log.d("search", searchQuery)
-        if(selectedType == "Money Income"){
+        if (selectedType == "Money Income") {
             viewModel2.getPemasukanUser(filterData, searchQuery)
-        }else{
+        } else {
             viewModel.getPengeluaranUser(filterData, searchQuery)
         }
         typeDone = false
@@ -108,7 +108,6 @@ fun HistoryScreen(
             isRefreshing = false
         }
     ) {
-
         if (isLoading || isLoadingPemasukan) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()
@@ -145,33 +144,19 @@ fun HistoryScreen(
                 }
             }
 
-            var currentTransactions by remember(selectedType) {
-                mutableStateOf(
-                    if (selectedType == "Money Income") incomeTransactions else outcomeTransactions
-                )
-            }
-            dataTransaction(currentTransactions)
-            periode(periode)
-
-
-            LaunchedEffect(selectedType) {
-                currentTransactions = if (selectedType == "Money Income") {
-                    incomeTransactions.sortedByDescending {
-                        it.date
-                    }
-                } else {
-                    outcomeTransactions.sortedByDescending {
-                        it.date
+            val displayedTransactions by remember(selectedType, isDescending, incomeTransactions, outcomeTransactions) {
+                derivedStateOf {
+                    val transactions = if (selectedType == "Money Income") incomeTransactions else outcomeTransactions
+                    if (isDescending) {
+                        transactions.sortedBy { it.amount }
+                    } else {
+                        transactions.sortedByDescending { it.amount }
                     }
                 }
-                isDescending = true
             }
 
-            val displayedTransactions = if (isDescending) {
-                currentTransactions
-            } else {
-                currentTransactions.reversed()
-            }
+            dataTransaction(displayedTransactions)
+            periode(periode)
 
             val totalAmount = displayedTransactions.sumOf { it.amount }
 
@@ -246,7 +231,6 @@ fun HistoryScreen(
                     onFilterClick = { onFilterClick() },
                     navController,
                     typeDone = { typeDone = it }
-
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -304,9 +288,7 @@ fun HistoryScreen(
                                         transaction.amount,
                                         transaction.isPengeluaran
                                     ),
-                                    color = if (transaction.isPengeluaran) Color.Red else Color(
-                                        0xFF4CAF50
-                                    ),
+                                    color = if (transaction.isPengeluaran) Color.Red else Color(0xFF4CAF50),
                                     fontWeight = FontWeight.SemiBold
                                 )
                             }
@@ -314,13 +296,9 @@ fun HistoryScreen(
                         Divider(modifier = Modifier.padding(vertical = 4.dp))
                     }
                 }
-
-
             }
-
         }
     }
-
 }
 
 

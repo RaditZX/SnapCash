@@ -81,7 +81,7 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel = hilt
                 viewModel.registerWithGoogle(idToken, onResult = { success, message ->
                     dialogMessage.value = message  // Update the popup message
                     showDialog.value = true  // Show the popu
-                    nextRoute.value = "dashboard"
+                    nextRoute.value = "signin"
                 })
 
             } else {
