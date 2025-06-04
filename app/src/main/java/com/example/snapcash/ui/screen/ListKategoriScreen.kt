@@ -254,27 +254,68 @@ fun CategoryDialog(
             title = { Text(if (category == null) "Tambah Kategori" else "Edit Kategori") },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    var errorText by remember { mutableStateOf<String?>(null) }
+
                     OutlinedTextField(
                         value = nama,
-                        onValueChange = { nama = it },
+                        onValueChange = { newValue ->
+                            nama = newValue
+                            errorText = when {
+                                newValue.isBlank() -> "Nama kategori tidak boleh kosong atau hanya spasi"
+                                !newValue.matches(Regex("^[a-zA-Z\\s]+\$")) -> "Nama hanya boleh berisi huruf dan spasi"
+                                else -> null
+                            }
+                        },
                         label = { Text("Nama Kategori") },
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
+                        isError = errorText != null,
+                        supportingText = {
+                            if (errorText != null) {
+                                Text(
+                                    text = errorText!!,
+                                    color = Color.Red,
+                                    fontSize = 12.sp
+                                )
+                            }
+                        },
                         colors = OutlinedTextFieldDefaults.colors(
                             unfocusedBorderColor = Color.Gray,
-                            focusedBorderColor = Color.Blue
+                            focusedBorderColor = Color.Blue,
+                            errorBorderColor = Color.Red
                         )
                     )
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text("Jenis: ${if (isPengeluaran) "Pengeluaran" else "Pemasukan"}")
-                        Switch(
-                            checked = isPengeluaran,
-                            onCheckedChange = { isPengeluaran = it }
-                        )
+
+                    Column {
+                        Text("Jenis Kategori")
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                RadioButton(
+                                    selected = isPengeluaran,
+                                    onClick = { isPengeluaran = true },
+                                    colors = RadioButtonDefaults.colors(selectedColor = Color.Blue)
+                                )
+                                Text("Pengeluaran", modifier = Modifier.padding(start = 4.dp))
+                            }
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                RadioButton(
+                                    selected = !isPengeluaran,
+                                    onClick = { isPengeluaran = false },
+                                    colors = RadioButtonDefaults.colors(selectedColor = Color.Blue)
+                                )
+                                Text("Pemasukan", modifier = Modifier.padding(start = 4.dp))
+                            }
+                        }
                     }
                 }
             },
