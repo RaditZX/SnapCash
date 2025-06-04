@@ -35,7 +35,6 @@ import com.example.snapcash.data.OnboardingPrefs
 import com.example.snapcash.data.Transaction
 import com.example.snapcash.ui.component.BottomNavigationBar
 import com.example.snapcash.ui.component.FilterBottomSheet
-import com.example.snapcash.ui.component.SidebarContent
 import com.example.snapcash.ui.screen.Auth.LoginScreen
 import com.example.snapcash.ui.screen.Auth.RegisterScreen
 import com.example.snapcash.ui.screen.DashboardScreen
@@ -70,8 +69,6 @@ fun AppNavHost(
     navController: NavHostController = rememberNavController(),
     startDestination: String
 ) {
-    val sidebarState = rememberDrawerState(DrawerValue.Closed)
-    val sidebarScope = rememberCoroutineScope()
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry?.destination?.route
     val bottomSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
@@ -80,140 +77,119 @@ fun AppNavHost(
     var isPemasukan by remember {mutableStateOf(false)}
     var dataTransaction by remember { mutableStateOf(listOf<Transaction>()) }
     var periode by remember {mutableStateOf("")}
-    ModalNavigationDrawer(
-        drawerContent = {
-            Surface(
-                modifier = Modifier.width(LocalConfiguration.current.screenWidthDp.dp * 3 / 4),
-                color = Color(0xFF0D0F13)
-            ) {
-                SidebarContent(
-                    navController = navController,
-                    sidebarScope = sidebarScope,
-                    sidebarState = sidebarState
-                )
-            }
-        },
-        drawerState = sidebarState
+
+    ModalBottomSheetLayout(
+        sheetState = bottomSheetState,
+        sheetBackgroundColor = Color.Transparent,
+        sheetContent = {
+            FilterBottomSheet(onDismiss = {
+                coroutineScope.launch { bottomSheetState.hide() }
+            }, filterData = { newFilterData ->
+                filterModel = newFilterData
+            }, isPemasukan = isPemasukan , navController = navController, dataTransaction = dataTransaction, periode = periode)
+        }
     ) {
-
-
-        ModalBottomSheetLayout(
-            sheetState = bottomSheetState,
-            sheetBackgroundColor = Color.Transparent,
-            sheetContent = {
-                FilterBottomSheet(onDismiss = {
-                    coroutineScope.launch { bottomSheetState.hide() }
-                }, filterData = { newFilterData ->
-                    filterModel = newFilterData
-                }, isPemasukan = isPemasukan , navController = navController, dataTransaction = dataTransaction, periode = periode)
-            }
-        ) {
-            Scaffold(
-                bottomBar = {
-                    if (currentRoute !in listOf("signIn", "signUp", "onBoarding")) {
-                        BottomNavigationBar(navController)
-                    }
-                },
-            ) { paddingValues ->
-                NavHost(
-                    navController = navController,
-                    startDestination = startDestination,
-                    modifier = Modifier.padding(paddingValues)
-                ) {
-
-                    composable("onBoarding") {
-                        OnboardingScreen(
-                            onFinish = {
-                                // Simpan status onboarding sudah selesai
-                                CoroutineScope(Dispatchers.IO).launch {
-                                    OnboardingPrefs.setOnboardingShown(navController.context)
-                                }
-                                navController.navigate("SignIn") {
-                                    popUpTo("onBoarding") { inclusive = true }
-                                }
-                            },
-                            navController = navController
-                        )
-                    }
-                    composable("signIn") {
-                        LoginScreen(navController)
-                    }
-
-                    composable("signUp") {
-                        RegisterScreen(navController)
-                    }
-
-                    composable("camera") {
-                        CameraScreen(navController = navController)
-                    }
-
-                    composable("dashboard") {
-                        DashboardScreen(
-                            navController = navController,
-                            openSidebar = { sidebarScope.launch { sidebarState.open() } }
-                        )
-                    }
-                    composable("tambah/pengeluaran") {
-                        PengeluaranEntryScreen(navController = navController, id = null,  preview = false)
-                    }
-                    composable("kategori") {
-                        ListKategoriScreen(navController = navController)
-                    }
-                    composable("tambah/pemasukan") {
-                        PemasukanEntryScreen(navController = navController, id = null,  preview = false)
-                    }
-                    composable("update/pengeluaran/{id}") { backStackEntry ->
-                        val id = backStackEntry.arguments?.getString("id").toString()
-                        PengeluaranEntryScreen(navController = navController, id = id, preview = false)
-                    }
-                    composable("update/pemasukan/{id}") { backStackEntry ->
-                        val id = backStackEntry.arguments?.getString("id").toString()
-                        PemasukanEntryScreen(navController = navController, id = id, preview = false)
-                    }
-                    composable("preview/pengeluaran/{id}") { backStackEntry ->
-                        val id = backStackEntry.arguments?.getString("id").toString()
-                        PengeluaranEntryScreen(navController = navController, id, preview = true )
-                    }
-                    composable("preview/pemasukan/{id}") { backStackEntry ->
-                        val id = backStackEntry.arguments?.getString("id").toString()
-                        PemasukanEntryScreen(navController = navController, id = id, preview = true)
-                    }
-
-                    composable("history") {
-                        HistoryScreen(
-                            navController = navController,
-                            onFilterClick = {
-                                coroutineScope.launch { bottomSheetState.show() }
-                            },
-                            isPemasukan = { value ->
-                                coroutineScope.launch {
-                                    isPemasukan = value
-                                }
-                            },
-                            filterData = filterModel,
-                            dataTransaction = {
-                                value ->
-                                coroutineScope.launch {
-                                    dataTransaction = value
-                                }
-                            },
-                            periode = {
-                                value ->
-                                coroutineScope.launch {
-                                    periode = value
-                                }
-
+        Scaffold(
+            bottomBar = {
+                if (currentRoute !in listOf("signIn", "signUp", "onBoarding")) {
+                    BottomNavigationBar(navController)
+                }
+            },
+        ) { paddingValues ->
+            NavHost(
+                navController = navController,
+                startDestination = startDestination,
+                modifier = Modifier.padding(paddingValues)
+            ) {
+                composable("onBoarding") {
+                    OnboardingScreen(
+                        onFinish = {
+                            // Simpan status onboarding sudah selesai
+                            CoroutineScope(Dispatchers.IO).launch {
+                                OnboardingPrefs.setOnboardingShown(navController.context)
                             }
-                        )
+                            navController.navigate("SignIn") {
+                                popUpTo("onBoarding") { inclusive = true }
+                            }
+                        },
+                        navController = navController
+                    )
+                }
+                composable("signIn") {
+                    LoginScreen(navController)
+                }
 
-                    }
-                    composable("profile") {
-                        ProfileScreen(navController = navController)
-                    }
-                    composable("profile/edit") {
-                        EditProfileScreen(navController = navController)
-                    }
+                composable("signUp") {
+                    RegisterScreen(navController)
+                }
 
+                composable("camera") {
+                    CameraScreen(navController = navController)
+                }
+
+                composable("dashboard") {
+                    DashboardScreen(
+                        navController = navController,
+                    )
+                }
+                composable("tambah/pengeluaran") {
+                    PengeluaranEntryScreen(navController = navController, id = null,  preview = false)
+                }
+                composable("kategori") {
+                    ListKategoriScreen(navController = navController)
+                }
+                composable("tambah/pemasukan") {
+                    PemasukanEntryScreen(navController = navController, id = null,  preview = false)
+                }
+                composable("update/pengeluaran/{id}") { backStackEntry ->
+                    val id = backStackEntry.arguments?.getString("id").toString()
+                    PengeluaranEntryScreen(navController = navController, id = id, preview = false)
+                }
+                composable("update/pemasukan/{id}") { backStackEntry ->
+                    val id = backStackEntry.arguments?.getString("id").toString()
+                    PemasukanEntryScreen(navController = navController, id = id, preview = false)
+                }
+                composable("preview/pengeluaran/{id}") { backStackEntry ->
+                    val id = backStackEntry.arguments?.getString("id").toString()
+                    PengeluaranEntryScreen(navController = navController, id, preview = true )
+                }
+                composable("preview/pemasukan/{id}") { backStackEntry ->
+                    val id = backStackEntry.arguments?.getString("id").toString()
+                    PemasukanEntryScreen(navController = navController, id = id, preview = true)
+                }
+
+                composable("history") {
+                    HistoryScreen(
+                        navController = navController,
+                        onFilterClick = {
+                            coroutineScope.launch { bottomSheetState.show() }
+                        },
+                        isPemasukan = { value ->
+                            coroutineScope.launch {
+                                isPemasukan = value
+                            }
+                        },
+                        filterData = filterModel,
+                        dataTransaction = {
+                            value ->
+                            coroutineScope.launch {
+                                dataTransaction = value
+                            }
+                        },
+                        periode = {
+                            value ->
+                            coroutineScope.launch {
+                                periode = value
+                            }
+
+                        }
+                    )
+                }
+                composable("profile") {
+                    ProfileScreen(navController = navController)
+                }
+                composable("profile/edit") {
+                    EditProfileScreen(navController = navController)
                 }
             }
         }

@@ -68,7 +68,6 @@ fun DashboardScreen(
     navController: NavController,
     viewModel: DashboardViewModel = hiltViewModel(),
     viewModel1: AuthViewModel = hiltViewModel(),
-    openSidebar: () -> Unit
 ) {
     val userData by remember { viewModel1.userDatas }
     val tahun = Calendar.getInstance().get(Calendar.YEAR)
