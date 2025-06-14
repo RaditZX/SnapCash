@@ -39,7 +39,7 @@ fun SearchWithFilterBar(
     query: String,
     onQueryChange: (String) -> Unit,
     onFilterClick: () -> Unit,
-    navController : NavController,
+    navController: NavController,
     typeDone: (Boolean) -> Unit
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -49,64 +49,57 @@ fun SearchWithFilterBar(
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Search Field
         TextField(
             value = query,
             onValueChange = onQueryChange,
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Default.Search,
-                    contentDescription = "Search Icon"
+                    contentDescription = "Search Icon",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             },
             placeholder = {
                 Text(
                     text = "Search...",
-                    style = MaterialTheme.typography.bodySmall
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             },
-            textStyle = MaterialTheme.typography.bodySmall,
+            textStyle = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurface),
             shape = RoundedCornerShape(12.dp),
             modifier = Modifier
                 .weight(1f)
                 .height(48.dp)
-                 .border(1.dp, Color.LightGray, shape = CircleShape),
+                .border(1.dp, MaterialTheme.colorScheme.outline, shape = CircleShape),
             colors = TextFieldDefaults.textFieldColors(
-                 focusedIndicatorColor = Color.Transparent,
+                focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
-                disabledIndicatorColor = Color.Transparent,
-                textColor = Color.White
+                disabledIndicatorColor = Color.Transparent
             ),
             singleLine = true,
-            keyboardOptions = KeyboardOptions.Default.copy(
-                imeAction = ImeAction.Done // "OK" or "Enter" key
-            ),
+            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
             keyboardActions = KeyboardActions(
                 onDone = {
                     typeDone(true)
-                    keyboardController?.hide() // Hide keyboard if needed
+                    keyboardController?.hide()
                 }
             ),
         )
 
-
         Spacer(modifier = Modifier.width(8.dp))
 
-        // Filter Button
         IconButton(
             onClick = onFilterClick,
             modifier = Modifier
                 .size(48.dp)
-//                .background(Color.Gray, shape = CircleShape)
-                .border(1.dp, Color.LightGray, shape = CircleShape)
+                .border(1.dp, MaterialTheme.colorScheme.outline, shape = CircleShape)
         ) {
             Image(
                 painter = painterResource(R.drawable.baseline_filter_alt_24),
                 contentDescription = null,
-                colorFilter = ColorFilter.tint(Color.White)
+                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurfaceVariant)
             )
-
         }
-
     }
 }

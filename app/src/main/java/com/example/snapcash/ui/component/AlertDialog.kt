@@ -50,7 +50,7 @@ fun ModernAlertDialog(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(32.dp)
-                    .background(night, shape = RoundedCornerShape(16.dp))
+                    .background(MaterialTheme.colorScheme.surface, shape = RoundedCornerShape(16.dp))
                     .padding(24.dp),
                 contentAlignment = Alignment.Center
             ) {
@@ -61,14 +61,14 @@ fun ModernAlertDialog(
                     Text(
                         text = title,
                         style = MaterialTheme.typography.headlineSmall,
-                        color = Color.White,
+                        color = MaterialTheme.colorScheme.onSurface,
                         fontWeight = FontWeight.Bold
                     )
                     Spacer(modifier = Modifier.height(15.dp))
                     Text(
                         text = message,
                         style = MaterialTheme.typography.bodySmall,
-                        color = Color.White,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center
                     )
                     Spacer(modifier = Modifier.height(24.dp))
@@ -77,11 +77,9 @@ fun ModernAlertDialog(
                             showDialog.value = false
                             navController.navigate(navigate)
                         },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF1877F2)
-                        )
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                     ) {
-                        Text("Got it", color = Color.White)
+                        Text("Got it", color = MaterialTheme.colorScheme.onPrimary)
                     }
                 }
             }

@@ -35,6 +35,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -108,8 +109,6 @@ fun DashboardScreen(
         selectedFilterTranslate = "DAY"
     }
 
-
-
     val months = listOf(
         "January", "February", "March", "April", "May", "June",
         "July", "August", "September", "October", "November", "December"
@@ -121,13 +120,13 @@ fun DashboardScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF0D0F13))
+            .background(MaterialTheme.colorScheme.background)
             .padding(16.dp)
             .verticalScroll(scrollState)
     ) {
         Text(
             text = "Welcome Back ${userData.username.toString()}",
-            color = Color.White,
+            color = MaterialTheme.colorScheme.onBackground,
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier
@@ -145,7 +144,7 @@ fun DashboardScreen(
             ) {
                 Text(
                     text = if (isIncomeMode) "Money Income" else "Money Outcome",
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onBackground,
                     fontSize = 18.sp,
                     modifier = Modifier.weight(1f)
                 )
@@ -153,7 +152,7 @@ fun DashboardScreen(
                     Icon(
                         imageVector = Icons.Default.ArrowDropDown,
                         contentDescription = "Dropdown",
-                        tint = Color.White
+                        tint = MaterialTheme.colorScheme.onBackground
                     )
                 }
             }
@@ -181,15 +180,14 @@ fun DashboardScreen(
             }
         }
 
-//
         Button(
             onClick = { showFilterDialog = true },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 16.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF2A2A2A),
-                contentColor = Color.White
+                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                contentColor = MaterialTheme.colorScheme.onSurfaceVariant
             ),
             shape = RoundedCornerShape(8.dp)
         ) {
@@ -219,7 +217,7 @@ fun DashboardScreen(
                         .fillMaxWidth()
                         .wrapContentHeight(),
                     shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A))
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
                 ) {
                     Column(
                         modifier = Modifier.padding(24.dp),
@@ -227,7 +225,7 @@ fun DashboardScreen(
                     ) {
                         Text(
                             text = "Select Filter",
-                            color = Color.White,
+                            color = MaterialTheme.colorScheme.onBackground,
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -236,7 +234,7 @@ fun DashboardScreen(
                         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                             Text(
                                 text = "Filter Type",
-                                color = Color.White,
+                                color = MaterialTheme.colorScheme.onBackground,
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Medium
                             )
@@ -247,9 +245,9 @@ fun DashboardScreen(
                                     onClick = { filterExpanded = true },
                                     modifier = Modifier.fillMaxWidth(),
                                     colors = ButtonDefaults.outlinedButtonColors(
-                                        contentColor = Color.White
+                                        contentColor = MaterialTheme.colorScheme.onBackground
                                     ),
-                                    border = androidx.compose.foundation.BorderStroke(1.dp, Color.White)
+                                    border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.onBackground)
                                 ) {
                                     Row(
                                         modifier = Modifier.fillMaxWidth(),
@@ -288,11 +286,10 @@ fun DashboardScreen(
                             }
                         }
 
-                        // Value Selection with improved display
                         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                             Text(
                                 text = "Select Value",
-                                color = Color.White,
+                                color = MaterialTheme.colorScheme.onBackground,
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Medium
                             )
@@ -306,7 +303,7 @@ fun DashboardScreen(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .heightIn(max = 200.dp)
-                                        .border(1.dp, Color.White, RoundedCornerShape(8.dp))
+                                        .border(1.dp, MaterialTheme.colorScheme.onBackground, RoundedCornerShape(8.dp))
                                         .padding(8.dp),
                                     horizontalArrangement = Arrangement.spacedBy(4.dp),
                                     verticalArrangement = Arrangement.spacedBy(4.dp)
@@ -318,7 +315,7 @@ fun DashboardScreen(
                                                 .aspectRatio(1f)
                                                 .padding(2.dp),
                                             colors = CardDefaults.cardColors(
-                                                containerColor = if (isSelected) Color(0xFF6200EE) else Color(0xFF2A2A2A)
+                                                containerColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
                                             ),
                                             onClick = { tempValue = day }
                                         ) {
@@ -328,7 +325,7 @@ fun DashboardScreen(
                                             ) {
                                                 Text(
                                                     text = day,
-                                                    color = Color.White,
+                                                    color = MaterialTheme.colorScheme.onBackground,
                                                     fontSize = 12.sp,
                                                     textAlign = TextAlign.Center
                                                 )
@@ -342,7 +339,7 @@ fun DashboardScreen(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .heightIn(max = 200.dp)
-                                        .border(1.dp, Color.White, RoundedCornerShape(8.dp))
+                                        .border(1.dp, MaterialTheme.colorScheme.onBackground, RoundedCornerShape(8.dp))
                                         .padding(8.dp),
                                     verticalArrangement = Arrangement.spacedBy(4.dp)
                                 ) {
@@ -351,13 +348,13 @@ fun DashboardScreen(
                                         Card(
                                             modifier = Modifier.fillMaxWidth(),
                                             colors = CardDefaults.cardColors(
-                                                containerColor = if (isSelected) Color(0xFF6200EE) else Color(0xFF2A2A2A)
+                                                containerColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
                                             ),
                                             onClick = { tempValue = value }
                                         ) {
                                             Text(
                                                 text = value,
-                                                color = Color.White,
+                                                color = MaterialTheme.colorScheme.onBackground,
                                                 fontSize = 16.sp,
                                                 modifier = Modifier.padding(16.dp)
                                             )
@@ -376,9 +373,9 @@ fun DashboardScreen(
                                 onClick = { showFilterDialog = false },
                                 modifier = Modifier.weight(1f),
                                 colors = ButtonDefaults.outlinedButtonColors(
-                                    contentColor = Color.White
+                                    contentColor = MaterialTheme.colorScheme.onBackground
                                 ),
-                                border = androidx.compose.foundation.BorderStroke(1.dp, Color.White)
+                                border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.onBackground)
                             ) {
                                 Text("Cancel")
                             }
@@ -392,8 +389,8 @@ fun DashboardScreen(
                                 },
                                 modifier = Modifier.weight(1f),
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color(0xFF6200EE),
-                                    contentColor = Color.White
+                                    containerColor = MaterialTheme.colorScheme.primary,
+                                    contentColor = MaterialTheme.colorScheme.onPrimary
                                 )
                             ) {
                                 Text("Apply")
@@ -416,23 +413,23 @@ fun DashboardScreen(
             ) {
                 Text(
                     text = if (isIncomeMode) "MONEY EARNED" else "MONEY SPENT",
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onBackground,
                     fontSize = 20.sp,
                     modifier = Modifier.padding(vertical = 4.dp)
                 )
                 Text(
                     text = formatCurrency(dashboardData?.total ?: 0),
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onBackground,
                     fontSize = 28.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(vertical = 4.dp)
                 )
-                Text("COMPARISON TO LAST ${selectedFilterTranslate}", color = Color.White, fontSize = 14.sp, modifier = Modifier.padding(top = 4.dp, bottom = 2.dp))
-                Text(formatCurrency(dashboardData?.totalTahunSebelumnya ?: 0), color = Color.White, fontSize = 28.sp, fontWeight = FontWeight.Bold)
+                Text("COMPARISON TO LAST ${selectedFilterTranslate}", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 14.sp, modifier = Modifier.padding(top = 4.dp, bottom = 2.dp))
+                Text(formatCurrency(dashboardData?.totalTahunSebelumnya ?: 0), color = MaterialTheme.colorScheme.onBackground, fontSize = 28.sp, fontWeight = FontWeight.Bold)
             }
             Text(
                 text = formatCurrency(dashboardData?.perubahanTotal ?: 0),
-                color = if (isIncomeMode) Color(0xFF00FF00) else Color(0xFFFF1E00),
+                color = if (isIncomeMode) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.error,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -441,7 +438,7 @@ fun DashboardScreen(
         // Progress Chart
         Text(
             text = if (isIncomeMode) "Progress Earned Charts" else "Progress Spent Charts",
-            color = Color.White,
+            color = MaterialTheme.colorScheme.onBackground,
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(bottom = 8.dp)
@@ -467,7 +464,7 @@ fun DashboardScreen(
         // Line Chart + Table
         Text(
             text = if (isIncomeMode) "Money Earned (${selectedFilterTranslate})" else "Money Spent (${selectedFilterTranslate})",
-            color = Color.White,
+            color = MaterialTheme.colorScheme.onBackground,
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(bottom = 8.dp)
@@ -476,9 +473,9 @@ fun DashboardScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 16.dp)
-                .border(2.dp, Brush.linearGradient(listOf(Color.White.copy(alpha = 0.8f), Color.White.copy(alpha = 0.2f), Color.Transparent)), RoundedCornerShape(16.dp)),
+                .border(2.dp, Brush.linearGradient(listOf(MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f), MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f), Color.Transparent)), RoundedCornerShape(16.dp)),
             shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFF2A2A2A))
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 LineChartDashboard(totalByRange = dashboardData?.TotalByRange ?: emptyMap())
@@ -493,10 +490,10 @@ fun DashboardScreen(
 
     if (isLoading) {
         Box(
-            modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 1f)),
+            modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background.copy(alpha = 1f)),
             contentAlignment = Alignment.Center
         ) {
-            CircularProgressIndicator()
+            CircularProgressIndicator(color = MaterialTheme.colorScheme.onBackground)
         }
     }
 }
@@ -521,7 +518,7 @@ fun tableChartData(year: String, amount: Int) {
             ) {
                 Text(
                     text = year,
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onBackground,
                     fontSize = 14.sp
                 )
             }
@@ -531,7 +528,7 @@ fun tableChartData(year: String, amount: Int) {
             ) {
                 Text(
                     text = formatCurrency(amount),
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onBackground,
                     fontSize = 14.sp
                 )
             }
