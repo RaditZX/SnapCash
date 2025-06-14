@@ -11,6 +11,8 @@ import com.example.snapcash.data.SnapCashApiService
 import com.google.gson.JsonObject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import org.json.JSONObject
+import retrofit2.HttpException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -68,15 +70,25 @@ class PemasukanViewModel @Inject constructor(private val apiService: SnapCashApi
         }
     }
 
-    fun updatePemasukanUserById(id: String, data: JsonObject, navController: NavController) {
+    fun updatePemasukanUserById(id: String, data: JsonObject, navController: NavController, onResult: (Boolean, String) -> Unit) {
         viewModelScope.launch {
             try {
                 isLoading.value = true
                 val response =
                     apiService.updatePemasukanById("Bearer ${SessionManager.idToken}", id, data)
-                if (response.isSucces) {
-                    navController.navigate("history")
-                }
+                onResult(true, response.message)
+            }catch (e: HttpException) {
+                val errorBody = e.response()?.errorBody()?.string()
+                val errorMessage = errorBody?.let {
+                    try {
+                        JSONObject(it).getString("message") // Extract the "message" field
+                    } catch (ex: Exception) {
+                        "Unknown HTTP error"
+                    }
+                } ?: "Unknown HTTP error"
+
+                Log.e("auth", "HttpException: $errorMessage")
+                onResult(false, "Error: $errorMessage")
             } catch (e: Exception) {
                 Log.e("EXCEPTION", "Exception: ${e.message}", e)
             } finally {
@@ -85,17 +97,28 @@ class PemasukanViewModel @Inject constructor(private val apiService: SnapCashApi
         }
     }
 
-    fun addPemasukan(data: JsonObject, navController: NavController) {
+    fun addPemasukan(data: JsonObject, navController: NavController,  onResult: (Boolean, String) -> Unit) {
         viewModelScope.launch {
             try {
                 isLoading.value = true
                 val response = apiService.addPemasukan("Bearer ${SessionManager.idToken}", data)
-                if (response.isSucces) {
-                    navController.navigate("history")
-                } else {
-                    Log.e("ADD_PEMASUKAN", "Failed: ${response.message}")
-                }
-            } catch (e: Exception) {
+
+                onResult(true, response.message)
+
+            }catch (e: HttpException) {
+                val errorBody = e.response()?.errorBody()?.string()
+                val errorMessage = errorBody?.let {
+                    try {
+                        JSONObject(it).getString("message") // Extract the "message" field
+                    } catch (ex: Exception) {
+                        "Unknown HTTP error"
+                    }
+                } ?: "Unknown HTTP error"
+
+                Log.e("auth", "HttpException: $errorMessage")
+                onResult(false, "Error: $errorMessage")
+            }
+            catch (e: Exception) {
                 Log.e("EXCEPTION", "Exception: ${e.message}", e)
             } finally {
                 isLoading.value = false
@@ -103,15 +126,25 @@ class PemasukanViewModel @Inject constructor(private val apiService: SnapCashApi
         }
     }
 
-    fun deletePemasukanById(id: String, navController: NavController) {
+    fun deletePemasukanById(id: String, navController: NavController,onResult: (Boolean, String) -> Unit) {
         viewModelScope.launch {
             try {
                 isLoading.value = true
                 val response =
                     apiService.deletePemasukanById("Bearer ${SessionManager.idToken}", id)
-                if (response.isSucces) {
-                    navController.navigate("history")
-                }
+                onResult(true, response.message)
+            }catch (e: HttpException) {
+                val errorBody = e.response()?.errorBody()?.string()
+                val errorMessage = errorBody?.let {
+                    try {
+                        JSONObject(it).getString("message") // Extract the "message" field
+                    } catch (ex: Exception) {
+                        "Unknown HTTP error"
+                    }
+                } ?: "Unknown HTTP error"
+
+                Log.e("auth", "HttpException: $errorMessage")
+                onResult(false, "Error: $errorMessage")
             } catch (e: Exception) {
                 Log.e("EXCEPTION", "Exception: ${e.message}", e)
             } finally {

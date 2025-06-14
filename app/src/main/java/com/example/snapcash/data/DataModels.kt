@@ -6,6 +6,12 @@ data class SignInRequest(
     val password: String
 )
 
+data class SignUpRequest(
+    val email: String,
+    val password: String,
+    val confirmPassword: String
+)
+
 data class SignUpResponse(
     val data: UserCredentialData,  // Adjust according to your API response
     val message: String,
@@ -42,6 +48,16 @@ data class DefaultResponse(
     val message: String,
     val isSucces: Boolean,
     val data: Array<JsonObject>
+)
+
+data class resetRequest(
+    val email: String
+)
+
+data class DefaultResponse2(
+    val message: String,
+    val isSucces: Boolean,
+    val data: JsonObject
 )
 
 data class User(
