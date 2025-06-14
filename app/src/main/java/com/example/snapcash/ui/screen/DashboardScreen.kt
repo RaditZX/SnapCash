@@ -123,8 +123,6 @@ fun DashboardScreen(
         selectedFilterTranslate = "DAY"
     }
 
-
-
     val months = listOf(
         "January", "February", "March", "April", "May", "June",
         "July", "August", "September", "October", "November", "December"
@@ -136,13 +134,13 @@ fun DashboardScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF0D0F13))
+            .background(MaterialTheme.colorScheme.background)
             .padding(16.dp)
             .verticalScroll(scrollState)
     ) {
         Text(
             text = "Welcome Back ${userData.username.toString()}",
-            color = Color.White,
+            color = MaterialTheme.colorScheme.onBackground,
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier
@@ -199,23 +197,23 @@ fun DashboardScreen(
             ) {
                 Text(
                     text = if (isIncomeMode) "MONEY EARNED" else "MONEY SPENT",
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onBackground,
                     fontSize = 20.sp,
                     modifier = Modifier.padding(vertical = 4.dp)
                 )
                 Text(
                     text = formatCurrency(dashboardData?.total ?: 0),
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onBackground,
                     fontSize = 28.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(vertical = 4.dp)
                 )
-                Text("COMPARISON TO LAST ${selectedFilterTranslate}", color = Color.White, fontSize = 14.sp, modifier = Modifier.padding(top = 4.dp, bottom = 2.dp))
-                Text(formatCurrency(dashboardData?.totalTahunSebelumnya ?: 0), color = Color.White, fontSize = 28.sp, fontWeight = FontWeight.Bold)
+                Text("COMPARISON TO LAST ${selectedFilterTranslate}", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 14.sp, modifier = Modifier.padding(top = 4.dp, bottom = 2.dp))
+                Text(formatCurrency(dashboardData?.totalTahunSebelumnya ?: 0), color = MaterialTheme.colorScheme.onBackground, fontSize = 28.sp, fontWeight = FontWeight.Bold)
             }
             Text(
                 text = formatCurrency(dashboardData?.perubahanTotal ?: 0),
-                color = if (isIncomeMode) Color(0xFF00FF00) else Color(0xFFFF1E00),
+                color = if (isIncomeMode) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.error,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -224,7 +222,7 @@ fun DashboardScreen(
         // Progress Chart
         Text(
             text = if (isIncomeMode) "Progress Earned Charts" else "Progress Spent Charts",
-            color = Color.White,
+            color = MaterialTheme.colorScheme.onBackground,
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(bottom = 8.dp)
@@ -250,7 +248,7 @@ fun DashboardScreen(
         // Line Chart + Table
         Text(
             text = if (isIncomeMode) "Money Earned (${selectedFilterTranslate})" else "Money Spent (${selectedFilterTranslate})",
-            color = Color.White,
+            color = MaterialTheme.colorScheme.onBackground,
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(bottom = 8.dp)
@@ -259,9 +257,9 @@ fun DashboardScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 16.dp)
-                .border(2.dp, Brush.linearGradient(listOf(Color.White.copy(alpha = 0.8f), Color.White.copy(alpha = 0.2f), Color.Transparent)), RoundedCornerShape(16.dp)),
+                .border(2.dp, Brush.linearGradient(listOf(MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f), MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f), Color.Transparent)), RoundedCornerShape(16.dp)),
             shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFF2A2A2A))
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 LineChartDashboard(totalByRange = dashboardData?.TotalByRange ?: emptyMap())
@@ -276,10 +274,10 @@ fun DashboardScreen(
 
     if (isLoading) {
         Box(
-            modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 1f)),
+            modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background.copy(alpha = 1f)),
             contentAlignment = Alignment.Center
         ) {
-            CircularProgressIndicator()
+            CircularProgressIndicator(color = MaterialTheme.colorScheme.onBackground)
         }
     }
 }
@@ -304,7 +302,7 @@ fun tableChartData(year: String, amount: Int) {
             ) {
                 Text(
                     text = year,
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onBackground,
                     fontSize = 14.sp
                 )
             }
@@ -314,7 +312,7 @@ fun tableChartData(year: String, amount: Int) {
             ) {
                 Text(
                     text = formatCurrency(amount),
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onBackground,
                     fontSize = 14.sp
                 )
             }

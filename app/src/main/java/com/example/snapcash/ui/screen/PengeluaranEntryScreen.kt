@@ -208,7 +208,7 @@ fun PengeluaranEntryScreen(
 
     if (isLoading) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            CircularProgressIndicator()
+            CircularProgressIndicator(color = MaterialTheme.colorScheme.onBackground)
         }
     } else {
         Scaffold(
@@ -226,42 +226,42 @@ fun PengeluaranEntryScreen(
                                 Icon(
                                     imageVector = Icons.Default.ArrowBack,
                                     contentDescription = "Back",
-                                    tint = MaterialTheme.colorScheme.onSurface
+                                    tint = MaterialTheme.colorScheme.onBackground
                                 )
                             }
                         } else {
-                            Spacer(modifier = Modifier.width(48.dp)) // Placeholder to align title
+                            Spacer(modifier = Modifier.width(48.dp))
                         }
                         Text(
                             text = "CATAT",
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface,
+                            color = MaterialTheme.colorScheme.onBackground,
                             textAlign = TextAlign.Center,
                             modifier = Modifier.weight(1f)
                         )
-                        Spacer(modifier = Modifier.width(48.dp)) // Balance the layout
+                        Spacer(modifier = Modifier.width(48.dp))
                     }
 
                     TabRow(
                         selectedTabIndex = 1,
-                        contentColor = Color(0xFF2D6CE9),
+                        contentColor = MaterialTheme.colorScheme.primary,
                         indicator = { tabPositions ->
                             TabRowDefaults.Indicator(
                                 modifier = Modifier.tabIndicatorOffset(tabPositions[1]),
-                                color = Color(0xFF2D6CE9)
+                                color = MaterialTheme.colorScheme.primary
                             )
                         }
                     ) {
                         Tab(
                             selected = false,
                             onClick = { navController.navigate("tambah/pemasukan") },
-                            text = { Text("INCOME", color = Color.Gray) }
+                            text = { Text("INCOME", color = MaterialTheme.colorScheme.onSurfaceVariant) }
                         )
                         Tab(
                             selected = true,
                             onClick = {},
-                            text = { Text("OUTCOME", fontWeight = FontWeight.Bold) }
+                            text = { Text("OUTCOME", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground) }
                         )
                     }
                 }
@@ -269,16 +269,18 @@ fun PengeluaranEntryScreen(
             floatingActionButton = {
                 if (isUpdate) {
                     FloatingActionButton(
-                        containerColor = Color(0xFF2D6CE9),
                         onClick = { viewModel.deletePengeluaranById(id.toString(), navController,onResult = { success, message ->
                             dialogMessage.value = message  // Update the popup message
                             showDialogMessage.value = true  // Show the popup
                             isSuccess.value = success
                         }) }
+
+                        containerColor = MaterialTheme.colorScheme.primary,
                     ) {
                         Icon(
                             imageVector = Icons.Default.Delete,
-                            contentDescription = "Delete Pengeluaran"
+                            contentDescription = "Delete Pengeluaran",
+                            tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
                 }
@@ -295,11 +297,12 @@ fun PengeluaranEntryScreen(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text("Total Outcome", style = MaterialTheme.typography.bodyLarge)
+                        Text("Total Outcome", style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onBackground)
                         Text(
                             formatRupiah(total),
                             style = MaterialTheme.typography.bodyLarge,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onBackground
                         )
                     }
                     Button(
@@ -320,13 +323,13 @@ fun PengeluaranEntryScreen(
                         },
                         modifier = Modifier.fillMaxWidth(),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF2D6CE9),
-                            contentColor = Color.White,
-                            disabledContainerColor = Color.Gray,
-                            disabledContentColor = Color.Gray
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary,
+                            disabledContainerColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                            disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     ) {
-                        Text("SUBMIT")
+                        Text("SUBMIT", color = MaterialTheme.colorScheme.onPrimary)
                     }
                 }
             }
@@ -343,42 +346,42 @@ fun PengeluaranEntryScreen(
                         OutlinedTextField(
                             value = judul,
                             onValueChange = { judul = it },
-                            label = { Text("Title") },
+                            label = { Text("Title", color = MaterialTheme.colorScheme.onSurfaceVariant) },
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(12.dp),
                             colors = OutlinedTextFieldDefaults.colors(
-                                unfocusedBorderColor = Color.Gray,
-                                focusedBorderColor = Color.Blue
+                                unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                                focusedBorderColor = MaterialTheme.colorScheme.primary
                             )
                         )
                         OutlinedTextField(
                             value = toko,
                             onValueChange = { toko = it },
-                            label = { Text("Store") },
+                            label = { Text("Store", color = MaterialTheme.colorScheme.onSurfaceVariant) },
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(12.dp),
                             colors = OutlinedTextFieldDefaults.colors(
-                                unfocusedBorderColor = Color.Gray,
-                                focusedBorderColor = Color.Blue
+                                unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                                focusedBorderColor = MaterialTheme.colorScheme.primary
                             )
                         )
                         OutlinedTextField(
                             value = tanggal,
                             onValueChange = {},
-                            label = { Text("Date") },
+                            label = { Text("Date", color = MaterialTheme.colorScheme.onSurfaceVariant) },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .pointerInput(Unit) { detectTapGestures { datePicker.show() } },
                             shape = RoundedCornerShape(12.dp),
                             trailingIcon = {
                                 IconButton(onClick = { datePicker.show() }) {
-                                    Icon(Icons.Default.DateRange, contentDescription = "Pilih Tanggal")
+                                    Icon(Icons.Default.DateRange, contentDescription = "Pilih Tanggal", tint = MaterialTheme.colorScheme.onSurfaceVariant)
                                 }
                             },
                             colors = OutlinedTextFieldDefaults.colors(
-                                unfocusedBorderColor = Color.Gray,
-                                focusedBorderColor = Color.Blue,
-                                disabledBorderColor = Color.Gray,
+                                unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                disabledBorderColor = MaterialTheme.colorScheme.outline,
                                 disabledTextColor = MaterialTheme.colorScheme.onSurface,
                                 disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
                                 disabledTrailingIconColor = MaterialTheme.colorScheme.onSurface
@@ -392,14 +395,12 @@ fun PengeluaranEntryScreen(
                             selectedOption = kategori,
                             onOptionSelected = { selected ->
                                 if (selected == "Tambah Kategori") {
-                                    // Navigasi ke ListKategoriScreen
                                     navController.navigate("kategori")
                                 } else {
-                                    // Update kategori jika bukan opsi "Tambah Kategori"
                                     kategori = selected
                                 }
                             },
-                            containerColor = night,
+                            containerColor = MaterialTheme.colorScheme.surface,
                             customOptionContent = { option ->
                                 @Composable {
                                     if (option == "Tambah Kategori") {
@@ -407,15 +408,15 @@ fun PengeluaranEntryScreen(
                                             verticalAlignment = Alignment.CenterVertically,
                                             modifier = Modifier.padding(8.dp)
                                         ) {
-                                            Text(option, modifier = Modifier.weight(1f))
+                                            Text(option, modifier = Modifier.weight(1f), color = MaterialTheme.colorScheme.onSurface)
                                             Icon(
                                                 imageVector = Icons.Default.Add,
                                                 contentDescription = "Tambah Kategori",
-                                                tint = Color(0xFF2D6CE9) // Warna biru untuk konsistensi
+                                                tint = MaterialTheme.colorScheme.primary
                                             )
                                         }
                                     } else {
-                                        Text(option, modifier = Modifier.padding(8.dp))
+                                        Text(option, modifier = Modifier.padding(8.dp), color = MaterialTheme.colorScheme.onSurface)
                                     }
                                 }
                             }
@@ -431,7 +432,8 @@ fun PengeluaranEntryScreen(
                         Text(
                             "List Item",
                             fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onBackground
                         )
                         IconButton(
                             onClick = {
@@ -442,13 +444,13 @@ fun PengeluaranEntryScreen(
                             Icon(
                                 imageVector = Icons.Default.Add,
                                 contentDescription = "Tambah Barang",
-                                tint = Color(0xFF2D6CE9)
+                                tint = MaterialTheme.colorScheme.primary
                             )
                         }
                     }
                     Spacer(modifier = Modifier.height(8.dp))
                     if (barangList.isEmpty()) {
-                        Text("There are no items", color = Color.Gray)
+                        Text("There are no items", color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
                 itemsIndexed(barangList) { index, barang ->
@@ -464,18 +466,18 @@ fun PengeluaranEntryScreen(
                             Text(
                                 barang.nama,
                                 fontSize = 14.sp,
-                                color = Color.White
+                                color = MaterialTheme.colorScheme.onBackground
                             )
                             Text(
                                 "Quantity: ${barang.jumlah} | Price: ${formatRupiah(barang.harga.toInt())}",
                                 fontSize = 12.sp,
-                                color = Color.Gray
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                         IconButton(onClick = {
                             barangList = barangList.toMutableList().apply { removeAt(index) }
                         }) {
-                            Icon(Icons.Default.Delete, contentDescription = "Hapus", tint = Color.Red)
+                            Icon(Icons.Default.Delete, contentDescription = "Hapus", tint = MaterialTheme.colorScheme.error)
                         }
                     }
                 }
@@ -488,7 +490,8 @@ fun PengeluaranEntryScreen(
                         Text(
                             "Additional Cost",
                             fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onBackground
                         )
                         IconButton(
                             onClick = {
@@ -499,13 +502,13 @@ fun PengeluaranEntryScreen(
                             Icon(
                                 imageVector = Icons.Default.Add,
                                 contentDescription = "Tambah Biaya",
-                                tint = Color(0xFF2D6CE9)
+                                tint = MaterialTheme.colorScheme.primary
                             )
                         }
                     }
                     Spacer(modifier = Modifier.height(8.dp))
                     if (biayalist.isEmpty()) {
-                        Text("There are no additional costs", color = Color.Gray)
+                        Text("There are no additional costs", color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
                 itemsIndexed(biayalist) { index, biaya ->
@@ -518,12 +521,12 @@ fun PengeluaranEntryScreen(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Column {
-                            Text("${biaya.namabiaya} - ${formatRupiah(biaya.jumlahbiaya.toInt())}", fontSize = 14.sp)
+                            Text("${biaya.namabiaya} - ${formatRupiah(biaya.jumlahbiaya.toInt())}", fontSize = 14.sp, color = MaterialTheme.colorScheme.onBackground)
                         }
                         IconButton(onClick = {
                             biayalist = biayalist.toMutableList().apply { removeAt(index) }
                         }) {
-                            Icon(Icons.Default.Delete, contentDescription = "Hapus", tint = Color.Red)
+                            Icon(Icons.Default.Delete, contentDescription = "Hapus", tint = MaterialTheme.colorScheme.error)
                         }
                     }
                 }
@@ -573,8 +576,8 @@ fun PengeluaranEntryScreen(
     if (showCancelDialog && preview) {
         AlertDialog(
             onDismissRequest = { showCancelDialog = false },
-            title = { Text("Konfirmasi") },
-            text = { Text("Apakah Anda yakin ingin kembali?") },
+            title = { Text("Konfirmasi", color = MaterialTheme.colorScheme.onBackground) },
+            text = { Text("Apakah Anda yakin ingin kembali?", color = MaterialTheme.colorScheme.onBackground) },
             confirmButton = {
                 Button(
                     onClick = {
@@ -584,14 +587,15 @@ fun PengeluaranEntryScreen(
                             isSuccess.value = success
                         })
                         showCancelDialog = false
-                    }
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                 ) {
-                    Text("Batal")
+                    Text("Batal", color = MaterialTheme.colorScheme.onPrimary)
                 }
             },
             dismissButton = {
                 OutlinedButton(onClick = { showCancelDialog = false }) {
-                    Text("Cancel")
+                    Text("Cancel", color = MaterialTheme.colorScheme.onBackground)
                 }
             }
         )

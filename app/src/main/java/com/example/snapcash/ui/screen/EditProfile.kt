@@ -36,6 +36,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -118,7 +119,7 @@ fun EditProfileScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF0D0F13)),
+            .background(MaterialTheme.colorScheme.background),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
@@ -133,7 +134,7 @@ fun EditProfileScreen(
                     .height(180.dp)
                     .background(
                         brush = Brush.verticalGradient(
-                            listOf(Color(0xFF2D6CE9), Color.Transparent)
+                            listOf(MaterialTheme.colorScheme.primary, Color.Transparent)
                         ),
                         shape = RoundedCornerShape(bottomStart = 100.dp, bottomEnd = 100.dp)
                     )
@@ -151,7 +152,7 @@ fun EditProfileScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .clip(CircleShape)
-                        .background(Color.Gray) // bantu debug
+                        .background(MaterialTheme.colorScheme.surfaceVariant) // bantu debug
                 ) {
                     Image(
                         painter = painter,
@@ -203,18 +204,15 @@ fun EditProfileScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2979FF))
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                 ) {
-                    Text("Save", color = Color.White)
+                    Text("Save", color = MaterialTheme.colorScheme.onPrimary)
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
             }
         }
 
-
-
-        // 📦 Overlay Dialog
 
     }
     // 🔄 Overlay Loading
@@ -258,11 +256,11 @@ fun EditProfileField(
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = Color.White,
+                tint = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier.size(20.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
-            Text(label, color = Color.White)
+            Text(label, color = MaterialTheme.colorScheme.onBackground)
         }
         Spacer(modifier = Modifier.height(4.dp))
         TextField(
@@ -271,13 +269,13 @@ fun EditProfileField(
             modifier = Modifier
                 .fillMaxWidth(),
             colors = TextFieldDefaults.colors(
-                focusedTextColor = Color.White,
-                unfocusedTextColor = Color.White,
+                focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
                 focusedContainerColor = Color.Transparent,
                 unfocusedContainerColor = Color.Transparent,
-                cursorColor = Color.White,
-                focusedIndicatorColor = Color(0xFF2979FF),
-                unfocusedIndicatorColor = Color.Gray,
+                cursorColor = MaterialTheme.colorScheme.onBackground,
+                focusedIndicatorColor = MaterialTheme.colorScheme.primary,
+                unfocusedIndicatorColor = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         )
     }
@@ -303,11 +301,11 @@ fun EditProfileDropdownField(
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = Color.White,
+                tint = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier.size(20.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
-            Text(label, color = Color.White)
+            Text(label, color = MaterialTheme.colorScheme.onBackground)
         }
         Spacer(modifier = Modifier.height(4.dp))
         ExposedDropdownMenuBox(
@@ -325,13 +323,13 @@ fun EditProfileDropdownField(
                     .menuAnchor()
                     .fillMaxWidth(),
                 colors = TextFieldDefaults.colors(
-                    focusedTextColor = Color.White,
-                    unfocusedTextColor = Color.White,
+                    focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                    unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
                     focusedContainerColor = Color.Transparent,
                     unfocusedContainerColor = Color.Transparent,
-                    cursorColor = Color.White,
-                    focusedIndicatorColor = Color(0xFF2979FF),
-                    unfocusedIndicatorColor = Color.Gray,
+                    cursorColor = MaterialTheme.colorScheme.onBackground,
+                    focusedIndicatorColor = MaterialTheme.colorScheme.primary,
+                    unfocusedIndicatorColor = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             )
             ExposedDropdownMenu(
@@ -340,7 +338,7 @@ fun EditProfileDropdownField(
             ) {
                 options.forEach { selectionOption ->
                     DropdownMenuItem(
-                        text = { Text(selectionOption, color = Color.White) },
+                        text = { Text(selectionOption, color = MaterialTheme.colorScheme.onBackground) },
                         onClick = {
                             onOptionSelected(selectionOption)
                             expanded = false
@@ -351,7 +349,6 @@ fun EditProfileDropdownField(
         }
     }
 }
-
 
 @Composable
 fun EditProfileImageField(
@@ -381,11 +378,11 @@ fun EditProfileImageField(
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = Color.White,
+                tint = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier.size(20.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
-            Text(label, color = Color.White)
+            Text(label, color = MaterialTheme.colorScheme.onBackground)
         }
         Spacer(modifier = Modifier.height(4.dp))
 
@@ -396,14 +393,14 @@ fun EditProfileImageField(
                     pickImageLauncher.launch("image/*")
                 }
                 .padding(16.dp)
-                .border(1.dp, Color.Gray, RoundedCornerShape(8.dp))
+                .border(1.dp, MaterialTheme.colorScheme.onSurfaceVariant, RoundedCornerShape(8.dp))
                 .padding(16.dp)
         ) {
             // Placeholder: tampilkan ikon saat tidak ada gambar yang dipilih
             Icon(
                 imageVector = Icons.Default.Person,
                 contentDescription = "Select Image",
-                tint = Color.Gray,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.align(Alignment.Center)
             )
         }
@@ -423,4 +420,3 @@ fun uriToFile(context: Context, uri: Uri): File? {
         null
     }
 }
-

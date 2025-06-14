@@ -24,6 +24,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RangeSlider
 import androidx.compose.material3.SliderDefaults
@@ -51,14 +52,14 @@ import com.example.snapcash.ui.theme.night
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
-
+import androidx.compose.material3.OutlinedTextFieldDefaults
 
 @Composable
 fun FilterBottomSheet(
     onDismiss: () -> Unit,
     categoryViewModel: CategoryViewModel = hiltViewModel(),
     isPemasukan: Boolean = false,
-    filterData: (FilterModel) ->Unit,
+    filterData: (FilterModel) -> Unit,
     navController: NavController,
     dataTransaction: List<Transaction>,
     periode: String
@@ -73,7 +74,6 @@ fun FilterBottomSheet(
     var kategori by remember { mutableStateOf("") }
     val kategoriPemasukanList = listOf("Gaji", "Investasi", "Bisnis", "Hadiah")
     val kategoriPengeluaranList = listOf("Transportasi", "Belanja", "Pendidikan", "Hiburan")
-
     categoryViewModel.getAllCategories()
     val defaultList = if (isPemasukan) {
         kategoriPemasukanList
@@ -91,9 +91,8 @@ fun FilterBottomSheet(
 
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        color = Color(0xFF0D0F13),
+        color = MaterialTheme.colorScheme.surface,
         shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
-
     ) {
         Column(
             Modifier
@@ -103,14 +102,14 @@ fun FilterBottomSheet(
             Box(
                 modifier = Modifier
                     .size(width = 40.dp, height = 4.dp)
-                    .background(Color.White.copy(alpha = 0.3f), RoundedCornerShape(2.dp))
+                    .background(MaterialTheme.colorScheme.outline, RoundedCornerShape(2.dp))
                     .align(Alignment.CenterHorizontally)
             )
 
             Spacer(Modifier.height(16.dp))
 
             Row (modifier = Modifier.fillMaxWidth(),horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                Text("Filter", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                Text("Filter", color = MaterialTheme.colorScheme.onSurface, fontSize = 20.sp, fontWeight = FontWeight.Bold)
                 IconButton(onClick = {
                     minValue = range.start.toInt()
                     maxValue = range.endInclusive.toInt()
@@ -132,114 +131,100 @@ fun FilterBottomSheet(
             Spacer(Modifier.height(30.dp))
 
             Row {
-                // Start Date Input
                 OutlinedTextField(
                     value = startDate,
-                    onValueChange = {}, // Read-only
-                    label = { Text("Start Date") },
+                    onValueChange = {},
+                    label = { Text("Start Date", color = MaterialTheme.colorScheme.onSurfaceVariant) },
                     readOnly = true,
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier.weight(1f),
                     trailingIcon = {
                         IconButton(onClick = { showStartDatePicker = true }) {
-                            Icon(Icons.Default.DateRange, contentDescription = "Select start date")
+                            Icon(Icons.Default.DateRange, contentDescription = "Select start date", tint = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
-                    }
+                    },
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.outline
+                    )
                 )
 
                 Spacer(modifier = Modifier.width(16.dp))
 
-                // End Date Input
                 OutlinedTextField(
                     value = endDate,
-                    onValueChange = {}, // Read-only
-                    label = { Text("End Date") },
+                    onValueChange = {},
+                    label = { Text("End Date", color = MaterialTheme.colorScheme.onSurfaceVariant) },
                     readOnly = true,
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier.weight(1f),
                     trailingIcon = {
                         IconButton(onClick = { showEndDatePicker = true }) {
-                            Icon(Icons.Default.DateRange, contentDescription = "Select end date")
+                            Icon(Icons.Default.DateRange, contentDescription = "Select end date", tint = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
-                    }
+                    },
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.outline
+                    )
                 )
             }
 
-
-            // Show Start Date Picker if `showStartDatePicker` is true
             if (showStartDatePicker) {
                 DatePickerDialogExample(onDatePicked = { selectedDate ->
                     startDate = selectedDate
                     showStartDatePicker = false
-                },onDismiss = {
-                    showStartDatePicker = false // reset saat dibatalkan
-                })
+                }, onDismiss = { showStartDatePicker = false })
             }
 
             if (showEndDatePicker) {
                 DatePickerDialogExample(onDatePicked = { selectedDate ->
                     endDate = selectedDate
                     showEndDatePicker = false
-                },onDismiss = {
-                    showEndDatePicker = false // reset saat dibatalkan
-                })
+                }, onDismiss = { showEndDatePicker = false })
             }
-
-
-
 
             Spacer(Modifier.height(40.dp))
 
-            Text("Nominal", color = Color.White)
+            Text("Nominal", color = MaterialTheme.colorScheme.onSurface)
 
-            // RangeSlider to adjust min/max values
             RangeSlider(
                 value = range,
                 onValueChange = {
                     range = it
-                    minValue = it.start.toInt()  // Update min value
-                    maxValue = it.endInclusive.toInt()  // Update max value
+                    minValue = it.start.toInt()
+                    maxValue = it.endInclusive.toInt()
                 },
                 valueRange = 0f..20000000f,
                 steps = 200,
                 colors = SliderDefaults.colors(
-                    thumbColor = Color.White,
-                    activeTrackColor = Color(0xFF2D6CE9),
-                    activeTickColor = Color(0xFF2D6CE9),
+                    thumbColor = MaterialTheme.colorScheme.onSurface,
+                    activeTrackColor = MaterialTheme.colorScheme.primary,
+                    activeTickColor = MaterialTheme.colorScheme.primary
                 )
             )
 
-            // Manual input fields for min and max values with OutlinedTextField
             Row(
                 Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-
                 Column(Modifier.weight(1f)) {
-                    Text("Min", color = Color.White) // Label outside the TextField
+                    Text("Min", color = MaterialTheme.colorScheme.onSurface)
                     CurrencyInputField(
                         label = "Min",
                         value = minValue,
                         onValueChange = { minValue = it },
-                        modifier = Modifier
-                            .fillMaxWidth() // Make sure the TextField takes full width
-
+                        modifier = Modifier.fillMaxWidth()
                     )
                 }
-
-
-                // Spacer to add gap between TextFields
-                Spacer(Modifier.width(16.dp)) // Adjust the gap size as needed
-
-                // Max Value Label and TextField
+                Spacer(Modifier.width(16.dp))
                 Column(Modifier.weight(1f)) {
-                    Text("Max", color = Color.White) // Label outside the TextField
+                    Text("Max", color = MaterialTheme.colorScheme.onSurface)
                     CurrencyInputField(
                         label = "Max",
                         value = maxValue,
                         onValueChange = { maxValue = it },
-                        modifier = Modifier
-                            .fillMaxWidth() // Make sure the TextField takes full width
+                        modifier = Modifier.fillMaxWidth()
                     )
                 }
             }
@@ -247,13 +232,12 @@ fun FilterBottomSheet(
             Spacer(Modifier.height(24.dp))
 
             Column {
-                Text("Kategori", color = Color.White)
+                Text("Kategori", color = MaterialTheme.colorScheme.onSurface)
                 Spacer(Modifier.height(10.dp))
                 DropdownMenu(
-                    containerColor = night,
+                    containerColor = MaterialTheme.colorScheme.surface,
                     label = "Kategori",
                     options = allCategories,
-
                     selectedOption = kategori,
                     onOptionSelected = { kategori = it }
                 )
@@ -271,19 +255,12 @@ fun FilterBottomSheet(
                     )
                     filterData(filterModel)
                     onDismiss()
-
-
                     navController.navigate("history")
-
-
                 },
                 modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF2D6CE9),
-                    contentColor = Color.White
-                )
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {
-                Text("Apply Filter")
+                Text("Apply Filter", color = MaterialTheme.colorScheme.onPrimary)
             }
 
             ExportPdfButton(dataTransaction, LocalContext.current, periode, isPemasukan)
@@ -291,16 +268,12 @@ fun FilterBottomSheet(
             Spacer(Modifier.height(24.dp))
         }
     }
-
-
 }
-
-
 
 @Composable
 fun DatePickerDialogExample(
     onDatePicked: (String) -> Unit,
-    onDismiss: () -> Unit = {} // optional callback saat dialog dibatalkan
+    onDismiss: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val calendar = Calendar.getInstance()
@@ -338,8 +311,6 @@ fun DatePickerDialogExample(
         datePickerDialog.show()
     }
 }
-
-
 
 
 

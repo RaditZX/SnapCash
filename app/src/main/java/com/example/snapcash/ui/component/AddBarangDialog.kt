@@ -27,6 +27,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.snapcash.ui.theme.night
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextFieldDefaults
 
 @Composable
 fun AddBarangDialog(
@@ -38,7 +41,7 @@ fun AddBarangDialog(
         Dialog(onDismissRequest = onDismiss) {
             Box(
                 modifier = Modifier
-                    .background(night, shape = RoundedCornerShape(12.dp))
+                    .background(MaterialTheme.colorScheme.surface, shape = RoundedCornerShape(12.dp))
                     .padding(16.dp)
             ) {
                 var namaProduk by remember { mutableStateOf("") }
@@ -46,37 +49,42 @@ fun AddBarangDialog(
                 var jumlah by remember { mutableStateOf("") }
                 var harga by remember { mutableStateOf(0) }
 
-
                 Column(
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text("Tambah Barang", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                    Text("Tambah Barang", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
 
                     OutlinedTextField(
                         value = namaProduk, onValueChange = { namaProduk = it },
-                        label = { Text("Nama Produk") },
+                        label = { Text("Nama Produk", color = MaterialTheme.colorScheme.onSurfaceVariant) },
                         shape = RoundedCornerShape(12.dp),
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outline
+                        )
                     )
-
 
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         OutlinedTextField(
                             value = jumlah,
                             onValueChange = {
-                                // Hanya izinkan angka positif selain 0
                                 if (it.matches(Regex("^[1-9][0-9]*$")) || it.isEmpty()) {
                                     jumlah = it
                                 }
                             },
-                            label = { Text("Quantity") },
+                            label = { Text("Quantity", color = MaterialTheme.colorScheme.onSurfaceVariant) },
                             shape = RoundedCornerShape(12.dp),
                             modifier = Modifier.weight(1f),
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                unfocusedBorderColor = MaterialTheme.colorScheme.outline
+                            )
                         )
 
-                        CurrencyInputField("Price", harga, {harga = it}, Modifier.weight(1f))
+                        CurrencyInputField("Price", harga, { harga = it }, Modifier.weight(1f))
                     }
 
                     Button(
@@ -85,9 +93,9 @@ fun AddBarangDialog(
                             onDismiss()
                         },
                         modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(Color(0xFF2D6CE9))
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                     ) {
-                        Text("Add", color = Color.White)
+                        Text("Add", color = MaterialTheme.colorScheme.onPrimary)
                     }
                 }
             }

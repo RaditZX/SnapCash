@@ -36,8 +36,8 @@ fun DropdownMenu(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .border(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
-                .background(color = containerColor, RoundedCornerShape(12.dp))
+                .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(12.dp))
+                .background(color = MaterialTheme.colorScheme.background, RoundedCornerShape(12.dp))
                 .clickable { expanded = true }
                 .padding(16.dp)
         ) {
@@ -47,7 +47,7 @@ fun DropdownMenu(
             ) {
                 Text(
                     text = selectedOption.ifEmpty { "Pilih $label" },
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = if (selectedOption.isEmpty()) 0.5f else 1f)
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Icon(Icons.Default.ArrowDropDown, contentDescription = "Dropdown")
             }
