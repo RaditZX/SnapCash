@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
@@ -38,11 +39,8 @@ fun BottomNavigationBar(navController: NavController) {
     val currentRoute = navController.currentBackStackEntry?.destination?.route
 
     Box {
-        val backgroundColor = if (isSystemInDarkTheme()) Color(0xFF1E1E1E) else night
-        val navPrimaryColor  = Color(0xFF2D6CE9)
-
         NavigationBar(
-            containerColor = backgroundColor,
+            containerColor = MaterialTheme.colorScheme.surface,
             modifier = Modifier.height(100.dp)
         ) {
             NavigationBarItem(
@@ -51,16 +49,12 @@ fun BottomNavigationBar(navController: NavController) {
                     Icon(
                         Icons.Default.Home,
                         contentDescription = "Home",
-
-                        )
+                        tint = if (currentRoute == "dashboard") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 },
-                label = { Text("Home") },
+                label = { Text("Home", color = if (currentRoute == "dashboard") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant) },
                 selected = currentRoute == "dashboard",
                 colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = navPrimaryColor,
-                    unselectedIconColor = Color.Gray,
-                    selectedTextColor = navPrimaryColor,
-                    unselectedTextColor = Color.Gray,
                     indicatorColor = Color.Transparent
                 ),
                 onClick = { navController.navigate("dashboard") }
@@ -68,19 +62,15 @@ fun BottomNavigationBar(navController: NavController) {
             NavigationBarItem(
                 modifier = Modifier.offset(y = 5.dp).offset(x = (-10).dp),
                 icon = {
-                        Image(
-                            painter = painterResource(R.drawable.baseline_sticky_note_2_24),
-                            contentDescription = null,
-                            colorFilter = ColorFilter.tint(Color.DarkGray)
-                        )
+                    Image(
+                        painter = painterResource(R.drawable.baseline_sticky_note_2_24),
+                        contentDescription = null,
+                        colorFilter = ColorFilter.tint(if (currentRoute == "tambah/pengeluaran" || currentRoute == "tambah/pemasukan") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant)
+                    )
                 },
-                label = { Text("Catat" ) },
+                label = { Text("Catat", color = if (currentRoute == "tambah/pengeluaran" || currentRoute == "tambah/pemasukan") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant) },
                 selected = currentRoute == "tambah/pengeluaran" || currentRoute == "tambah/pemasukan",
                 colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = navPrimaryColor,
-                    unselectedIconColor = Color.Gray,
-                    selectedTextColor = navPrimaryColor,
-                    unselectedTextColor = Color.Gray,
                     indicatorColor = Color.Transparent
                 ),
                 onClick = { navController.navigate("tambah/pengeluaran") }
@@ -92,16 +82,12 @@ fun BottomNavigationBar(navController: NavController) {
                     Image(
                         painter = painterResource(R.drawable.baseline_history_24),
                         contentDescription = null,
-                        colorFilter = ColorFilter.tint(Color.DarkGray)
+                        colorFilter = ColorFilter.tint(if (currentRoute == "history") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant)
                     )
                 },
-                label = { Text("History") },
+                label = { Text("History", color = if (currentRoute == "history") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant) },
                 selected = currentRoute == "history",
                 colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = navPrimaryColor,
-                    unselectedIconColor = Color.Gray,
-                    selectedTextColor = navPrimaryColor,
-                    unselectedTextColor = Color.Gray,
                     indicatorColor = Color.Transparent
                 ),
                 onClick = { navController.navigate("history") }
@@ -112,15 +98,12 @@ fun BottomNavigationBar(navController: NavController) {
                     Icon(
                         Icons.Default.Person,
                         contentDescription = "Profile",
+                        tint = if (currentRoute == "profile") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 },
-                label = { Text("Profile") },
+                label = { Text("Profile", color = if (currentRoute == "profile") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant) },
                 selected = currentRoute == "profile",
                 colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = navPrimaryColor,
-                    unselectedIconColor = Color.Gray,
-                    selectedTextColor = navPrimaryColor,
-                    unselectedTextColor = Color.Gray,
                     indicatorColor = Color.Transparent
                 ),
                 onClick = { navController.navigate("profile") }
@@ -129,18 +112,14 @@ fun BottomNavigationBar(navController: NavController) {
 
         FloatingActionButton(
             onClick = { navController.navigate("camera") },
-            containerColor = Color(0xFF2D6CE9),
+            containerColor = MaterialTheme.colorScheme.primary,
             shape = CircleShape,
             modifier = Modifier
                 .size(100.dp)
                 .align(Alignment.Center)
-                .border(
-                    width = 4.dp,
-                    color = Color(0xFFA9C0FF),
-                    shape = CircleShape
-                )
+                .border(4.dp, MaterialTheme.colorScheme.outlineVariant, shape = CircleShape)
         ) {
-            Icon(Icons.Default.AddCircle, contentDescription = "Middle", tint = Color.White)
+            Icon(Icons.Default.AddCircle, contentDescription = "Middle", tint = MaterialTheme.colorScheme.onPrimary)
         }
     }
 }

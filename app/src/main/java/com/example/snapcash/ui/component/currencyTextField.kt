@@ -4,6 +4,7 @@ import androidx.benchmark.perfetto.ExperimentalPerfettoCaptureApi
 import androidx.benchmark.perfetto.PerfettoConfig.Text
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -17,8 +18,9 @@ import androidx.compose.ui.unit.dp
 import com.example.snapcash.data.SessionManager
 import java.text.NumberFormat
 import java.util.Locale
+import androidx.compose.material3.Text
+import androidx.compose.material3.OutlinedTextFieldDefaults
 
-@OptIn(ExperimentalPerfettoCaptureApi::class)
 @Composable
 fun CurrencyInputField(
     label: String,
@@ -30,7 +32,7 @@ fun CurrencyInputField(
     var isFocused by remember { mutableStateOf(false) }
 
     OutlinedTextField(
-        value =  formatCurrency(value),
+        value = formatCurrency(value),
         onValueChange = {
             rawInput = it
             val onlyDigits = it.replace("[^\\d]".toRegex(), "")
@@ -38,7 +40,7 @@ fun CurrencyInputField(
                 onValueChange(parsed)
             }
         },
-        label = { Text(label) },
+        label = { Text(label, color = MaterialTheme.colorScheme.onSurfaceVariant) },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
         singleLine = true,
         shape = RoundedCornerShape(12.dp),
@@ -47,10 +49,19 @@ fun CurrencyInputField(
             if (!focusState.isFocused) {
                 rawInput = value.toString()
             }
-        }
+        },
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedTextColor = MaterialTheme.colorScheme.onSurface,
+            unfocusedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            focusedBorderColor = MaterialTheme.colorScheme.primary,
+            unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+            focusedLabelColor = MaterialTheme.colorScheme.primary,
+            unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            cursorColor = MaterialTheme.colorScheme.primary
+        )
+
     )
 }
-
 
 fun formatCurrency(amount: Int): String {
     val localeString = SessionManager.locale?.toString() ?: "id_ID"

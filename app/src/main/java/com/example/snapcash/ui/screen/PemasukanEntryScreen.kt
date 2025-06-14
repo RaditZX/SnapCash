@@ -67,6 +67,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ButtonDefaults
 import com.example.snapcash.ViewModel.CategoryViewModel
 
 @Composable
@@ -177,42 +178,42 @@ fun PemasukanEntryScreen(
                             Icon(
                                 imageVector = Icons.Default.ArrowBack,
                                 contentDescription = "Back",
-                                tint = MaterialTheme.colorScheme.onSurface
+                                tint = MaterialTheme.colorScheme.onBackground
                             )
                         }
                     } else {
-                        Spacer(modifier = Modifier.width(48.dp)) // Placeholder to align title
+                        Spacer(modifier = Modifier.width(48.dp))
                     }
                     Text(
                         text = "CATAT",
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface,
+                        color = MaterialTheme.colorScheme.onBackground,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.weight(1f)
                     )
-                    Spacer(modifier = Modifier.width(48.dp)) // Balance the layout
+                    Spacer(modifier = Modifier.width(48.dp))
                 }
 
                 TabRow(
                     selectedTabIndex = 0,
-                    contentColor = Color(0xFF2D6CE9),
+                    contentColor = MaterialTheme.colorScheme.primary,
                     indicator = { tabPositions ->
                         TabRowDefaults.Indicator(
                             modifier = Modifier.tabIndicatorOffset(tabPositions[0]),
-                            color = Color(0xFF2D6CE9)
+                            color = MaterialTheme.colorScheme.primary
                         )
                     }
                 ) {
                     Tab(
                         selected = true,
                         onClick = {},
-                        text = { Text("INCOME", fontWeight = FontWeight.Bold) }
+                        text = { Text("INCOME", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground) }
                     )
                     Tab(
                         selected = false,
                         onClick = { navController.navigate("tambah/pengeluaran") },
-                        text = { Text("OUTCOME", color = Color.Gray) }
+                        text = { Text("OUTCOME", color = MaterialTheme.colorScheme.onSurfaceVariant) }
                     )
                 }
             }
@@ -224,12 +225,13 @@ fun PemasukanEntryScreen(
             ) {
                 if (isUpdate) {
                     FloatingActionButton(
-                        containerColor = Color(0xFF2D6CE9),
+                        containerColor = MaterialTheme.colorScheme.primary,
                         onClick = { viewModel.deletePemasukanById(id.toString(), navController) }
                     ) {
                         Icon(
                             imageVector = Icons.Default.Delete,
-                            contentDescription = "Delete Pemasukan"
+                            contentDescription = "Delete Pemasukan",
+                            tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
                 }
@@ -255,11 +257,12 @@ fun PemasukanEntryScreen(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text("Total Income", style = MaterialTheme.typography.bodyLarge)
+                    Text("Total Income", style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onBackground)
                     Text(
                         formatRupiah(total.toInt()),
                         style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onBackground
                     )
                 }
                 Button(
@@ -293,15 +296,15 @@ fun PemasukanEntryScreen(
                         }
                     },
                     colors = ButtonColors(
-                        containerColor = Color(0xFF2D6CE9),
-                        contentColor = Color.White,
-                        disabledContainerColor = Color.Gray,
-                        disabledContentColor = Color.Gray,
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary,
+                        disabledContainerColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                        disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
                     ),
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp)
                 ) {
-                    Text("SUBMIT")
+                    Text("SUBMIT", color = MaterialTheme.colorScheme.onPrimary)
                 }
             }
         }
@@ -317,18 +320,26 @@ fun PemasukanEntryScreen(
                 OutlinedTextField(
                     value = judul,
                     onValueChange = { judul = it },
-                    label = { Text("Title") },
+                    label = { Text("Title", color = MaterialTheme.colorScheme.onSurfaceVariant) },
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(12.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.outline
+                    )
                 )
             }
             item {
                 OutlinedTextField(
                     value = sumber,
                     onValueChange = { sumber = it },
-                    label = { Text("Source") },
+                    label = { Text("Source", color = MaterialTheme.colorScheme.onSurfaceVariant) },
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(12.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.outline
+                    )
                 )
             }
             item {
@@ -338,14 +349,12 @@ fun PemasukanEntryScreen(
                     selectedOption = kategori,
                     onOptionSelected = { selected ->
                         if (selected == "Tambah Kategori") {
-                            // Navigasi ke ListKategoriScreen
                             navController.navigate("kategori")
                         } else {
-                            // Update kategori jika bukan opsi "Tambah Kategori"
                             kategori = selected
                         }
                     },
-                    containerColor = night,
+                    containerColor = MaterialTheme.colorScheme.surface,
                     customOptionContent = { option ->
                         @Composable {
                             if (option == "Tambah Kategori") {
@@ -353,15 +362,15 @@ fun PemasukanEntryScreen(
                                     verticalAlignment = Alignment.CenterVertically,
                                     modifier = Modifier.padding(8.dp)
                                 ) {
-                                    Text(option, modifier = Modifier.weight(1f))
+                                    Text(option, modifier = Modifier.weight(1f), color = MaterialTheme.colorScheme.onSurface)
                                     Icon(
                                         imageVector = Icons.Default.Add,
                                         contentDescription = "Tambah Kategori",
-                                        tint = Color(0xFF2D6CE9) // Warna biru untuk konsistensi
+                                        tint = MaterialTheme.colorScheme.primary
                                     )
                                 }
                             } else {
-                                Text(option, modifier = Modifier.padding(8.dp))
+                                Text(option, modifier = Modifier.padding(8.dp), color = MaterialTheme.colorScheme.onSurface)
                             }
                         }
                     }
@@ -381,20 +390,20 @@ fun PemasukanEntryScreen(
                     OutlinedTextField(
                         value = tanggal,
                         onValueChange = {},
-                        label = { Text("Date") },
+                        label = { Text("Date", color = MaterialTheme.colorScheme.onSurfaceVariant) },
                         modifier = Modifier
                             .weight(1f)
                             .pointerInput(Unit) { detectTapGestures { datePicker.show() } },
                         shape = RoundedCornerShape(12.dp),
                         trailingIcon = {
                             IconButton(onClick = { datePicker.show() }) {
-                                Icon(Icons.Default.DateRange, contentDescription = "Pilih Tanggal")
+                                Icon(Icons.Default.DateRange, contentDescription = "Pilih Tanggal", tint = MaterialTheme.colorScheme.onSurfaceVariant)
                             }
                         },
                         colors = OutlinedTextFieldDefaults.colors(
-                            unfocusedBorderColor = Color.Gray,
-                            focusedBorderColor = Color.Blue,
-                            disabledBorderColor = Color.Gray,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            disabledBorderColor = MaterialTheme.colorScheme.outline,
                             disabledTextColor = MaterialTheme.colorScheme.onSurface,
                             disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
                             disabledTrailingIconColor = MaterialTheme.colorScheme.onSurface
@@ -413,7 +422,8 @@ fun PemasukanEntryScreen(
                     Text(
                         "Additional Add",
                         fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onBackground
                     )
                     IconButton(
                         onClick = {
@@ -423,13 +433,13 @@ fun PemasukanEntryScreen(
                         Icon(
                             imageVector = Icons.Default.Add,
                             contentDescription = "Tambah Biaya",
-                            tint = Color(0xFF2D6CE9)
+                            tint = MaterialTheme.colorScheme.primary
                         )
                     }
                 }
                 Spacer(modifier = Modifier.height(8.dp))
                 if (biayalist.isEmpty()) {
-                    Text("There are no additional add", color = Color.Gray)
+                    Text("There are no additional add", color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
             itemsIndexed(biayalist) { index, biaya ->
@@ -442,12 +452,12 @@ fun PemasukanEntryScreen(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Column {
-                        Text("${biaya.namabiaya} - ${formatRupiah(biaya.jumlahbiaya.toInt())}", fontSize = 14.sp)
+                        Text("${biaya.namabiaya} - ${formatRupiah(biaya.jumlahbiaya.toInt())}", fontSize = 14.sp, color = MaterialTheme.colorScheme.onBackground)
                     }
                     IconButton(onClick = {
                         biayalist = biayalist.toMutableList().apply { removeAt(index) }
                     }) {
-                        Icon(Icons.Default.Delete, contentDescription = "Hapus", tint = Color.Red)
+                        Icon(Icons.Default.Delete, contentDescription = "Hapus", tint = MaterialTheme.colorScheme.error)
                     }
                 }
             }
@@ -465,21 +475,22 @@ fun PemasukanEntryScreen(
     if (showCancelDialog && preview) {
         AlertDialog(
             onDismissRequest = { showCancelDialog = false },
-            title = { Text("Konfirmasi") },
-            text = { Text("Apakah Anda yakin ingin kembali?") },
+            title = { Text("Konfirmasi", color = MaterialTheme.colorScheme.onBackground) },
+            text = { Text("Apakah Anda yakin ingin kembali?", color = MaterialTheme.colorScheme.onBackground) },
             confirmButton = {
                 Button(
                     onClick = {
                         viewModel.deletePemasukanById(id.toString(), navController)
                         showCancelDialog = false
-                    }
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                 ) {
-                    Text("Batal")
+                    Text("Batal", color = MaterialTheme.colorScheme.onPrimary)
                 }
             },
             dismissButton = {
                 OutlinedButton(onClick = { showCancelDialog = false }) {
-                    Text("Cancel")
+                    Text("Cancel", color = MaterialTheme.colorScheme.onBackground)
                 }
             }
         )

@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.snapcash.ui.theme.night
+import androidx.compose.material3.OutlinedTextFieldDefaults
 
 @Composable
 fun AddBiayaDialog(
@@ -36,7 +38,7 @@ fun AddBiayaDialog(
         Dialog(onDismissRequest = onDismiss) {
             Box(
                 modifier = Modifier
-                    .background(night, shape = RoundedCornerShape(12.dp))
+                    .background(MaterialTheme.colorScheme.surface, shape = RoundedCornerShape(12.dp))
                     .padding(16.dp)
             ) {
                 var namabiaya by remember { mutableStateOf("") }
@@ -46,21 +48,24 @@ fun AddBiayaDialog(
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text("Tambahan Biaya", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                    Text("Tambahan Biaya", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
 
                     OutlinedTextField(
                         value = namabiaya, onValueChange = { namabiaya = it },
-                        label = { Text("Cost Title") },
+                        label = { Text("Cost Title", color = MaterialTheme.colorScheme.onSurfaceVariant) },
                         shape = RoundedCornerShape(12.dp),
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outline
+                        )
                     )
-
 
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         CurrencyInputField(
                             "Cost",
                             jumlahbiaya,
-                            onValueChange = { jumlahbiaya = it},
+                            onValueChange = { jumlahbiaya = it },
                             modifier = Modifier.weight(1f),
                         )
                     }
@@ -71,9 +76,9 @@ fun AddBiayaDialog(
                             onDismiss()
                         },
                         modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(Color(0xFF2D6CE9))
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                     ) {
-                        Text("Add", color = Color.White)
+                        Text("Add", color = MaterialTheme.colorScheme.onPrimary)
                     }
                 }
             }
