@@ -11,7 +11,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.snapcash.R
 import com.example.snapcash.data.SessionManager
 import com.example.snapcash.data.SignInRequest
+import com.example.snapcash.data.SignUpRequest
 import com.example.snapcash.data.SnapCashApiService
+import com.example.snapcash.data.resetRequest
 import com.example.snapcash.data.userData
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -54,11 +56,11 @@ class AuthViewModel @Inject constructor(private val apiService: SnapCashApiServi
     ))
 
     @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
-    fun signUp(email: String, password: String, onResult: (Boolean, String) -> Unit) {
+    fun signUp(email: String, password: String, confirmPassword: String, onResult: (Boolean, String) -> Unit) {
         viewModelScope.launch {
             setLoading(true)
             try {
-                val response = apiService.signUp(SignInRequest(email, password))
+                val response = apiService.signUp(SignUpRequest(email, password, confirmPassword))
                 if(response.isSucces){
                     setIsSucces(true)
                 }
@@ -132,6 +134,38 @@ class AuthViewModel @Inject constructor(private val apiService: SnapCashApiServi
         }
     }
 
+    fun resetPassowrd (email: String,onResult: (Boolean, String) -> Unit){
+        viewModelScope.launch {
+            setLoading(true)
+            try {
+                val response = apiService.resetPassword(resetRequest(email))
+                onResult(true, response.message)
+            }catch (e: HttpException) {
+                val errorBody = e.response()?.errorBody()?.string()
+                Log.d("auth", errorBody.toString() )
+                val errorMessage = errorBody?.let {
+                    try {
+                        val json = JSONObject(it)
+                        val message = json.getString("message")
+                        Log.d("auth", message)
+                        message // <--- return nilai ini dari lambda
+                    } catch (ex: Exception) {
+                        "Unknown HTTP error"
+                    }
+                } ?: "Unknown HTTP error"
+
+                Log.e("auth", "HttpException: $errorMessage")
+                onResult(false, "Error: $errorMessage")
+            }catch (e: Exception) {
+                // This handles other unexpected exceptions
+                Log.e("auth", "Exception: ${e.message ?: "Unknown error"}")
+                onResult(false, "Exception: ${e.message ?: "Unknown error"}")
+            } finally {
+                setLoading(false)
+            }
+        }
+    }
+
     fun registerWithGoogle(idToken: String, onResult: (Boolean, String) -> Unit) {
         viewModelScope.launch {
             setLoading(true)
@@ -157,6 +191,10 @@ class AuthViewModel @Inject constructor(private val apiService: SnapCashApiServi
                 Log.e("auth", "HttpException: $errorMessage")
                 onResult(false, "Error: $errorMessage")
             } catch (e: Exception) {
+                // This handles other unexpected exceptions
+                Log.e("auth", "Exception: ${e.message ?: "Unknown error"}")
+                onResult(false, "Exception: ${e.message ?: "Unknown error"}")
+            }catch (e: Exception) {
                 onResult(false, "Exception: ${e.localizedMessage}")
             }finally {
                 setLoading(false)

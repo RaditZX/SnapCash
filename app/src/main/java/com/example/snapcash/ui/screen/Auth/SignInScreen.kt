@@ -152,7 +152,7 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel = hiltVie
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier
                     .align(Alignment.End)
-                    .clickable { /* TODO: Forgot Password Logic */ }
+                    .clickable { navController.navigate("reset") }
             )
 
             Spacer(modifier = Modifier.height(16.dp))

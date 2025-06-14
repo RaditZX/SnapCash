@@ -2,6 +2,7 @@ package com.example.snapcash.ui.component
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,6 +19,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -41,7 +43,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.snapcash.ViewModel.CategoryViewModel
 import com.example.snapcash.data.FilterModel
 import com.example.snapcash.data.Transaction
 import com.example.snapcash.ui.theme.night
@@ -53,13 +57,14 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 @Composable
 fun FilterBottomSheet(
     onDismiss: () -> Unit,
+    categoryViewModel: CategoryViewModel = hiltViewModel(),
     isPemasukan: Boolean = false,
     filterData: (FilterModel) -> Unit,
     navController: NavController,
     dataTransaction: List<Transaction>,
     periode: String
 ) {
-    var range by remember { mutableStateOf(0f..200000000f) }
+    var range by remember { mutableStateOf(0f..20000000000f) }
     var minValue by remember { mutableStateOf(range.start.toInt()) }
     var maxValue by remember { mutableStateOf(range.endInclusive.toInt()) }
     var startDate by remember { mutableStateOf("") }
@@ -69,6 +74,20 @@ fun FilterBottomSheet(
     var kategori by remember { mutableStateOf("") }
     val kategoriPemasukanList = listOf("Gaji", "Investasi", "Bisnis", "Hadiah")
     val kategoriPengeluaranList = listOf("Transportasi", "Belanja", "Pendidikan", "Hiburan")
+    categoryViewModel.getAllCategories()
+    val defaultList = if (isPemasukan) {
+        kategoriPemasukanList
+    } else {
+        kategoriPengeluaranList
+    }
+
+    val categories by categoryViewModel.categories
+    val filteredFromDb = categories
+        .filter { if (isPemasukan) !it.isPengeluaran else it.isPengeluaran }
+        .map { it.nama }
+
+    val allCategories = (defaultList + filteredFromDb).distinct()
+
 
     Surface(
         modifier = Modifier.fillMaxWidth(),
@@ -89,7 +108,25 @@ fun FilterBottomSheet(
 
             Spacer(Modifier.height(16.dp))
 
-            Text("Filter", color = MaterialTheme.colorScheme.onSurface, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            Row (modifier = Modifier.fillMaxWidth(),horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                Text("Filter", color = MaterialTheme.colorScheme.onSurface, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                IconButton(onClick = {
+                    minValue = range.start.toInt()
+                    maxValue = range.endInclusive.toInt()
+                    startDate = ""
+                    endDate = ""
+                    showStartDatePicker = false
+                    showEndDatePicker = false
+                    kategori = ""
+                }) {
+                    Icon(
+                        imageVector = Icons.Default.Refresh, // atau Icons.Rounded.Restore
+                        contentDescription = "Reset Filter",
+                        tint = Color(0xFF2D6CE9)
+                    )
+                }
+
+            }
 
             Spacer(Modifier.height(30.dp))
 
@@ -200,7 +237,7 @@ fun FilterBottomSheet(
                 DropdownMenu(
                     containerColor = MaterialTheme.colorScheme.surface,
                     label = "Kategori",
-                    options = if (isPemasukan) kategoriPemasukanList else kategoriPengeluaranList,
+                    options = allCategories,
                     selectedOption = kategori,
                     onOptionSelected = { kategori = it }
                 )

@@ -27,7 +27,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -108,7 +107,6 @@ fun EditProfileScreen(
     val request = JsonObject().apply {
         addProperty("username", name)
         addProperty("currencyChoice", currency)
-        addProperty("no_hp", number)
 //        addProperty("photo", uriToFile(context, url))
     }
 
@@ -172,7 +170,6 @@ fun EditProfileScreen(
             item {
                 EditProfileField(Icons.Default.Person, "Name", name.toString()) { name = it }
                 EditProfileField(Icons.Default.Email, "Email", email.toString()) { email = it }
-                EditProfileField(Icons.Default.Phone, "Number", number.toString()) { number = it }
 
                 EditProfileImageField(
                     icon = Icons.Default.Person,
@@ -216,29 +213,29 @@ fun EditProfileScreen(
             }
         }
 
-        // 🔄 Overlay Loading
-        if (isLoading) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.background.copy(alpha = 0.3f)),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator(color = MaterialTheme.colorScheme.onBackground)
-            }
-        }
 
-        // 📦 Overlay Dialog
-        if (showDialog.value) {
-            ModernAlertDialog(
-                showDialog,
-                "UpdateProfile",
-                dialogMessage.value,
-                if (isSuccess) "profile" else "profile/edit",
-                navController
-            )
-
+    }
+    // 🔄 Overlay Loading
+    if (isLoading) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.3f)),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
         }
+    }
+
+    if (showDialog.value) {
+        ModernAlertDialog(
+            showDialog,
+            "UpdateProfile",
+            dialogMessage.value,
+            if (isSuccess) "profile" else "profile/edit",
+            navController
+        )
+
     }
 
 }

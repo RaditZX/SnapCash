@@ -5,15 +5,10 @@ import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresExtension
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.rememberModalBottomSheetState
-import androidx.compose.material3.DrawerValue
-import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
-import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -23,8 +18,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -37,15 +30,16 @@ import com.example.snapcash.ui.component.BottomNavigationBar
 import com.example.snapcash.ui.component.FilterBottomSheet
 import com.example.snapcash.ui.screen.Auth.LoginScreen
 import com.example.snapcash.ui.screen.Auth.RegisterScreen
+import com.example.snapcash.ui.screen.Auth.ResetScreen
 import com.example.snapcash.ui.screen.DashboardScreen
 import com.example.snapcash.ui.screen.EditProfileScreen
 import com.example.snapcash.ui.screen.HistoryScreen
+import com.example.snapcash.ui.screen.ListKategoriScreen
 import com.example.snapcash.ui.screen.OnboardingScreen
 import com.example.snapcash.ui.screen.PemasukanEntryScreen
 import com.example.snapcash.ui.screen.PengeluaranEntryScreen
 import com.example.snapcash.ui.screen.ProfileScreen
 import com.example.snapcash.ui.screen.Upload.CameraScreen
-import  com.example.snapcash.ui.screen.ListKategoriScreen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -91,7 +85,7 @@ fun AppNavHost(
     ) {
         Scaffold(
             bottomBar = {
-                if (currentRoute !in listOf("signIn", "signUp", "onBoarding")) {
+                if (currentRoute !in listOf("signIn", "signUp", "onBoarding","reset")) {
                     BottomNavigationBar(navController)
                 }
             },
@@ -190,6 +184,9 @@ fun AppNavHost(
                 }
                 composable("profile/edit") {
                     EditProfileScreen(navController = navController)
+                }
+                composable("reset"){
+                    ResetScreen(navController = navController)
                 }
             }
         }

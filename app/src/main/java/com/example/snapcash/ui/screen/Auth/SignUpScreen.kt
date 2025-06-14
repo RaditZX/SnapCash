@@ -78,9 +78,9 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel = hilt
             Log.d("token", idToken.toString())
             if (idToken != null) {
                 viewModel.registerWithGoogle(idToken, onResult = { success, message ->
-                    dialogMessage.value = message
-                    showDialog.value = true
-                    nextRoute.value = "dashboard"
+                    dialogMessage.value = message  // Update the popup message
+                    showDialog.value = true  // Show the popu
+                    nextRoute.value = "signin"
                 })
             } else {
                 Log.e("GoogleLogin", "Gagal mendapatkan ID Token")
@@ -176,6 +176,7 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel = hilt
                     viewModel.signUp(
                         email = emailState.value,
                         password = passwordState.value,
+                        confirmPassword = ConfirmationPasswordState.value,
                         onResult = { success, message ->
                             dialogMessage.value = message
                             showDialog.value = true
