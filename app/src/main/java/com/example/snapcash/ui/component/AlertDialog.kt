@@ -9,12 +9,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -35,7 +31,7 @@ fun ModernAlertDialog(
     showDialog: MutableState<Boolean>,
     title: String,
     message: String,
-    navigate: String,
+    navigate: String?,
     navController: NavController
 ) {
     if (showDialog.value) {
@@ -75,7 +71,7 @@ fun ModernAlertDialog(
                     Button(
                         onClick = {
                             showDialog.value = false
-                            navController.navigate(navigate)
+                            navigate?.let { navController.navigate(it) }
                         },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color(0xFF1877F2)

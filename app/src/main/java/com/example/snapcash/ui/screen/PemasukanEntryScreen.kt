@@ -3,10 +3,10 @@ package com.example.snapcash.ui.screen
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.icu.util.Calendar
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,20 +14,24 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
@@ -53,21 +57,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.snapcash.ViewModel.CategoryViewModel
 import com.example.snapcash.ViewModel.PemasukanViewModel
 import com.example.snapcash.data.Tambahanbiaya
 import com.example.snapcash.ui.component.AddBiayaDialog
 import com.example.snapcash.ui.component.CurrencyInputField
 import com.example.snapcash.ui.component.DropdownMenu
+import com.example.snapcash.ui.component.ModernAlertDialog
 import com.example.snapcash.ui.theme.night
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import java.text.SimpleDateFormat
 import java.util.Locale
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.foundation.layout.width
-import androidx.compose.material3.AlertDialog
-import com.example.snapcash.ViewModel.CategoryViewModel
 
 @Composable
 fun PemasukanEntryScreen(
@@ -76,7 +77,7 @@ fun PemasukanEntryScreen(
     categoryViewModel: CategoryViewModel = hiltViewModel(),
     id: String?,
     preview: Boolean
-)  {
+) {
     val context = LocalContext.current
     var showCancelDialog by remember { mutableStateOf(false) }
 
@@ -99,6 +100,11 @@ fun PemasukanEntryScreen(
     var showDialogBiaya by remember { mutableStateOf(false) }
     var isUpdate by remember { mutableStateOf(false) }
     var totalIsUpdate by remember { mutableStateOf(0.0) }
+
+    val showDialog = remember { mutableStateOf(false) }
+    val dialogMessage = remember { mutableStateOf("") }
+    val isSuccess = remember { mutableStateOf(false) }
+    val isLoading by viewModel.isLoading
 
     LaunchedEffect(Unit) {
         categoryViewModel.getAllCategories()
@@ -225,7 +231,11 @@ fun PemasukanEntryScreen(
                 if (isUpdate) {
                     FloatingActionButton(
                         containerColor = Color(0xFF2D6CE9),
-                        onClick = { viewModel.deletePemasukanById(id.toString(), navController) }
+                        onClick = { viewModel.deletePemasukanById(id.toString(), navController,onResult = { success, message ->
+                            dialogMessage.value = message  // Update the popup message
+                            showDialog.value = true  // Show the popup
+                            isSuccess.value = success
+                        }) }
                     ) {
                         Icon(
                             imageVector = Icons.Default.Delete,
@@ -264,33 +274,44 @@ fun PemasukanEntryScreen(
                 }
                 Button(
                     onClick = {
-                        if (judul.isNotBlank() && sumber.isNotBlank() && tanggal.isNotBlank() && nominal != 0) {
-                            val biayaArray = JsonArray()
-                            biayalist.forEach {
-                                val biayaObj = JsonObject().apply {
-                                    addProperty("namaBiaya", it.namabiaya)
-                                    addProperty("jumlah", it.jumlahbiaya)
-                                }
-                                biayaArray.add(biayaObj)
-                            }
 
-                            val request = JsonObject().apply {
-                                addProperty("namaPemasukan", judul)
-                                addProperty("sumber", sumber)
-                                addProperty("tanggal", tanggal)
-                                addProperty("total", total)
-                                addProperty("subTotal", nominal)
-                                addProperty("kategori", kategori)
-                                add("tambahanBiaya", biayaArray)
-                                addProperty("isPengeluaran", false)
+                        val biayaArray = JsonArray()
+                        biayalist.forEach {
+                            val biayaObj = JsonObject().apply {
+                                addProperty("namaBiaya", it.namabiaya)
+                                addProperty("jumlah", it.jumlahbiaya)
                             }
-
-                            if (isUpdate) {
-                                viewModel.updatePemasukanUserById(id.toString(), request, navController)
-                            } else {
-                                viewModel.addPemasukan(request, navController)
-                            }
+                            biayaArray.add(biayaObj)
                         }
+
+                        val request = JsonObject().apply {
+                            addProperty("namaPemasukan", judul)
+                            addProperty("sumber", sumber)
+                            addProperty("tanggal", tanggal)
+                            addProperty("total", total)
+                            addProperty("subTotal", nominal)
+                            addProperty("kategori", kategori)
+                            add("tambahanBiaya", biayaArray)
+                            addProperty("isPengeluaran", false)
+                        }
+
+                        if (isUpdate) {
+                            viewModel.updatePemasukanUserById(id.toString(), request, navController,onResult = { success, message ->
+                                dialogMessage.value = message  // Update the popup message
+                                showDialog.value = true  // Show the popup
+                                isSuccess.value = success
+                            } )
+                        } else {
+                            viewModel.addPemasukan(
+                                request, onResult = { success, message ->
+                                    dialogMessage.value = message  // Update the popup message
+                                    showDialog.value = true  // Show the popup
+                                    isSuccess.value = success
+                                },
+                                navController = navController
+                            )
+                        }
+
                     },
                     colors = ButtonColors(
                         containerColor = Color(0xFF2D6CE9),
@@ -442,7 +463,10 @@ fun PemasukanEntryScreen(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Column {
-                        Text("${biaya.namabiaya} - ${formatRupiah(biaya.jumlahbiaya.toInt())}", fontSize = 14.sp)
+                        Text(
+                            "${biaya.namabiaya} - ${formatRupiah(biaya.jumlahbiaya.toInt())}",
+                            fontSize = 14.sp
+                        )
                     }
                     IconButton(onClick = {
                         biayalist = biayalist.toMutableList().apply { removeAt(index) }
@@ -451,6 +475,30 @@ fun PemasukanEntryScreen(
                     }
                 }
             }
+        }
+
+        // 🔄 Overlay Loading
+        if (isLoading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.3f)),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+
+        // 📦 Overlay Dialog
+        if (showDialog.value) {
+            ModernAlertDialog(
+                showDialog,
+                "Income",
+                dialogMessage.value,
+                if (isSuccess.value) "history" else null,
+                navController
+            )
+
         }
     }
 
@@ -470,7 +518,11 @@ fun PemasukanEntryScreen(
             confirmButton = {
                 Button(
                     onClick = {
-                        viewModel.deletePemasukanById(id.toString(), navController)
+                        viewModel.deletePemasukanById(id.toString(), navController,onResult = { success, message ->
+                            dialogMessage.value = message  // Update the popup message
+                            showDialog.value = true  // Show the popup
+                            isSuccess.value = success
+                        })
                         showCancelDialog = false
                     }
                 ) {

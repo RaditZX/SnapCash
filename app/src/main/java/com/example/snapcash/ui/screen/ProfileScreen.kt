@@ -18,7 +18,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -112,7 +111,6 @@ fun ProfileScreen(navController: NavController, viewModel: AuthViewModel = hiltV
         Column(modifier = Modifier.padding(horizontal = 24.dp)) {
             ProfileField(Icons.Default.Person, "Name", userData.username.toString())
             ProfileField(Icons.Default.Email, "Email", userData.email.toString())
-            ProfileField(Icons.Default.Phone, "Number", userData.no_hp.toString())
             ProfileField(Icons.Default.ShoppingCart, "Currency", userData.currencyChoice.toString())
 
             Spacer(modifier = Modifier.height(32.dp))
@@ -148,19 +146,20 @@ fun ProfileScreen(navController: NavController, viewModel: AuthViewModel = hiltV
                 Text("Sign Out", color = Color.White)
             }
         }
-        // 🔄 Overlay Loading
-        if (isLoading) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.3f)),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
-            }
+
+
+
+    }
+    // 🔄 Overlay Loading
+    if (isLoading) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.3f)),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
         }
-
-
     }
 }
 

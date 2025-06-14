@@ -16,7 +16,7 @@ import retrofit2.http.Query
 
 interface SnapCashApiService {
     @POST("signup")
-    suspend fun signUp(@Body request: SignInRequest): SignUpResponse
+    suspend fun signUp(@Body request: SignUpRequest): SignUpResponse
 
     @POST("signin")
     suspend fun signIn(@Body request: SignInRequest): SignInResponse
@@ -104,7 +104,7 @@ interface SnapCashApiService {
         @Body data: JsonObject
     ): generateTextFromInvoiceResponse
 
-    @DELETE("pemasukanUser/delete/{id}")
+    @DELETE("pemasukan/delete/{id}")
     suspend fun deletePemasukanById(
         @Header("Authorization") token: String,
         @Path("id") id: String,
@@ -176,4 +176,9 @@ interface SnapCashApiService {
         @Header("Authorization") token: String,
         @Path("id") id: String
     ): generateTextFromInvoiceResponse
+
+    @POST("resetPassword")
+    suspend fun resetPassword(
+        @Body request: resetRequest
+    ): DefaultResponse2
 }

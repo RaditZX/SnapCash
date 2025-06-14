@@ -1,6 +1,7 @@
 package com.example.snapcash.ui.screen
 
 import android.util.Log
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
@@ -11,8 +12,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -25,7 +28,13 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -33,8 +42,10 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -45,10 +56,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -62,6 +75,7 @@ import com.example.snapcash.ui.component.ProgressCircleChart
 import com.example.snapcash.ui.component.formatCurrency
 import java.util.Calendar
 import kotlin.random.Random
+import kotlin.reflect.KFunction4
 
 @Composable
 fun DashboardScreen(
@@ -74,6 +88,7 @@ fun DashboardScreen(
     val dashboardData by viewModel.dashboardData
     val isLoading by viewModel.isLoading
     var isIncomeMode by remember { mutableStateOf(false) }
+    var incomeExpanded by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         if (isIncomeMode){
@@ -138,271 +153,39 @@ fun DashboardScreen(
 
         var incomeExpanded by remember { mutableStateOf(false) }
         Box {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = if (isIncomeMode) "Money Income" else "Money Outcome",
-                    color = Color.White,
-                    fontSize = 18.sp,
-                    modifier = Modifier.weight(1f)
-                )
-                IconButton(onClick = { incomeExpanded = true }) {
-                    Icon(
-                        imageVector = Icons.Default.ArrowDropDown,
-                        contentDescription = "Dropdown",
-                        tint = Color.White
-                    )
-                }
-            }
-            DropdownMenu(
+            EnhancedIncomeDropdown(
                 expanded = incomeExpanded,
-                onDismissRequest = { incomeExpanded = false }
-            ) {
-                DropdownMenuItem(
-                    text = { Text("Money Income") },
-                    onClick = {
-                        isIncomeMode = true
-                        Updatebyfilter(viewModel, isIncomeMode, selectedFilter, selectedValue, months, tahun)
-                        Log.d("income", isIncomeMode.toString())
-                        incomeExpanded = false
-                    }
-                )
-                DropdownMenuItem(
-                    text = { Text("Money Outcome") },
-                    onClick = {
-                        isIncomeMode = false
-                        Updatebyfilter(viewModel, isIncomeMode, selectedFilter, selectedValue, months, tahun)
-                        incomeExpanded = false
-                    }
-                )
-            }
+                onExpandedChange = { incomeExpanded = it },
+                isIncomeMode = isIncomeMode,
+                onModeChanged = { newMode ->
+                    isIncomeMode = newMode
+                    // Call your update function here
+                    Updatebyfilter(viewModel, isIncomeMode, selectedFilter, selectedValue, months, tahun)
+                    Log.d("income", isIncomeMode.toString())
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 10.dp)
+            )
         }
 
-//
-        Button(
-            onClick = { showFilterDialog = true },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF2A2A2A),
-                contentColor = Color.White
-            ),
-            shape = RoundedCornerShape(8.dp)
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(
-                    text = "Filter: $selectedFilter - $selectedValue",
-                    fontSize = 16.sp
-                )
-                Icon(
-                    imageVector = Icons.Default.ArrowDropDown,
-                    contentDescription = "Filter Button"
-                )
-            }
-        }
+        EnhancedFilterButton(
+            selectedFilter = selectedFilter,
+            selectedValue = selectedValue,
+            onFilterChanged = { filter, value ->
+                selectedFilter = filter
+                selectedValue = value.toString()
+                // Call your update function
+                Updatebyfilter(viewModel, isIncomeMode, selectedFilter, selectedValue, months, tahun)
+            },
+            years = years, // List<Int>
+            months = months, // List<Int> (1-12)
+            getDays = ::getDays, // Function that returns List<Int>
+            tahun = tahun, // Int
+            modifier = Modifier.padding(bottom = 10.dp)
+        )
 
-        // Improved Filter Dialog
-        if (showFilterDialog) {
-            Dialog(
-                onDismissRequest = { showFilterDialog = false }
-            ) {
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .wrapContentHeight(),
-                    shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A))
-                ) {
-                    Column(
-                        modifier = Modifier.padding(24.dp),
-                        verticalArrangement = Arrangement.spacedBy(20.dp)
-                    ) {
-                        Text(
-                            text = "Select Filter",
-                            color = Color.White,
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold
-                        )
 
-                        // Filter Type Selection
-                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                            Text(
-                                text = "Filter Type",
-                                color = Color.White,
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Medium
-                            )
-
-                            var filterExpanded by remember { mutableStateOf(false) }
-                            Box {
-                                OutlinedButton(
-                                    onClick = { filterExpanded = true },
-                                    modifier = Modifier.fillMaxWidth(),
-                                    colors = ButtonDefaults.outlinedButtonColors(
-                                        contentColor = Color.White
-                                    ),
-                                    border = androidx.compose.foundation.BorderStroke(1.dp, Color.White)
-                                ) {
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.SpaceBetween,
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Text(tempFilter)
-                                        Icon(
-                                            imageVector = Icons.Default.ArrowDropDown,
-                                            contentDescription = "Filter Dropdown"
-                                        )
-                                    }
-                                }
-
-                                DropdownMenu(
-                                    expanded = filterExpanded,
-                                    onDismissRequest = { filterExpanded = false },
-                                    modifier = Modifier.fillMaxWidth()
-                                ) {
-                                    listOf("tahun", "bulan", "hari").forEach { filter ->
-                                        DropdownMenuItem(
-                                            text = { Text(filter) },
-                                            onClick = {
-                                                tempFilter = filter
-                                                tempValue = when (filter) {
-                                                    "tahun" -> tahun.toString()
-                                                    "bulan" -> "January"
-                                                    "hari" -> "1"
-                                                    else -> tahun.toString()
-                                                }
-                                                filterExpanded = false
-                                            }
-                                        )
-                                    }
-                                }
-                            }
-                        }
-
-                        // Value Selection with improved display
-                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                            Text(
-                                text = "Select Value",
-                                color = Color.White,
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Medium
-                            )
-
-                            val tempValueItems = getValueByFilter(tempFilter, years, months, getDays(tempFilter, tempValue, tahun, months))
-
-                            if (tempFilter == "Day") {
-                                // Grid layout for days (1-31)
-                                LazyVerticalGrid(
-                                    columns = GridCells.Fixed(7),
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .heightIn(max = 200.dp)
-                                        .border(1.dp, Color.White, RoundedCornerShape(8.dp))
-                                        .padding(8.dp),
-                                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                                    verticalArrangement = Arrangement.spacedBy(4.dp)
-                                ) {
-                                    items(tempValueItems) { day ->
-                                        val isSelected = day == tempValue
-                                        Card(
-                                            modifier = Modifier
-                                                .aspectRatio(1f)
-                                                .padding(2.dp),
-                                            colors = CardDefaults.cardColors(
-                                                containerColor = if (isSelected) Color(0xFF6200EE) else Color(0xFF2A2A2A)
-                                            ),
-                                            onClick = { tempValue = day }
-                                        ) {
-                                            Box(
-                                                modifier = Modifier.fillMaxSize(),
-                                                contentAlignment = Alignment.Center
-                                            ) {
-                                                Text(
-                                                    text = day,
-                                                    color = Color.White,
-                                                    fontSize = 12.sp,
-                                                    textAlign = TextAlign.Center
-                                                )
-                                            }
-                                        }
-                                    }
-                                }
-                            } else {
-                                // List layout for months and years
-                                LazyColumn(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .heightIn(max = 200.dp)
-                                        .border(1.dp, Color.White, RoundedCornerShape(8.dp))
-                                        .padding(8.dp),
-                                    verticalArrangement = Arrangement.spacedBy(4.dp)
-                                ) {
-                                    items(tempValueItems) { value ->
-                                        val isSelected = value == tempValue
-                                        Card(
-                                            modifier = Modifier.fillMaxWidth(),
-                                            colors = CardDefaults.cardColors(
-                                                containerColor = if (isSelected) Color(0xFF6200EE) else Color(0xFF2A2A2A)
-                                            ),
-                                            onClick = { tempValue = value }
-                                        ) {
-                                            Text(
-                                                text = value,
-                                                color = Color.White,
-                                                fontSize = 16.sp,
-                                                modifier = Modifier.padding(16.dp)
-                                            )
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        // Action buttons
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            OutlinedButton(
-                                onClick = { showFilterDialog = false },
-                                modifier = Modifier.weight(1f),
-                                colors = ButtonDefaults.outlinedButtonColors(
-                                    contentColor = Color.White
-                                ),
-                                border = androidx.compose.foundation.BorderStroke(1.dp, Color.White)
-                            ) {
-                                Text("Cancel")
-                            }
-
-                            Button(
-                                onClick = {
-                                    selectedFilter = tempFilter
-                                    selectedValue = tempValue
-                                    Updatebyfilter(viewModel, isIncomeMode, selectedFilter, selectedValue, months, tahun)
-                                    showFilterDialog = false
-                                },
-                                modifier = Modifier.weight(1f),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color(0xFF6200EE),
-                                    contentColor = Color.White
-                                )
-                            ) {
-                                Text("Apply")
-                            }
-                        }
-                    }
-                }
-            }
-        }
         Row(
             horizontalArrangement = Arrangement.spacedBy(20.dp),
             modifier = Modifier
@@ -602,3 +385,728 @@ fun generateBrightRandomColor(): Color {
     return Color(colorInt)
 }
 
+@Composable
+fun EnhancedIncomeDropdown(
+    expanded: Boolean,
+    onExpandedChange: (Boolean) -> Unit,
+    isIncomeMode: Boolean,
+    onModeChanged: (Boolean) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Box(modifier = modifier) {
+        // Main dropdown button
+        OutlinedButton(
+            onClick = { onExpandedChange(!expanded) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp),
+            colors = ButtonDefaults.outlinedButtonColors(
+                containerColor = if (expanded) MaterialTheme.colorScheme.surfaceVariant
+                else MaterialTheme.colorScheme.surface
+            ),
+            border = BorderStroke(
+                width = 1.dp,
+                color = if (expanded) MaterialTheme.colorScheme.primary
+                else MaterialTheme.colorScheme.outline
+            ),
+            shape = RoundedCornerShape(12.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    // Icon based on mode
+                    Icon(
+                        imageVector = if (isIncomeMode) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                        contentDescription = null,
+                        tint = if (isIncomeMode) Color(0xFF4CAF50) else Color(0xFFF44336),
+                        modifier = Modifier.size(24.dp)
+                    )
+
+                    // Current selection text
+                    Text(
+                        text = if (isIncomeMode) "Money Income" else "Money Outcome",
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+
+                // Dropdown arrow
+                Icon(
+                    imageVector = if (expanded) Icons.Default.Close else Icons.Default.Menu,
+                    contentDescription = "Expand dropdown",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier
+                        .size(24.dp)
+                        .rotate(if (expanded) 0f else 0f)
+                )
+            }
+        }
+
+        // Dropdown menu
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { onExpandedChange(false) },
+            modifier = Modifier
+                .fillMaxWidth(0.9f)
+                .background(
+                    MaterialTheme.colorScheme.surface,
+                    RoundedCornerShape(12.dp)
+                )
+                .border(
+                    1.dp,
+                    MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
+                    RoundedCornerShape(12.dp)
+                ),
+            offset = DpOffset(0.dp, 8.dp)
+        ) {
+            // Income option
+            DropdownMenuItem(
+                text = {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.KeyboardArrowUp,
+                            contentDescription = null,
+                            tint = Color(0xFF4CAF50),
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Column {
+                            Text(
+                                text = "Money Income",
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.Medium,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Text(
+                                text = "Track your earnings",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                },
+                onClick = {
+                    onModeChanged(true)
+                    onExpandedChange(false)
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        if (isIncomeMode) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
+                        else Color.Transparent
+                    ),
+                leadingIcon = if (isIncomeMode) {
+                    {
+                        Icon(
+                            imageVector = Icons.Default.Check,
+                            contentDescription = "Selected",
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
+                } else null
+            )
+
+            // Divider
+            HorizontalDivider(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
+            )
+
+            // Outcome option
+            DropdownMenuItem(
+                text = {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.KeyboardArrowDown,
+                            contentDescription = null,
+                            tint = Color(0xFFF44336),
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Column {
+                            Text(
+                                text = "Money Outcome",
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.Medium,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Text(
+                                text = "Track your expenses",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                },
+                onClick = {
+                    onModeChanged(false)
+                    onExpandedChange(false)
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        if (!isIncomeMode) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
+                        else Color.Transparent
+                    ),
+                leadingIcon = if (!isIncomeMode) {
+                    {
+                        Icon(
+                            imageVector = Icons.Default.Check,
+                            contentDescription = "Selected",
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
+                } else null
+            )
+        }
+    }
+}
+
+@Composable
+fun EnhancedFilterButton(
+    selectedFilter: String,
+    selectedValue: Any, // Changed from Int to Any to handle both Int and String
+    onFilterChanged: (String, Any) -> Unit, // Changed from Int to Any
+    years: List<Int>,
+    months: List<String>,
+    getDays: KFunction4<String, String, Int, List<String>, List<Int>>, // Changed second parameter to Any
+    tahun: Int,
+    modifier: Modifier = Modifier
+) {
+    var showFilterDialog by remember { mutableStateOf(false) }
+
+    // Filter button
+    OutlinedButton(
+        onClick = { showFilterDialog = true },
+        modifier = modifier
+            .fillMaxWidth()
+            .height(56.dp),
+        colors = ButtonDefaults.outlinedButtonColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.onSurface
+        ),
+        border = BorderStroke(
+            width = 1.dp,
+            color = MaterialTheme.colorScheme.outline
+        ),
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.List,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(24.dp)
+                )
+
+                Column(
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = "Filter: $selectedFilter",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Text(
+                        text = getDisplayValue(selectedFilter, selectedValue),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+
+            Icon(
+                imageVector = Icons.Default.Menu,
+                contentDescription = "Open filter",
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(24.dp)
+            )
+        }
+    }
+
+    // Enhanced Filter Dialog
+    if (showFilterDialog) {
+        FilterDialog(
+            selectedFilter = selectedFilter,
+            selectedValue = selectedValue,
+            onDismiss = { showFilterDialog = false },
+            onApply = { filter, value ->
+                onFilterChanged(filter, value)
+                showFilterDialog = false
+            },
+            years = years,
+            months = months,
+            getDays = getDays,
+            tahun = tahun
+        )
+    }
+}
+
+@Composable
+private fun FilterDialog(
+    selectedFilter: String,
+    selectedValue: Any,
+    onDismiss: () -> Unit,
+    onApply: (String, Any) -> Unit,
+    years: List<Int>,
+    months: List<String>,
+    getDays: KFunction4<String, String, Int, List<String>, List<Int>>,
+    tahun: Int
+) {
+    var tempFilter by remember { mutableStateOf(selectedFilter) }
+    var tempValue by remember { mutableStateOf(selectedValue) }
+
+    Dialog(onDismissRequest = onDismiss) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight(),
+            shape = RoundedCornerShape(16.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surface
+            )
+        ) {
+            Column(
+                modifier = Modifier.padding(24.dp),
+                verticalArrangement = Arrangement.spacedBy(20.dp)
+            ) {
+                // Header
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Select Filter",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+
+                    IconButton(onClick = onDismiss) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Close",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+
+                // Filter Type Selection
+                FilterTypeSection(
+                    selectedFilter = tempFilter,
+                    onFilterChanged = { newFilter ->
+                        tempFilter = newFilter
+                        tempValue = when (newFilter) {
+                            "tahun" -> tahun
+                            "bulan" -> "January"
+                            "hari" -> 1
+                            else -> tahun
+                        }
+                    }
+                )
+
+                // Value Selection
+                FilterValueSection(
+                    filter = tempFilter,
+                    selectedValue = tempValue,
+                    onValueChanged = { tempValue = it },
+                    years = years,
+                    months = months,
+                    getDays = getDays,
+                    tahun = tahun
+                )
+
+                // Action Buttons
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    OutlinedButton(
+                        onClick = onDismiss,
+                        modifier = Modifier.weight(1f),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = MaterialTheme.colorScheme.onSurface
+                        ),
+                        border = BorderStroke(
+                            1.dp,
+                            MaterialTheme.colorScheme.outline
+                        ),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text("Cancel")
+                    }
+
+                    Button(
+                        onClick = { onApply(tempFilter, tempValue) },
+                        modifier = Modifier.weight(1f),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
+                        ),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text("Apply Filter")
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun FilterTypeSection(
+    selectedFilter: String,
+    onFilterChanged: (String) -> Unit
+) {
+    var filterExpanded by remember { mutableStateOf(false) }
+
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(
+            text = "Filter Type",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Medium,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+
+        Box {
+            OutlinedButton(
+                onClick = { filterExpanded = true },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+                colors = ButtonDefaults.outlinedButtonColors(
+                    containerColor = if (filterExpanded) MaterialTheme.colorScheme.surfaceVariant
+                    else MaterialTheme.colorScheme.surface,
+                    contentColor = MaterialTheme.colorScheme.onSurface
+                ),
+                border = BorderStroke(
+                    1.dp,
+                    if (filterExpanded) MaterialTheme.colorScheme.primary
+                    else MaterialTheme.colorScheme.outline
+                ),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Icon(
+                            imageVector = when (selectedFilter) {
+                                "tahun" -> Icons.Default.DateRange
+                                "bulan" -> Icons.Default.DateRange
+                                "hari" -> Icons.Default.DateRange
+                                else -> Icons.Default.DateRange
+                            },
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(20.dp)
+                        )
+
+                        Text(
+                            text = selectedFilter.replaceFirstChar { it.uppercaseChar() },
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+
+                    Icon(
+                        imageVector = if (filterExpanded) Icons.Default.Close else Icons.Default.Menu,
+                        contentDescription = "Expand",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+
+            DropdownMenu(
+                expanded = filterExpanded,
+                onDismissRequest = { filterExpanded = false },
+                modifier = Modifier
+                    .fillMaxWidth(0.9f)
+                    .background(
+                        MaterialTheme.colorScheme.surface,
+                        RoundedCornerShape(12.dp)
+                    )
+                    .border(
+                        1.dp,
+                        MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
+                        RoundedCornerShape(12.dp)
+                    ),
+                offset = DpOffset(0.dp, 8.dp)
+            ) {
+                val filterOptions = listOf(
+                    Triple("tahun", "Year", Icons.Default.DateRange),
+                    Triple("bulan", "Month", Icons.Default.DateRange),
+                    Triple("hari", "Day", Icons.Default.DateRange)
+                )
+
+                filterOptions.forEachIndexed { index, (filter, label, icon) ->
+                    DropdownMenuItem(
+                        text = {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                Icon(
+                                    imageVector = icon,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                                Text(
+                                    text = label,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.Medium
+                                )
+                            }
+                        },
+                        onClick = {
+                            onFilterChanged(filter)
+                            filterExpanded = false
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(
+                                if (selectedFilter == filter)
+                                    MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
+                                else Color.Transparent
+                            ),
+                        leadingIcon = if (selectedFilter == filter) {
+                            {
+                                Icon(
+                                    imageVector = Icons.Default.Check,
+                                    contentDescription = "Selected",
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                            }
+                        } else null
+                    )
+
+                    if (index < filterOptions.size - 1) {
+                        HorizontalDivider(
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun FilterValueSection(
+    filter: String,
+    selectedValue: Any,
+    onValueChanged: (Any) -> Unit,
+    years: List<Int>,
+    months: List<String>,
+    getDays: KFunction4<String, String, Int, List<String>, List<Int>>,
+    tahun: Int
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(
+            text = "Select Value",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Medium,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+            ),
+            border = BorderStroke(
+                1.dp,
+                MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
+            )
+        ) {
+            when (filter) {
+                "tahun" -> {
+                    // List layout for years
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(max = 200.dp)
+                            .padding(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        items(years) { year ->
+                            val isSelected = year == selectedValue
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = if (isSelected)
+                                        MaterialTheme.colorScheme.primary
+                                    else MaterialTheme.colorScheme.surface
+                                ),
+                                onClick = { onValueChanged(year) },
+                                shape = RoundedCornerShape(8.dp)
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = year.toString(),
+                                        color = if (isSelected)
+                                            MaterialTheme.colorScheme.onPrimary
+                                        else MaterialTheme.colorScheme.onSurface,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                                    )
+
+                                    if (isSelected) {
+                                        Icon(
+                                            imageVector = Icons.Default.Check,
+                                            contentDescription = "Selected",
+                                            tint = MaterialTheme.colorScheme.onPrimary,
+                                            modifier = Modifier.size(20.dp)
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                "bulan" -> {
+                    // List layout for months
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(max = 200.dp)
+                            .padding(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        items(months) { month ->
+                            val isSelected = month == selectedValue
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = if (isSelected)
+                                        MaterialTheme.colorScheme.primary
+                                    else MaterialTheme.colorScheme.surface
+                                ),
+                                onClick = { onValueChanged(month) },
+                                shape = RoundedCornerShape(8.dp)
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = month,
+                                        color = if (isSelected)
+                                            MaterialTheme.colorScheme.onPrimary
+                                        else MaterialTheme.colorScheme.onSurface,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                                    )
+
+                                    if (isSelected) {
+                                        Icon(
+                                            imageVector = Icons.Default.Check,
+                                            contentDescription = "Selected",
+                                            tint = MaterialTheme.colorScheme.onPrimary,
+                                            modifier = Modifier.size(20.dp)
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                "hari" -> {
+                    val days = getDays(filter, selectedValue.toString(), tahun, months)
+                    // Grid layout for days
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(7),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(max = 200.dp)
+                            .padding(16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(days) { day ->
+                            val isSelected = day == selectedValue
+                            Card(
+                                modifier = Modifier
+                                    .aspectRatio(1f)
+                                    .padding(2.dp),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = if (isSelected)
+                                        MaterialTheme.colorScheme.primary
+                                    else MaterialTheme.colorScheme.surface
+                                ),
+                                onClick = { onValueChanged(day) },
+                                shape = RoundedCornerShape(8.dp)
+                            ) {
+                                Box(
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = day.toString(),
+                                        color = if (isSelected)
+                                            MaterialTheme.colorScheme.onPrimary
+                                        else MaterialTheme.colorScheme.onSurface,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Helper function to display values properly
+private fun getDisplayValue(filter: String, value: Any): String {
+    return when (filter) {
+        "tahun" -> value.toString()
+        "bulan" -> value.toString() // Already a string from months list
+        "hari" -> value.toString()
+        else -> value.toString()
+    }
+}

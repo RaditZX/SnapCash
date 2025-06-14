@@ -3,8 +3,6 @@ package com.example.snapcash.ui.screen
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.icu.util.Calendar
-import android.util.Log
-import com.example.snapcash.ui.component.AddBarangDialog
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -16,65 +14,64 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.snapcash.ViewModel.PengeluaranViewModel
-import com.example.snapcash.data.Barang
-import com.example.snapcash.data.Tambahanbiaya
-import com.example.snapcash.ui.component.AddBiayaDialog
-import com.google.gson.JsonArray
-import com.google.gson.JsonObject
-import java.text.NumberFormat
-import java.util.Locale
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
-import com.example.snapcash.ui.component.DropdownMenu
-import com.example.snapcash.ui.theme.night
-import java.text.SimpleDateFormat
-import androidx.compose.material3.OutlinedButton
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.foundation.layout.width
-import androidx.compose.material3.AlertDialog
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.example.snapcash.ViewModel.CategoryViewModel
+import com.example.snapcash.ViewModel.PengeluaranViewModel
+import com.example.snapcash.data.Barang
+import com.example.snapcash.data.Tambahanbiaya
+import com.example.snapcash.ui.component.AddBarangDialog
+import com.example.snapcash.ui.component.AddBiayaDialog
+import com.example.snapcash.ui.component.DropdownMenu
+import com.example.snapcash.ui.component.ModernAlertDialog
+import com.example.snapcash.ui.theme.night
+import com.google.gson.JsonArray
+import com.google.gson.JsonObject
+import java.text.NumberFormat
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -109,6 +106,9 @@ fun PengeluaranEntryScreen(
     var showDialogBiaya by remember { mutableStateOf(false) }
     var barangList by remember { mutableStateOf(listOf<Barang>()) }
     var biayalist by remember { mutableStateOf(listOf<Tambahanbiaya>()) }
+    val showDialogMessage = remember { mutableStateOf(false) }
+    val dialogMessage = remember { mutableStateOf("") }
+    val isSuccess = remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         categoryViewModel.getAllCategories()
@@ -270,7 +270,11 @@ fun PengeluaranEntryScreen(
                 if (isUpdate) {
                     FloatingActionButton(
                         containerColor = Color(0xFF2D6CE9),
-                        onClick = { viewModel.deletePengeluaranById(id.toString(), navController) }
+                        onClick = { viewModel.deletePengeluaranById(id.toString(), navController,onResult = { success, message ->
+                            dialogMessage.value = message  // Update the popup message
+                            showDialogMessage.value = true  // Show the popup
+                            isSuccess.value = success
+                        }) }
                     ) {
                         Icon(
                             imageVector = Icons.Default.Delete,
@@ -301,9 +305,17 @@ fun PengeluaranEntryScreen(
                     Button(
                         onClick = {
                             if (isUpdate) {
-                                viewModel.updatePengeluaranUserById(id.toString(), request, navController)
+                                viewModel.updatePengeluaranUserById(id.toString(), request, navController,onResult = { success, message ->
+                                    dialogMessage.value = message  // Update the popup message
+                                    showDialogMessage.value = true  // Show the popup
+                                    isSuccess.value = success
+                                })
                             } else {
-                                viewModel.addPengeluaran(request, navController)
+                                viewModel.addPengeluaran(request, navController,onResult = { success, message ->
+                                    dialogMessage.value = message  // Update the popup message
+                                    showDialogMessage.value = true  // Show the popup
+                                    isSuccess.value = success
+                                })
                             }
                         },
                         modifier = Modifier.fillMaxWidth(),
@@ -517,6 +529,29 @@ fun PengeluaranEntryScreen(
                 }
             }
         }
+        // 🔄 Overlay Loading
+        if (isLoading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.3f)),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+
+        // 📦 Overlay Dialog
+        if (showDialogMessage.value) {
+            ModernAlertDialog(
+                showDialogMessage,
+                "Income",
+                dialogMessage.value,
+                if (isSuccess.value) "history" else null,
+                navController
+            )
+
+        }
     }
 
     AddBarangDialog(
@@ -543,7 +578,11 @@ fun PengeluaranEntryScreen(
             confirmButton = {
                 Button(
                     onClick = {
-                        viewModel.deletePengeluaranById(id.toString(), navController)
+                        viewModel.deletePengeluaranById(id.toString(), navController,onResult = { success, message ->
+                            dialogMessage.value = message  // Update the popup message
+                            showDialogMessage.value = true  // Show the popup
+                            isSuccess.value = success
+                        })
                         showCancelDialog = false
                     }
                 ) {

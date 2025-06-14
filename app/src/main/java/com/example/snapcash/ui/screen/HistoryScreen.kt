@@ -78,7 +78,7 @@ fun HistoryScreen(
     } else {
         "-"
     }
-
+    
     LaunchedEffect(selectedType == "Money Outcome") {
         viewModel.getPengeluaranUser(filterData, searchQuery)
     }
