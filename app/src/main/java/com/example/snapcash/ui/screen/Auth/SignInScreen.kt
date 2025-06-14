@@ -38,6 +38,7 @@ import com.example.snapcash.R
 import androidx.compose.material3.*
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
@@ -63,7 +64,6 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel = hiltVie
     val isLoading by viewModel.isLoading
     val isSuccess by viewModel.isSucces
 
-
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -72,8 +72,8 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel = hiltVie
             Log.d("token", idToken.toString())
             if (idToken != null) {
                 viewModel.signWithGoogle(idToken, onResult = { success, message ->
-                    dialogMessage.value = message  // Update the popup message
-                    showDialog.value = true  // Show the popup
+                    dialogMessage.value = message
+                    showDialog.value = true
                 })
             } else {
                 Log.e("GoogleLogin", "Gagal mendapatkan ID Token")
@@ -84,14 +84,14 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel = hiltVie
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFF0D0F13))
+                .background(MaterialTheme.colorScheme.background)
                 .padding(16.dp),
             verticalArrangement = Arrangement.Center
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.snapcash),
                 contentDescription = "App Logo",
-                tint = Color.White,
+                tint = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier.size(64.dp)
             )
 
@@ -99,7 +99,7 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel = hiltVie
 
             Text(
                 text = "Sign in to your Account",
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onBackground,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -108,7 +108,7 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel = hiltVie
 
             Text(
                 text = "Enter your email and password to log in",
-                color = Color.Gray,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 fontSize = 14.sp
             )
 
@@ -117,14 +117,15 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel = hiltVie
             TextField(
                 value = emailState.value,
                 onValueChange = { emailState.value = it },
-                label = { Text("Email") },
+                label = { Text("Email", color = MaterialTheme.colorScheme.onSurfaceVariant) },
                 colors = TextFieldDefaults.colors(
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
-                    focusedTextColor = Color.White
+                    focusedTextColor = MaterialTheme.colorScheme.onBackground
                 ),
                 shape = RoundedCornerShape(10.dp),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -133,12 +134,12 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel = hiltVie
                 value = passwordState.value,
                 onValueChange = { passwordState.value = it },
                 visualTransformation = PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                label = { Text("Password") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
+                label = { Text("Password", color = MaterialTheme.colorScheme.onSurfaceVariant) },
                 colors = TextFieldDefaults.colors(
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
-                    focusedTextColor = Color.White
+                    focusedTextColor = MaterialTheme.colorScheme.onBackground
                 ),
                 shape = RoundedCornerShape(10.dp),
                 modifier = Modifier.fillMaxWidth()
@@ -148,7 +149,7 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel = hiltVie
 
             Text(
                 text = "Forgot Password?",
-                color = Color(0xFF4D81E7),
+                color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier
                     .align(Alignment.End)
                     .clickable { /* TODO: Forgot Password Logic */ }
@@ -167,16 +168,16 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel = hiltVie
                         })
                 },
                 modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Blue)
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {
-                Text(text = "Log In", color = Color.White, fontWeight = FontWeight.Bold)
+                Text(text = "Log In", color = MaterialTheme.colorScheme.onPrimary, fontWeight = FontWeight.Bold)
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
                 text = "Or",
-                color = Color.Gray,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
@@ -189,7 +190,7 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel = hiltVie
                         launcher.launch(authClient.getSignInIntent())
                     }
                 },
-                colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.surface),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Icon(
@@ -199,35 +200,33 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel = hiltVie
                     tint = Color.Unspecified
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(text = "Continue with Google", color = Color.Black)
+                Text(text = "Continue with Google", color = MaterialTheme.colorScheme.onBackground)
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
             Row(modifier = Modifier.align(Alignment.CenterHorizontally)) {
-                Text(text = "Don't have an account?", color = Color.Gray)
+                Text(text = "Don't have an account?", color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     text = "Register",
-                    color = Color(0xFF4D81E7),
+                    color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.clickable { navController.navigate("signUp") }
                 )
             }
         }
 
-        // 🔄 Overlay Loading
         if (isLoading) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.3f)),
+                    .background(MaterialTheme.colorScheme.background.copy(alpha = 0.3f)),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator()
+                CircularProgressIndicator(color = MaterialTheme.colorScheme.onBackground)
             }
         }
 
-        // 📦 Overlay Dialog
         if (showDialog.value) {
             ModernAlertDialog(
                 showDialog,
@@ -236,8 +235,6 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel = hiltVie
                 if (isSuccess) "dashboard" else "signIn",
                 navController
             )
-
         }
     }
 }
-

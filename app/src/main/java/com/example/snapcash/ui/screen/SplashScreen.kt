@@ -4,11 +4,13 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -28,8 +30,9 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun SplashScreen(onTimeout: () -> Unit){
-    val backgroundColor = Color(0xFF0D0F13)
-
+    val backgroundColor = MaterialTheme.colorScheme.background
+    val isDarkTheme = isSystemInDarkTheme()
+    val imageRes = if (isDarkTheme) R.drawable.snapcash else R.drawable.snapcash_light
 
     var startAnimation by remember { mutableStateOf(false) }
     val alphaAnim = animateFloatAsState(
@@ -42,15 +45,22 @@ fun SplashScreen(onTimeout: () -> Unit){
         delay(2000)
         onTimeout()
     }
+
     Box(
         modifier = Modifier
-            .fillMaxSize().background(backgroundColor),
+            .fillMaxSize()
+            .background(backgroundColor),
         contentAlignment = Alignment.Center
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Image(painter = painterResource(R.drawable.snapcash), contentDescription = null)
+            Image(painter = painterResource(imageRes), contentDescription = null)
             Spacer(Modifier.height(20.dp))
-            Text(fontWeight = FontWeight.Bold, fontSize = 20.sp, text = "SnapCash", color = Color.White)
+            Text(
+                fontWeight = FontWeight.Bold,
+                fontSize = 20.sp,
+                text = "SnapCash",
+                color = MaterialTheme.colorScheme.onBackground
+            )
         }
     }
 }

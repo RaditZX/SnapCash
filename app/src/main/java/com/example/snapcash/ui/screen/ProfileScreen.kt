@@ -24,6 +24,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -61,7 +62,7 @@ fun ProfileScreen(navController: NavController, viewModel: AuthViewModel = hiltV
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF0D0F13)),
+            .background(MaterialTheme.colorScheme.background),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
@@ -76,7 +77,7 @@ fun ProfileScreen(navController: NavController, viewModel: AuthViewModel = hiltV
                     .height(180.dp)
                     .background(
                         brush = Brush.verticalGradient(
-                            listOf(Color(0xFF2D6CE9), Color.Transparent)
+                            listOf(MaterialTheme.colorScheme.primary, Color.Transparent)
                         ),
                         shape = RoundedCornerShape(bottomStart = 100.dp, bottomEnd = 100.dp)
                     )
@@ -94,7 +95,7 @@ fun ProfileScreen(navController: NavController, viewModel: AuthViewModel = hiltV
                     modifier = Modifier
                         .fillMaxSize()
                         .clip(CircleShape)
-                        .background(Color.Gray) // bantu debug
+                        .background(MaterialTheme.colorScheme.surfaceVariant) // bantu debug
                 ) {
                     Image(
                         painter = rememberAsyncImagePainter(userData.foto),
@@ -122,9 +123,9 @@ fun ProfileScreen(navController: NavController, viewModel: AuthViewModel = hiltV
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2979FF))
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {
-                Text("Edit Profile", color = Color.White)
+                Text("Edit Profile", color = MaterialTheme.colorScheme.onPrimary)
             }
             Spacer(modifier = Modifier.height(15.dp))
             Button(
@@ -143,9 +144,9 @@ fun ProfileScreen(navController: NavController, viewModel: AuthViewModel = hiltV
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
             ) {
-                Text("Sign Out", color = Color.White)
+                Text("Sign Out", color = MaterialTheme.colorScheme.onError)
             }
         }
         // 🔄 Overlay Loading
@@ -153,10 +154,10 @@ fun ProfileScreen(navController: NavController, viewModel: AuthViewModel = hiltV
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.3f)),
+                    .background(MaterialTheme.colorScheme.background.copy(alpha = 0.3f)),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator()
+                CircularProgressIndicator(color = MaterialTheme.colorScheme.onBackground)
             }
         }
 
@@ -166,6 +167,7 @@ fun ProfileScreen(navController: NavController, viewModel: AuthViewModel = hiltV
 
 @Composable
 fun ProfileField(icon: ImageVector, label: String, value: String) {
+    val lineColor = MaterialTheme.colorScheme.onSurfaceVariant
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -175,21 +177,21 @@ fun ProfileField(icon: ImageVector, label: String, value: String) {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = Color.White,
+                tint = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier.size(20.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
-            Text(label, color = Color.White)
+            Text(label, color = MaterialTheme.colorScheme.onBackground)
         }
         Spacer(modifier = Modifier.height(4.dp))
         Text(
             text = value,
-            color = Color.Gray,
+            color =lineColor,
             modifier = Modifier
                 .fillMaxWidth()
                 .drawBehind {
                     drawLine(
-                        color = Color.Gray,
+                        color = lineColor,
                         start = Offset(0f, size.height),
                         end = Offset(size.width, size.height),
                         strokeWidth = 1.dp.toPx()

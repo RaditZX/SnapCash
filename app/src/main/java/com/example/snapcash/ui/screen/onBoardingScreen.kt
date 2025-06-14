@@ -70,9 +70,9 @@ fun OnboardingContent(
     totalPages: Int,
     onNextClicked: () -> Unit
 ) {
-    val backgroundColor = Color(0xFF0D0F13)
-    val activeIndicatorColor = Color(0xFF3B82F6)
-    val inactiveIndicatorColor = Color.Gray
+    val backgroundColor = MaterialTheme.colorScheme.background
+    val activeIndicatorColor = MaterialTheme.colorScheme.primary
+    val inactiveIndicatorColor = MaterialTheme.colorScheme.onSurfaceVariant
 
     Box(
         modifier = Modifier
@@ -115,7 +115,7 @@ fun OnboardingContent(
             // Text
             Text(
                 text = page.text,
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onBackground,
                 style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(horizontal = 16.dp)
@@ -129,8 +129,7 @@ fun OnboardingContent(
                     .height(48.dp)
                     .padding(bottom = 16.dp),
                 shape = RoundedCornerShape(24.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray)
-
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
             ) {
                 Box(
                     modifier = Modifier
@@ -140,7 +139,7 @@ fun OnboardingContent(
                     // Centered Text
                     Text(
                         text = if (currentPage == totalPages - 1) "Finish" else "Next",
-                        color = Color.Black,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         style = MaterialTheme.typography.labelLarge,
                     )
 
@@ -151,18 +150,17 @@ fun OnboardingContent(
                             .clip(RoundedCornerShape(50.dp))
                             .shadow(
                                 elevation = 20.dp,
-                                ambientColor = Color.Black,
-                                spotColor = Color.Black
+                                ambientColor = MaterialTheme.colorScheme.onSurface,
+                                spotColor = MaterialTheme.colorScheme.onSurface
                             )
                     ) {
                         Icon(
                             imageVector = Icons.Default.ArrowForward,
                             contentDescription = "Next",
-                            tint = Color.Black
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
-
             }
         }
     }

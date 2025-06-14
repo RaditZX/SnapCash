@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -45,7 +46,7 @@ fun ListKategoriScreen(navController: NavController, viewModel: CategoryViewMode
 
     if (isLoading) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            CircularProgressIndicator()
+            CircularProgressIndicator(color = MaterialTheme.colorScheme.onBackground)
         }
     } else {
         Scaffold(
@@ -62,18 +63,18 @@ fun ListKategoriScreen(navController: NavController, viewModel: CategoryViewMode
                             Icon(
                                 imageVector = Icons.Default.ArrowBack,
                                 contentDescription = "Back",
-                                tint = MaterialTheme.colorScheme.onSurface
+                                tint = MaterialTheme.colorScheme.onBackground
                             )
                         }
                         Text(
                             text = "KATEGORI",
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface,
-                            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                            color = MaterialTheme.colorScheme.onBackground,
+                            textAlign = TextAlign.Center,
                             modifier = Modifier.weight(1f)
                         )
-                        Spacer(modifier = Modifier.width(48.dp)) // Balance the layout
+                        Spacer(modifier = Modifier.width(48.dp))
                     }
 
                     TabRow(
@@ -82,7 +83,7 @@ fun ListKategoriScreen(navController: NavController, viewModel: CategoryViewMode
                             false -> 2
                             null -> 0
                         },
-                        contentColor = Color(0xFF2D6CE9),
+                        contentColor = MaterialTheme.colorScheme.primary,
                         indicator = { tabPositions ->
                             TabRowDefaults.Indicator(
                                 modifier = Modifier.tabIndicatorOffset(
@@ -92,36 +93,37 @@ fun ListKategoriScreen(navController: NavController, viewModel: CategoryViewMode
                                         null -> 0
                                     }]
                                 ),
-                                color = Color(0xFF2D6CE9)
+                                color = MaterialTheme.colorScheme.primary
                             )
                         }
                     ) {
                         Tab(
                             selected = isPengeluaranFilter == null,
                             onClick = { isPengeluaranFilter = null },
-                            text = { Text("Semua", fontWeight = if (isPengeluaranFilter == null) FontWeight.Bold else FontWeight.Normal) }
+                            text = { Text("Semua", fontWeight = if (isPengeluaranFilter == null) FontWeight.Bold else FontWeight.Normal, color = MaterialTheme.colorScheme.onBackground) }
                         )
                         Tab(
                             selected = isPengeluaranFilter == true,
                             onClick = { isPengeluaranFilter = true },
-                            text = { Text("Pengeluaran", fontWeight = if (isPengeluaranFilter == true) FontWeight.Bold else FontWeight.Normal) }
+                            text = { Text("Pengeluaran", fontWeight = if (isPengeluaranFilter == true) FontWeight.Bold else FontWeight.Normal, color = MaterialTheme.colorScheme.onBackground) }
                         )
                         Tab(
                             selected = isPengeluaranFilter == false,
                             onClick = { isPengeluaranFilter = false },
-                            text = { Text("Pemasukan", fontWeight = if (isPengeluaranFilter == false) FontWeight.Bold else FontWeight.Normal) }
+                            text = { Text("Pemasukan", fontWeight = if (isPengeluaranFilter == false) FontWeight.Bold else FontWeight.Normal, color = MaterialTheme.colorScheme.onBackground) }
                         )
                     }
                 }
             },
             floatingActionButton = {
                 FloatingActionButton(
-                    containerColor = Color(0xFF2D6CE9),
+                    containerColor = MaterialTheme.colorScheme.primary,
                     onClick = { showAddDialog = true }
                 ) {
                     Icon(
                         imageVector = Icons.Default.Add,
-                        contentDescription = "Tambah Kategori"
+                        contentDescription = "Tambah Kategori",
+                        tint = MaterialTheme.colorScheme.onPrimary
                     )
                 }
             }
@@ -136,30 +138,30 @@ fun ListKategoriScreen(navController: NavController, viewModel: CategoryViewMode
                 OutlinedTextField(
                     value = searchQuery,
                     onValueChange = { searchQuery = it },
-                    label = { Text("Cari Kategori") },
+                    label = { Text("Cari Kategori", color = MaterialTheme.colorScheme.onSurfaceVariant) },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
                     colors = OutlinedTextFieldDefaults.colors(
-                        unfocusedBorderColor = Color.Gray,
-                        focusedBorderColor = Color.Blue
+                        unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                        focusedBorderColor = MaterialTheme.colorScheme.primary
                     )
                 )
 
                 if (errorMessage != null) {
                     Text(
                         text = errorMessage!!,
-                        color = Color.Red,
+                        color = MaterialTheme.colorScheme.error,
                         modifier = Modifier.fillMaxWidth(),
-                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                        textAlign = TextAlign.Center
                     )
                 }
 
                 if (categories.isEmpty()) {
                     Text(
                         text = "Tidak ada kategori",
-                        color = Color.Gray,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.fillMaxWidth(),
-                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                        textAlign = TextAlign.Center
                     )
                 } else {
                     LazyColumn(
@@ -219,20 +221,20 @@ fun CategoryItem(category: Category, onEdit: () -> Unit, onDelete: () -> Unit) {
             Text(
                 text = category.nama,
                 fontSize = 14.sp,
-                color = Color.White
+                color = MaterialTheme.colorScheme.onBackground
             )
             Text(
                 text = if (category.isPengeluaran) "Pengeluaran" else "Pemasukan",
                 fontSize = 12.sp,
-                color = Color.Gray
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
         Row {
             IconButton(onClick = onEdit) {
-                Icon(Icons.Default.Edit, contentDescription = "Edit", tint = Color(0xFF2D6CE9))
+                Icon(Icons.Default.Edit, contentDescription = "Edit", tint = MaterialTheme.colorScheme.primary)
             }
             IconButton(onClick = onDelete) {
-                Icon(Icons.Default.Delete, contentDescription = "Hapus", tint = Color.Red)
+                Icon(Icons.Default.Delete, contentDescription = "Hapus", tint = MaterialTheme.colorScheme.error)
             }
         }
     }
@@ -251,7 +253,7 @@ fun CategoryDialog(
 
         AlertDialog(
             onDismissRequest = onDismiss,
-            title = { Text(if (category == null) "Tambah Kategori" else "Edit Kategori") },
+            title = { Text(if (category == null) "Tambah Kategori" else "Edit Kategori", color = MaterialTheme.colorScheme.onBackground) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     var errorText by remember { mutableStateOf<String?>(null) }
@@ -266,7 +268,7 @@ fun CategoryDialog(
                                 else -> null
                             }
                         },
-                        label = { Text("Nama Kategori") },
+                        label = { Text("Nama Kategori", color = MaterialTheme.colorScheme.onSurfaceVariant) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
                         isError = errorText != null,
@@ -274,20 +276,20 @@ fun CategoryDialog(
                             if (errorText != null) {
                                 Text(
                                     text = errorText!!,
-                                    color = Color.Red,
+                                    color = MaterialTheme.colorScheme.error,
                                     fontSize = 12.sp
                                 )
                             }
                         },
                         colors = OutlinedTextFieldDefaults.colors(
-                            unfocusedBorderColor = Color.Gray,
-                            focusedBorderColor = Color.Blue,
-                            errorBorderColor = Color.Red
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            errorBorderColor = MaterialTheme.colorScheme.error
                         )
                     )
 
                     Column {
-                        Text("Jenis Kategori")
+                        Text("Jenis Kategori", color = MaterialTheme.colorScheme.onBackground)
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween,
@@ -300,9 +302,9 @@ fun CategoryDialog(
                                 RadioButton(
                                     selected = isPengeluaran,
                                     onClick = { isPengeluaran = true },
-                                    colors = RadioButtonDefaults.colors(selectedColor = Color.Blue)
+                                    colors = RadioButtonDefaults.colors(selectedColor = MaterialTheme.colorScheme.primary)
                                 )
-                                Text("Pengeluaran", modifier = Modifier.padding(start = 4.dp))
+                                Text("Pengeluaran", modifier = Modifier.padding(start = 4.dp), color = MaterialTheme.colorScheme.onBackground)
                             }
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
@@ -311,9 +313,9 @@ fun CategoryDialog(
                                 RadioButton(
                                     selected = !isPengeluaran,
                                     onClick = { isPengeluaran = false },
-                                    colors = RadioButtonDefaults.colors(selectedColor = Color.Blue)
+                                    colors = RadioButtonDefaults.colors(selectedColor = MaterialTheme.colorScheme.primary)
                                 )
-                                Text("Pemasukan", modifier = Modifier.padding(start = 4.dp))
+                                Text("Pemasukan", modifier = Modifier.padding(start = 4.dp), color = MaterialTheme.colorScheme.onBackground)
                             }
                         }
                     }
@@ -328,16 +330,16 @@ fun CategoryDialog(
                         }
                     },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF2D6CE9),
-                        contentColor = Color.White
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
                     )
                 ) {
-                    Text("Simpan")
+                    Text("Simpan", color = MaterialTheme.colorScheme.onPrimary)
                 }
             },
             dismissButton = {
                 OutlinedButton(onClick = onDismiss) {
-                    Text("Batal")
+                    Text("Batal", color = MaterialTheme.colorScheme.onBackground)
                 }
             }
         )

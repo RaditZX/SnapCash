@@ -26,6 +26,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -57,7 +58,7 @@ import com.example.snapcash.ui.component.ModernAlertDialog
 fun RegisterScreen(navController: NavController, viewModel: AuthViewModel = hiltViewModel()) {
     val emailState = remember { mutableStateOf("") }
     val passwordState = remember { mutableStateOf("") }
-    val ConfirmationPasswordState = remember { mutableStateOf("") }
+    val confirmationPasswordState = remember { mutableStateOf("") }
 
     val showDialog = remember { mutableStateOf(false) }
     val dialogMessage = remember { mutableStateOf("") }
@@ -70,40 +71,35 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel = hilt
 
     val nextRoute = remember { mutableStateOf("") }
 
-
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
         authClient.getIdTokenFromIntent(result.data) { idToken ->
             Log.d("token", idToken.toString())
             if (idToken != null) {
-
                 viewModel.registerWithGoogle(idToken, onResult = { success, message ->
-                    dialogMessage.value = message  // Update the popup message
-                    showDialog.value = true  // Show the popu
+                    dialogMessage.value = message
+                    showDialog.value = true
                     nextRoute.value = "dashboard"
                 })
-
             } else {
                 Log.e("GoogleLogin", "Gagal mendapatkan ID Token")
             }
         }
     }
 
-
     Box(modifier = Modifier.fillMaxSize()) {
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFF0D0F13))
+                .background(MaterialTheme.colorScheme.background)
                 .padding(16.dp),
             verticalArrangement = Arrangement.Center
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.snapcash),
                 contentDescription = "App Logo",
-                tint = Color.White,
+                tint = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier.size(64.dp)
             )
 
@@ -111,7 +107,7 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel = hilt
 
             Text(
                 text = "Make Your Account",
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onBackground,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -120,7 +116,7 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel = hilt
 
             Text(
                 text = "Enter your email and password to SignUp",
-                color = Color.Gray,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 fontSize = 14.sp
             )
 
@@ -129,11 +125,11 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel = hilt
             TextField(
                 value = emailState.value,
                 onValueChange = { emailState.value = it },
-                label = { Text("Email") },
+                label = { Text("Email", color = MaterialTheme.colorScheme.onSurfaceVariant) },
                 colors = TextFieldDefaults.colors(
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
-                    focusedTextColor = Color.White
+                    focusedTextColor = MaterialTheme.colorScheme.onBackground
                 ),
                 shape = RoundedCornerShape(10.dp),
                 modifier = Modifier.fillMaxWidth()
@@ -144,13 +140,13 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel = hilt
             TextField(
                 value = passwordState.value,
                 onValueChange = { passwordState.value = it },
-                label = { Text("Password") },
+                label = { Text("Password", color = MaterialTheme.colorScheme.onSurfaceVariant) },
                 visualTransformation = PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 colors = TextFieldDefaults.colors(
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
-                    focusedTextColor = Color.White
+                    focusedTextColor = MaterialTheme.colorScheme.onBackground
                 ),
                 shape = RoundedCornerShape(10.dp),
                 modifier = Modifier.fillMaxWidth()
@@ -159,15 +155,15 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel = hilt
             Spacer(modifier = Modifier.height(8.dp))
 
             TextField(
-                value = ConfirmationPasswordState.value,
-                onValueChange = { ConfirmationPasswordState.value = it },
-                label = { Text("Confirmation Password") },
+                value = confirmationPasswordState.value,
+                onValueChange = { confirmationPasswordState.value = it },
+                label = { Text("Confirmation Password", color = MaterialTheme.colorScheme.onSurfaceVariant) },
                 visualTransformation = PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 colors = TextFieldDefaults.colors(
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
-                    focusedTextColor = Color.White
+                    focusedTextColor = MaterialTheme.colorScheme.onBackground
                 ),
                 shape = RoundedCornerShape(10.dp),
                 modifier = Modifier.fillMaxWidth()
@@ -187,16 +183,16 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel = hilt
                     )
                 },
                 modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Blue)
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {
-                Text(text = "Register", color = Color.White, fontWeight = FontWeight.Bold)
+                Text(text = "Register", color = MaterialTheme.colorScheme.onPrimary, fontWeight = FontWeight.Bold)
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
                 text = "Or",
-                color = Color.Gray,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
@@ -209,7 +205,7 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel = hilt
                         launcher.launch(authClient.getSignInIntent())
                     }
                 },
-                colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.surface),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Icon(
@@ -219,49 +215,46 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel = hilt
                     tint = Color.Unspecified
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(text = "Continue with Google", color = Color.Black)
+                Text(text = "Continue with Google", color = MaterialTheme.colorScheme.onBackground)
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
             Row(modifier = Modifier.align(Alignment.CenterHorizontally)) {
-                Text(text = "Already Have Account?", color = Color.Gray)
+                Text(text = "Already Have Account?", color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     text = "SignIn",
-                    color = Color(0xFF4D81E7),
+                    color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.clickable { navController.navigate("signIn") }
                 )
             }
         }
 
-        // ✅ Loading Overlay — on top of all UI
         if (isLoading) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.3f)),
+                    .background(MaterialTheme.colorScheme.background.copy(alpha = 0.3f)),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator()
+                CircularProgressIndicator(color = MaterialTheme.colorScheme.onBackground)
             }
         }
 
-        // ✅ Dialog — also on top of all UI
         if (showDialog.value) {
             ModernAlertDialog(
                 showDialog,
                 "Register",
                 dialogMessage.value,
                 if (isSuccess) {
-                    if (nextRoute.value == "dashboard") "dashboard" else "SignIn"
+                    if (nextRoute.value == "dashboard") "dashboard" else "signIn"
                 } else {
                     "signUp"
                 },
                 navController
             )
         }
-
     }
 }
 
