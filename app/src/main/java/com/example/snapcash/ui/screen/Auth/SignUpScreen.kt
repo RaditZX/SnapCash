@@ -176,7 +176,7 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel = hilt
                     viewModel.signUp(
                         email = emailState.value,
                         password = passwordState.value,
-                        confirmPassword = ConfirmationPasswordState.value,
+                        confirmPassword = confirmationPasswordState.value,
                         onResult = { success, message ->
                             dialogMessage.value = message
                             showDialog.value = true

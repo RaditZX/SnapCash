@@ -74,7 +74,6 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
-import com.example.snapcash.ViewModel.CategoryViewModel
 
 @Composable
 fun PemasukanEntryScreen(
@@ -240,7 +239,7 @@ fun PemasukanEntryScreen(
                             dialogMessage.value = message  // Update the popup message
                             showDialog.value = true  // Show the popup
                             isSuccess.value = success
-                        }) }
+                        }) },
                         containerColor = MaterialTheme.colorScheme.primary,
                     ) {
                         Icon(
