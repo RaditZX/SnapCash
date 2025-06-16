@@ -277,7 +277,7 @@ fun DashboardScreen(
             modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background.copy(alpha = 1f)),
             contentAlignment = Alignment.Center
         ) {
-            CircularProgressIndicator(color = MaterialTheme.colorScheme.onBackground)
+            CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
         }
     }
 }

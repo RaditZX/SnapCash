@@ -16,13 +16,16 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Brightness2
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.filled.WbSunny
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -46,7 +49,12 @@ import coil3.compose.rememberAsyncImagePainter
 import com.example.snapcash.ViewModel.AuthViewModel
 
 @Composable
-fun ProfileScreen(navController: NavController, viewModel: AuthViewModel = hiltViewModel()) {
+fun ProfileScreen(
+    navController: NavController,
+    isDarkTheme: Boolean,
+    onThemeToggle: () -> Unit,
+    viewModel: AuthViewModel = hiltViewModel()
+) {
 
     val userData by remember { viewModel.userDatas }
     val showDialog = remember { mutableStateOf(false) }
@@ -80,8 +88,22 @@ fun ProfileScreen(navController: NavController, viewModel: AuthViewModel = hiltV
                         ),
                         shape = RoundedCornerShape(bottomStart = 100.dp, bottomEnd = 100.dp)
                     )
-            )
-
+            ){
+                // Icon switch tema di pojok kanan atas
+                IconButton(
+                    onClick = onThemeToggle,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(top = 24.dp, end = 20.dp)
+                ) {
+                    Icon(
+                        imageVector = if (isDarkTheme) Icons.Default.Brightness2 else Icons.Default.WbSunny ,
+                        contentDescription = if (isDarkTheme) "Switch to Light Theme" else "Switch to Dark Theme",
+                        tint = MaterialTheme.colorScheme.onPrimary,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+            }
 
             Box( // Box luar
                 modifier = Modifier
@@ -104,8 +126,6 @@ fun ProfileScreen(navController: NavController, viewModel: AuthViewModel = hiltV
                     )
                 }
             }
-
-
         }
 
         Spacer(modifier = Modifier.height(80.dp))
@@ -144,26 +164,21 @@ fun ProfileScreen(navController: NavController, viewModel: AuthViewModel = hiltV
                     .height(50.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
             ) {
-                Text("Sign Out", color = MaterialTheme.colorScheme.onError)
+                Text("Sign Out", color = MaterialTheme.colorScheme.onBackground)
             }
         }
-        
-
-
-
-
     }
+
     if (isLoading) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.background.copy(alpha = 0.3f)),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator(color = MaterialTheme.colorScheme.onBackground)
-            }
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background.copy(alpha = 0.3f)),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
         }
-  
+    }
 }
 
 @Composable
@@ -187,7 +202,7 @@ fun ProfileField(icon: ImageVector, label: String, value: String) {
         Spacer(modifier = Modifier.height(4.dp))
         Text(
             text = value,
-            color =lineColor,
+            color = lineColor,
             modifier = Modifier
                 .fillMaxWidth()
                 .drawBehind {
@@ -202,4 +217,3 @@ fun ProfileField(icon: ImageVector, label: String, value: String) {
         )
     }
 }
-

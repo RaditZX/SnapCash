@@ -8,13 +8,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -28,7 +25,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -51,10 +47,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -62,7 +56,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.snapcash.ViewModel.CategoryViewModel
 import com.example.snapcash.data.Category
-import androidx.compose.foundation.lazy.itemsIndexed
+import com.example.snapcash.ui.component.ModernAlertDialog
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -76,6 +70,8 @@ fun ListKategoriScreen(navController: NavController, viewModel: CategoryViewMode
     var showAddDialog by remember { mutableStateOf(false) }
     var showEditDialog by remember { mutableStateOf<Category?>(null) }
     var searchComplete by remember {mutableStateOf(false)}
+    val showDialog = remember { mutableStateOf(false) }
+    val dialogMessage = remember { mutableStateOf("") }
 
     LaunchedEffect(isPengeluaranFilter, searchComplete) {
         viewModel.getAllCategories(searchQuery.takeIf { it.isNotBlank() }, isPengeluaranFilter)
@@ -84,7 +80,7 @@ fun ListKategoriScreen(navController: NavController, viewModel: CategoryViewMode
 
     if (isLoading) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            CircularProgressIndicator(color = MaterialTheme.colorScheme.onBackground)
+            CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
         }
     } else {
         Scaffold(
@@ -207,7 +203,6 @@ fun ListKategoriScreen(navController: NavController, viewModel: CategoryViewMode
                     }
                 }
 
-
                 if (errorMessage != null) {
                     Text(
                         text = errorMessage!!,
@@ -247,7 +242,11 @@ fun ListKategoriScreen(navController: NavController, viewModel: CategoryViewMode
         onSave = { nama, isPengeluaran ->
             viewModel.addCategory(
                 Category(id = "", nama = nama, isPengeluaran = isPengeluaran),
-                navController
+                navController,
+                onResult = { success, message ->
+                    dialogMessage.value = message
+                    showDialog.value = true
+                }
             )
         }
     )
@@ -261,9 +260,23 @@ fun ListKategoriScreen(navController: NavController, viewModel: CategoryViewMode
                 viewModel.updateCategory(
                     category.id,
                     Category(id = category.id, nama = nama, isPengeluaran = isPengeluaran),
-                    navController
+                    navController,
+                    onResult = { success, message ->
+                        dialogMessage.value = message
+                        showDialog.value = true
+                    }
                 )
             }
+        )
+    }
+
+    if (showDialog.value) {
+        ModernAlertDialog(
+            showDialog,
+            "Kategori",
+            dialogMessage.value,
+            null,
+            navController
         )
     }
 }
@@ -405,4 +418,5 @@ fun CategoryDialog(
             }
         )
     }
+
 }
