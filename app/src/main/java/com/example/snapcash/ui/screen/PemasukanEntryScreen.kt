@@ -64,11 +64,17 @@ import com.example.snapcash.ui.component.AddBiayaDialog
 import com.example.snapcash.ui.component.CurrencyInputField
 import com.example.snapcash.ui.component.DropdownMenu
 import com.example.snapcash.ui.component.ModernAlertDialog
+import com.example.snapcash.ui.theme.night
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import java.text.SimpleDateFormat
 import java.util.Locale
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
+import com.example.snapcash.ViewModel.CategoryViewModel
 
 @Composable
 fun PemasukanEntryScreen(
@@ -230,14 +236,11 @@ fun PemasukanEntryScreen(
             ) {
                 if (isUpdate) {
                     FloatingActionButton(
-                        onClick = { viewModel.deletePemasukanById(id.toString(), navController,onResult =
-                            { success, message ->
-                                dialogMessage.value = message  // Update the popup message
-                                showDialog.value = true  // Show the popup
-                                isSuccess.value = success
-                            }
-                            )
-                        },
+                        onClick = { viewModel.deletePemasukanById(id.toString(), navController,onResult = { success, message ->
+                            dialogMessage.value = message  // Update the popup message
+                            showDialog.value = true  // Show the popup
+                            isSuccess.value = success
+                        }) }
                         containerColor = MaterialTheme.colorScheme.primary,
                     ) {
                         Icon(

@@ -369,4 +369,5 @@ class AuthViewModel @Inject constructor(private val apiService: SnapCashApiServi
             }
         }
     }
+
 }
