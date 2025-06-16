@@ -11,6 +11,8 @@ import com.example.snapcash.data.SnapCashApiService
 import com.google.gson.JsonObject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import org.json.JSONObject
+import retrofit2.HttpException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -107,7 +109,7 @@ class CategoryViewModel @Inject constructor(private val apiService: SnapCashApiS
         }
     }
 
-    fun addCategory(category: Category, navController: NavController) {
+    fun addCategory(category: Category, navController: NavController, onResult: (Boolean, String) -> Unit) {
         viewModelScope.launch {
             try {
                 isLoading.value = true
@@ -123,6 +125,19 @@ class CategoryViewModel @Inject constructor(private val apiService: SnapCashApiS
                 } else {
                     errorMessage.value = response.message ?: "Gagal menambahkan kategori"
                 }
+                onResult(true, errorMessage.value.toString())
+            }catch (e: HttpException) {
+                val errorBody = e.response()?.errorBody()?.string()
+                val errorMessage = errorBody?.let {
+                    try {
+                        JSONObject(it).getString("message") // Extract the "message" field
+                    } catch (ex: Exception) {
+                        "Unknown HTTP error"
+                    }
+                } ?: "Unknown HTTP error"
+
+                Log.e("auth", "HttpException: $errorMessage")
+                onResult(false, "$errorMessage")
             } catch (e: Exception) {
                 Log.e("CATEGORY_EXCEPTION", "Exception: ${e.message}", e)
                 errorMessage.value = "Terjadi kesalahan: ${e.message}"
@@ -132,7 +147,7 @@ class CategoryViewModel @Inject constructor(private val apiService: SnapCashApiS
         }
     }
 
-    fun updateCategory(id: String, category: Category, navController: NavController) {
+    fun updateCategory(id: String, category: Category, navController: NavController,onResult: (Boolean, String) -> Unit) {
         viewModelScope.launch {
             try {
                 isLoading.value = true
@@ -148,6 +163,19 @@ class CategoryViewModel @Inject constructor(private val apiService: SnapCashApiS
                 } else {
                     errorMessage.value = response.message ?: "Gagal memperbarui kategori"
                 }
+                onResult(true, errorMessage.value.toString())
+            }catch (e: HttpException) {
+                val errorBody = e.response()?.errorBody()?.string()
+                val errorMessage = errorBody?.let {
+                    try {
+                        JSONObject(it).getString("message") // Extract the "message" field
+                    } catch (ex: Exception) {
+                        "Unknown HTTP error"
+                    }
+                } ?: "Unknown HTTP error"
+
+                Log.e("auth", "HttpException: $errorMessage")
+                onResult(false, "$errorMessage")
             } catch (e: Exception) {
                 Log.e("CATEGORY_EXCEPTION", "Exception: ${e.message}", e)
                 errorMessage.value = "Terjadi kesalahan: ${e.message}"

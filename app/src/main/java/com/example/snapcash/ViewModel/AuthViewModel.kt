@@ -103,7 +103,7 @@ class AuthViewModel @Inject constructor(private val apiService: SnapCashApiServi
                     setIsSucces(true)
                     SessionManager.idToken = response.data.userCredential._tokenResponse.idToken
                     val responses= apiService.getUserData("Bearer ${SessionManager.idToken}")
-                    SessionManager.currencyChoice = responses.data.currencyChoice
+                    SessionManager.currencyChoice = responses.data.currencyChoice ?: "IDR"
                     val currencyResponse = apiService.getCurrencyData("Bearer ${SessionManager.idToken}",SessionManager.currencyChoice.toString() )
                     SessionManager.locale = currencyResponse.data.locale
                     SessionManager.currencySymbol = currencyResponse.data.currency_symbol

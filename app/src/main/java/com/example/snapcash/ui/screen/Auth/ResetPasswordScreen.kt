@@ -18,6 +18,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -55,14 +56,14 @@ fun ResetScreen(navController: NavController, viewModel: AuthViewModel = hiltVie
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFF0D0F13))
+                .background(MaterialTheme.colorScheme.background)
                 .padding(16.dp),
             verticalArrangement = Arrangement.Center
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.snapcash),
                 contentDescription = "App Logo",
-                tint = Color.White,
+                tint = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier.size(64.dp)
             )
 
@@ -70,7 +71,7 @@ fun ResetScreen(navController: NavController, viewModel: AuthViewModel = hiltVie
 
             Text(
                 text = "Forgot Password",
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onBackground,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -79,7 +80,7 @@ fun ResetScreen(navController: NavController, viewModel: AuthViewModel = hiltVie
 
             Text(
                 text = "Enter your email so our app can send you an email for reset you account password",
-                color = Color.Gray,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 fontSize = 14.sp
             )
 
@@ -88,11 +89,11 @@ fun ResetScreen(navController: NavController, viewModel: AuthViewModel = hiltVie
             TextField(
                 value = emailState.value,
                 onValueChange = { emailState.value = it },
-                label = { Text("Email") },
+                label = { Text("Email", color = MaterialTheme.colorScheme.onSurfaceVariant) },
                 colors = TextFieldDefaults.colors(
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
-                    focusedTextColor = Color.White
+                    focusedTextColor = MaterialTheme.colorScheme.onBackground
                 ),
                 shape = RoundedCornerShape(10.dp),
                 modifier = Modifier.fillMaxWidth()

@@ -25,7 +25,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -57,6 +56,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.snapcash.ViewModel.CategoryViewModel
 import com.example.snapcash.data.Category
+import com.example.snapcash.ui.component.ModernAlertDialog
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -70,6 +70,8 @@ fun ListKategoriScreen(navController: NavController, viewModel: CategoryViewMode
     var showAddDialog by remember { mutableStateOf(false) }
     var showEditDialog by remember { mutableStateOf<Category?>(null) }
     var searchComplete by remember {mutableStateOf(false)}
+    val showDialog = remember { mutableStateOf(false) }
+    val dialogMessage = remember { mutableStateOf("") }
 
     LaunchedEffect(isPengeluaranFilter, searchComplete) {
         viewModel.getAllCategories(searchQuery.takeIf { it.isNotBlank() }, isPengeluaranFilter)
@@ -147,18 +149,6 @@ fun ListKategoriScreen(navController: NavController, viewModel: CategoryViewMode
                     }
                 }
             },
-            floatingActionButton = {
-                FloatingActionButton(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    onClick = { showAddDialog = true }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = "Tambah Kategori",
-                        tint = MaterialTheme.colorScheme.onPrimary
-                    )
-                }
-            }
         ) { paddingValues ->
             Column(
                 modifier = Modifier
@@ -183,6 +173,35 @@ fun ListKategoriScreen(navController: NavController, viewModel: CategoryViewMode
                     )
                 )
 
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    item {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 10.dp, vertical = 4.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "List Kategori",
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onBackground
+                            )
+                            IconButton(
+                                onClick = { showAddDialog = true } // ✅ gunakan variabel yang benar
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Add,
+                                    contentDescription = "Tambah Kategori",
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                        }
+                    }
+                }
 
                 if (errorMessage != null) {
                     Text(
@@ -223,7 +242,11 @@ fun ListKategoriScreen(navController: NavController, viewModel: CategoryViewMode
         onSave = { nama, isPengeluaran ->
             viewModel.addCategory(
                 Category(id = "", nama = nama, isPengeluaran = isPengeluaran),
-                navController
+                navController,
+                onResult = { success, message ->
+                    dialogMessage.value = message
+                    showDialog.value = true
+                }
             )
         }
     )
@@ -237,9 +260,23 @@ fun ListKategoriScreen(navController: NavController, viewModel: CategoryViewMode
                 viewModel.updateCategory(
                     category.id,
                     Category(id = category.id, nama = nama, isPengeluaran = isPengeluaran),
-                    navController
+                    navController,
+                    onResult = { success, message ->
+                        dialogMessage.value = message
+                        showDialog.value = true
+                    }
                 )
             }
+        )
+    }
+
+    if (showDialog.value) {
+        ModernAlertDialog(
+            showDialog,
+            "Kategori",
+            dialogMessage.value,
+            null,
+            navController
         )
     }
 }
@@ -381,4 +418,5 @@ fun CategoryDialog(
             }
         )
     }
+
 }
