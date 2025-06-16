@@ -66,7 +66,6 @@ import com.example.snapcash.ui.component.AddBarangDialog
 import com.example.snapcash.ui.component.AddBiayaDialog
 import com.example.snapcash.ui.component.DropdownMenu
 import com.example.snapcash.ui.component.ModernAlertDialog
-import com.example.snapcash.ui.theme.night
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import java.text.NumberFormat
@@ -273,7 +272,7 @@ fun PengeluaranEntryScreen(
                             dialogMessage.value = message  // Update the popup message
                             showDialogMessage.value = true  // Show the popup
                             isSuccess.value = success
-                        }) }
+                        }) },
 
                         containerColor = MaterialTheme.colorScheme.primary,
                     ) {
