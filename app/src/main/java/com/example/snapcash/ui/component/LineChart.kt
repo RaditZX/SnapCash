@@ -36,8 +36,8 @@ fun LineChartDashboard(totalByRange: Map<String, Int>) {
         .steps((pointsData.size - 1).coerceAtLeast(1))
         .labelData { i -> labels.getOrNull(i) ?: "" }
         .labelAndAxisLinePadding(15.dp)
-        .axisLineColor(MaterialTheme.colorScheme.tertiary)
-        .axisLabelColor(MaterialTheme.colorScheme.tertiary)
+        .axisLineColor(MaterialTheme.colorScheme.onBackground)
+        .axisLabelColor(MaterialTheme.colorScheme.onBackground)
         .build()
 
     val yAxisSteps = 5
@@ -52,8 +52,8 @@ fun LineChartDashboard(totalByRange: Map<String, Int>) {
             formatCurrency(value)
         }
         .labelAndAxisLinePadding(20.dp)
-        .axisLineColor(MaterialTheme.colorScheme.tertiary)
-        .axisLabelColor(MaterialTheme.colorScheme.tertiary)
+        .axisLineColor(MaterialTheme.colorScheme.onBackground)
+        .axisLabelColor(MaterialTheme.colorScheme.onBackground)
         .build()
 
     val lineChartData = LineChartData(

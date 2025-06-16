@@ -48,10 +48,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -80,7 +78,7 @@ fun ListKategoriScreen(navController: NavController, viewModel: CategoryViewMode
 
     if (isLoading) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            CircularProgressIndicator(color = MaterialTheme.colorScheme.onBackground)
+            CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
         }
     } else {
         Scaffold(
@@ -175,15 +173,16 @@ fun ListKategoriScreen(navController: NavController, viewModel: CategoryViewMode
                     label = { Text("Cari Kategori", color = MaterialTheme.colorScheme.onSurfaceVariant) },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
                     keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Search),
                     keyboardActions = KeyboardActions(
                         onSearch = { searchComplete = true }
-
-                    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
-                    focusedBorderColor = MaterialTheme.colorScheme.primary
+                    ),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                        focusedBorderColor = MaterialTheme.colorScheme.primary
                     )
                 )
+
 
                 if (errorMessage != null) {
                     Text(

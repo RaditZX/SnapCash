@@ -46,7 +46,7 @@ import kotlinx.coroutines.launch
 
 @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
 @Composable
-fun AppEntry(navController: NavHostController, context: Context) {
+fun AppEntry(navController: NavHostController, context: Context, isDarkTheme: Boolean, onThemeToggle: () -> Unit) {
     var startDestination by remember { mutableStateOf("onBoarding") }
 
     LaunchedEffect(Unit) {
@@ -54,14 +54,14 @@ fun AppEntry(navController: NavHostController, context: Context) {
         startDestination = if (isOnboardingShown) "signIn" else "onBoarding"
     }
 
-    AppNavHost(navController, startDestination)
+    AppNavHost(navController, startDestination, isDarkTheme= isDarkTheme, onThemeToggle= onThemeToggle)
 }
 
 @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
 @Composable
 fun AppNavHost(
     navController: NavHostController = rememberNavController(),
-    startDestination: String
+    startDestination: String, isDarkTheme: Boolean, onThemeToggle: () -> Unit
 ) {
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry?.destination?.route
@@ -180,7 +180,7 @@ fun AppNavHost(
                     )
                 }
                 composable("profile") {
-                    ProfileScreen(navController = navController)
+                    ProfileScreen(navController = navController, isDarkTheme= isDarkTheme, onThemeToggle= onThemeToggle)
                 }
                 composable("profile/edit") {
                     EditProfileScreen(navController = navController)

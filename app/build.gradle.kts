@@ -109,6 +109,8 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.10.0") // Or the latest version
     implementation ("co.yml:ycharts:2.1.0")
     implementation("com.google.accompanist:accompanist-swiperefresh:0.31.5-beta")
+    implementation("androidx.compose.material:material-icons-extended")
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
 
 
 }

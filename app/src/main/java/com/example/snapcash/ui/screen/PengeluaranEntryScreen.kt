@@ -273,7 +273,7 @@ fun PengeluaranEntryScreen(
                             dialogMessage.value = message  // Update the popup message
                             showDialogMessage.value = true  // Show the popup
                             isSuccess.value = success
-                        }) }
+                        }) },
 
                         containerColor = MaterialTheme.colorScheme.primary,
                     ) {
@@ -540,7 +540,7 @@ fun PengeluaranEntryScreen(
                     .background(Color.Black.copy(alpha = 0.3f)),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator()
+                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
             }
         }
 

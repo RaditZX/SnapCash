@@ -57,7 +57,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.example.snapcash.ViewModel.CategoryViewModel
 import com.example.snapcash.ViewModel.PemasukanViewModel
 import com.example.snapcash.data.Tambahanbiaya
 import com.example.snapcash.ui.component.AddBiayaDialog
@@ -240,7 +239,7 @@ fun PemasukanEntryScreen(
                             dialogMessage.value = message  // Update the popup message
                             showDialog.value = true  // Show the popup
                             isSuccess.value = success
-                        }) }
+                        }) },
                         containerColor = MaterialTheme.colorScheme.primary,
                     ) {
                         Icon(
@@ -497,7 +496,7 @@ fun PemasukanEntryScreen(
                     .background(Color.Black.copy(alpha = 0.3f)),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator()
+                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
             }
         }
 

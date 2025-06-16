@@ -12,7 +12,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Color(0xFF3F51B5),         // Indigo Light (agar tetap tegas tapi tidak menusuk)
+    primary = Color(0xFF2C6BE9),         // Indigo Light (agar tetap tegas tapi tidak menusuk)
     secondary = Color(0xFF9FA8DA),       // Soft Blue Gray (tetap tenang di dark mode)
     tertiary = Color(0xFF80C683),        // Emerald Green lebih terang (success)
     background = Color(0xFF121212),      // Deep Gray/Black
@@ -21,7 +21,7 @@ private val DarkColorScheme = darkColorScheme(
     onSecondary = Color(0xFFE0E0E0),     // Light Gray (teks di atas secondary)
     onBackground = Color(0xFFE0E0E0),    // Light Gray (teks utama di background)
     onSurface = Color(0xFFF5F5F5),       // Hampir putih (untuk teks di panel gelap)
-    error = Color(0xFFEF9A9A),           // Soft Red terang (untuk dark background)
+    error = Color.Red,           // Soft Red terang (untuk dark background)
     onError = Color(0xFF000000),         // Hitam (teks di atas error)
     outline = Color(0xFF444444),         // Abu tua untuk garis/border
     surfaceVariant = Color(0xFF2C2C2C),  // Varian surface lebih gelap (untuk diferensiasi UI)
@@ -31,7 +31,7 @@ private val DarkColorScheme = darkColorScheme(
 
 
 private val LightColorScheme = lightColorScheme(
-    primary = Color(0xFF3F51B5),         // Indigo (soft)
+    primary = Color(0xFF2C6BE9),         // Indigo (soft)
     secondary = Color(0xFF9FA8DA),       // Soft Blue Gray
     tertiary = Color(0xFF4CAF50),        // Emerald Green (Accent / Success)
     background = Color(0xFFFAFAFA),      // Snow White
@@ -40,17 +40,17 @@ private val LightColorScheme = lightColorScheme(
     onSecondary = Color(0xFF212121),     // Dark Charcoal (teks di atas secondary)
     onBackground = Color(0xFF212121),    // Dark Charcoal (teks di latar)
     onSurface = Color(0xFF212121),       // Dark Charcoal (teks di surface)
-    error = Color(0xFFE57373),           // Soft Coral Red
+    error = Color.Red,           // Soft Coral Red
     onError = Color(0xFF212121),         // Dark Charcoal (teks di error)
     outline = Color(0xFFE0E0E0),         // Light Gray (border/divider)
     surfaceVariant = Color(0xFFFAFAFA),   // Snow White (varian surface)
-    onSurfaceVariant = Color(0xFF757575)  // Medium Gray (teks sekunder)
+    onSurfaceVariant = Color(0xFF757575),  // Medium Gray (teks sekunder)
 )
 
 @Composable
 fun SnapCashTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
